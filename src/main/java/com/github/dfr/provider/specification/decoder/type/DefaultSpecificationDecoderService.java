@@ -9,9 +9,9 @@ import com.github.dfr.decoder.FilterDecoder;
 import com.github.dfr.decoder.type.Equals;
 import com.github.dfr.decoder.type.Greater;
 import com.github.dfr.decoder.type.GreaterOrEquals;
-import com.github.dfr.provider.specification.decoder.SpecificationDecoderService;
+import com.github.dfr.provider.specification.decoder.SpecificationFilterDecoderService;
 
-public class DefaultSpecificationDecoderService<T> implements SpecificationDecoderService<T> {
+public class DefaultSpecificationDecoderService<T> implements SpecificationFilterDecoderService<T> {
 
 	@SuppressWarnings("rawtypes")
 	private Map<Class<? extends FilterDecoder>, FilterDecoder<Specification<T>>> decoders;
@@ -24,7 +24,7 @@ public class DefaultSpecificationDecoderService<T> implements SpecificationDecod
 	}
 
 	@Override
-	public FilterDecoder<Specification<T>> getDecoderFor(Class<? extends FilterDecoder<?>> decoder) {
+	public FilterDecoder<Specification<T>> getFilterDecoderFor(Class<? extends FilterDecoder<?>> decoder) {
 		return decoders.get(decoder);
 	}
 

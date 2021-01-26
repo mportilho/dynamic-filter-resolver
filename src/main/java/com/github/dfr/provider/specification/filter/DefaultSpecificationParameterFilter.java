@@ -8,19 +8,19 @@ import javax.persistence.criteria.JoinType;
 
 import org.springframework.data.jpa.domain.Specification;
 
-import com.github.dfr.decoder.DecoderService;
+import com.github.dfr.decoder.FilterDecoderService;
 import com.github.dfr.decoder.FilterDecoder;
-import com.github.dfr.decoder.ValueConverter;
+import com.github.dfr.decoder.ParameterConverter;
 import com.github.dfr.filter.ParameterFilterMetadata;
 
 public class DefaultSpecificationParameterFilter<T> implements SpecificationParameterFilter<T> {
 
-	private final DecoderService<Specification<T>> decoderService;
-	private final ValueConverter valueConverter;
+	private final FilterDecoderService<Specification<T>> filterDecoderService;
+	private final ParameterConverter parameterConverter;
 
-	public DefaultSpecificationParameterFilter(DecoderService<Specification<T>> decoderService, ValueConverter valueConverter) {
-		this.decoderService = decoderService;
-		this.valueConverter = valueConverter;
+	public DefaultSpecificationParameterFilter(FilterDecoderService<Specification<T>> decoderService, ParameterConverter parameterConverter) {
+		this.filterDecoderService = decoderService;
+		this.parameterConverter = parameterConverter;
 	}
 
 	@Override
@@ -32,8 +32,8 @@ public class DefaultSpecificationParameterFilter<T> implements SpecificationPara
 		});
 
 		for (ParameterFilterMetadata metadata : parameters) {
-			FilterDecoder<Specification<T>> decoder = decoderService.getDecoderFor(metadata.getDecoderClass());
-			Specification<T> spec = decoder.decode(metadata, valueConverter, sharedContext);
+			FilterDecoder<Specification<T>> decoder = filterDecoderService.getFilterDecoderFor(metadata.getDecoderClass());
+			Specification<T> spec = decoder.decode(metadata, parameterConverter, sharedContext);
 			if (spec != null) {
 				rootSpecification = rootSpecification.and(spec);
 			}

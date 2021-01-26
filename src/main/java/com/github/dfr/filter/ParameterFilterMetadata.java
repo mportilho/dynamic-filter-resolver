@@ -38,28 +38,38 @@ public class ParameterFilterMetadata {
 	 */
 	private final Object[] values;
 
+	/**
+	 * Optional format pattern to assist de convertion on some data
+	 */
+	private final String[] valueFormats;
+
+	/**
+	 * The mutable state of the parameter during the filter resolution
+	 */
 	private Map<Object, Object> state = new HashMap<>();
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ParameterFilterMetadata(String name, String[] parameters, String path, Class<?> targetClass, Class<? extends FilterDecoder> decoderClass,
-			Object[] value) {
+			Object[] value, String[] valueFormats) {
 		this.name = name;
 		this.parameters = parameters;
 		this.path = path;
 		this.targetClass = targetClass;
 		this.decoderClass = (Class<? extends FilterDecoder<?>>) decoderClass;
 		this.values = value;
+		this.valueFormats = valueFormats;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public ParameterFilterMetadata(String name, String[] parameters, String path, Class<?> targetClass, Class<? extends FilterDecoder> decoderClass,
-			Object value) {
+			Object value, String valueFormat) {
 		this.name = name;
 		this.parameters = parameters;
 		this.path = path;
 		this.targetClass = targetClass;
 		this.decoderClass = (Class<? extends FilterDecoder<?>>) decoderClass;
 		this.values = new Object[] { value };
+		this.valueFormats = new String[] { valueFormat };
 	}
 
 	public String getPath() {
@@ -84,6 +94,10 @@ public class ParameterFilterMetadata {
 
 	public Class<? extends FilterDecoder<?>> getDecoderClass() {
 		return decoderClass;
+	}
+
+	public String[] getValueFormats() {
+		return valueFormats;
 	}
 
 	public void addState(Object key, Object value) {
