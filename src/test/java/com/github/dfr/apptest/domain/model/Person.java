@@ -30,6 +30,9 @@ public class Person {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
 	private List<Address> addresses;
 
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
+	private List<Phone> phones;
+
 	Person() {
 	}
 
@@ -51,6 +54,10 @@ public class Person {
 
 	public List<Address> getAddresses() {
 		return addresses;
+	}
+
+	public List<Phone> getPhones() {
+		return phones;
 	}
 
 	@Override

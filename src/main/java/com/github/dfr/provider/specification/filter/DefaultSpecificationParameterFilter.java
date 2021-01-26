@@ -27,7 +27,8 @@ public class DefaultSpecificationParameterFilter<T> implements SpecificationPara
 	public Specification<T> convertTo(Collection<ParameterFilterMetadata> parameters) {
 		Map<String, Object> sharedContext = new HashMap<>();
 		Specification<T> rootSpecification = Specification.where((root, query, cb) -> {
-			root.fetch("addresses", JoinType.LEFT);
+			root.fetch("addresses", JoinType.INNER);
+			root.fetch("phones", JoinType.INNER);
 			return null;
 		});
 

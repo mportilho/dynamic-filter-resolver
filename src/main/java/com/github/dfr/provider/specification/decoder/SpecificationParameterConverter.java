@@ -2,7 +2,6 @@ package com.github.dfr.provider.specification.decoder;
 
 import org.springframework.core.convert.ConversionService;
 import org.springframework.format.support.DefaultFormattingConversionService;
-import org.springframework.util.StringValueResolver;
 
 import com.github.dfr.decoder.ParameterConverter;
 import com.github.dfr.provider.specification.converters.StringToInstantConverter;
@@ -19,30 +18,15 @@ public class SpecificationParameterConverter implements ParameterConverter {
 
 	private final ConversionService localConversionService;
 	private final ConversionService conversionService;
-	private final StringValueResolver valueResolver;
 
 	public SpecificationParameterConverter() {
-		this.localConversionService = loadLocalConversionService(null);
-		this.conversionService = new DefaultFormattingConversionService(null, true);
-		this.valueResolver = null;
+		this.localConversionService = loadLocalConversionService();
+		this.conversionService = null;
 	}
 
 	public SpecificationParameterConverter(ConversionService conversionService) {
-		this.localConversionService = loadLocalConversionService(null);
+		this.localConversionService = loadLocalConversionService();
 		this.conversionService = conversionService;
-		this.valueResolver = null;
-	}
-
-	public SpecificationParameterConverter(StringValueResolver valueResolver) {
-		this.localConversionService = loadLocalConversionService(valueResolver);
-		this.conversionService = new DefaultFormattingConversionService(valueResolver, true);
-		this.valueResolver = valueResolver;
-	}
-
-	public SpecificationParameterConverter(ConversionService conversionService, StringValueResolver valueResolver) {
-		this.localConversionService = loadLocalConversionService(valueResolver);
-		this.conversionService = conversionService;
-		this.valueResolver = valueResolver;
 	}
 
 	/**
@@ -50,8 +34,8 @@ public class SpecificationParameterConverter implements ParameterConverter {
 	 * @param valueResolver
 	 * @return
 	 */
-	private ConversionService loadLocalConversionService(StringValueResolver valueResolver) {
-		DefaultFormattingConversionService localConverter = new DefaultFormattingConversionService(valueResolver, true);
+	private ConversionService loadLocalConversionService() {
+		DefaultFormattingConversionService localConverter = new DefaultFormattingConversionService(null, true);
 		localConverter.addConverter(new StringToInstantConverter());
 		localConverter.addConverter(new StringToLocalDateConverter());
 		localConverter.addConverter(new StringToLocalDateTimeConverter());
@@ -92,16 +76,9 @@ public class SpecificationParameterConverter implements ParameterConverter {
 			return null;
 		}
 		if (localConversionService.canConvert(value.getClass(), targetClass)) {
-			return localConversionService.convert(applyValueResolver(value), targetClass);
-		} else if (conversionService.canConvert(value.getClass(), targetClass)) {
-			return conversionService.convert(applyValueResolver(value), targetClass);
-		}
-		return value;
-	}
-
-	private Object applyValueResolver(Object value) {
-		if (valueResolver != null && value instanceof String) {
-			return valueResolver.resolveStringValue((String) value);
+			return localConversionService.convert(value, targetClass);
+		} else if (conversionService != null && conversionService.canConvert(value.getClass(), targetClass)) {
+			return conversionService.convert(value, targetClass);
 		}
 		return value;
 	}

@@ -39,6 +39,7 @@ public class TestProgramEntries {
 		parameters.add(new ParameterFilterMetadata("height", new String[0], "height", BigDecimal.class, Equals.class, BigDecimal.valueOf(3), null));
 		parameters.add(new ParameterFilterMetadata("city", new String[0], "addresses.location.city", String.class, Equals.class, "Belem", null));
 		parameters.add(new ParameterFilterMetadata("streetName", new String[0], "addresses.street", String.class, Equals.class, "rua", null));
+		parameters.add(new ParameterFilterMetadata("phoneNumber", new String[0], "phones.number", String.class, Equals.class, "1345", null));
 
 		SpecificationParameterFilter<Person> parameterFilter = new DefaultSpecificationParameterFilter<>(decoderService, parameterConverter);
 
