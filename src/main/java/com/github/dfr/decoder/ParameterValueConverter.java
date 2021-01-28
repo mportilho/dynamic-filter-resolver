@@ -1,6 +1,6 @@
 package com.github.dfr.decoder;
 
-public interface ParameterConverter {
+public interface ParameterValueConverter {
 
 	/**
 	 * Convert the value provided as parameter to an expected class

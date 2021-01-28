@@ -1,9 +1,9 @@
-package com.github.dfr.provider.specification.converters.utils;
+package com.github.dfr.provider.specification.converters;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 
-public class DateConverterUtils {
+class DateConverterUtils {
 
 	public static final DateTimeFormatter GENERIC_MONTH_YEAR_FORMATTER;
 	public static final DateTimeFormatter GENERIC_DATE_FORMATTER;

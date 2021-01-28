@@ -4,8 +4,6 @@ import java.time.LocalTime;
 
 import org.springframework.core.convert.converter.Converter;
 
-import com.github.dfr.provider.specification.converters.utils.DateConverterUtils;
-
 public class StringToLocalTimeConverter implements Converter<String, LocalTime> {
 
 	@Override

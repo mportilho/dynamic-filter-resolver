@@ -10,19 +10,18 @@ import javax.persistence.metamodel.Attribute;
 
 import org.springframework.data.mapping.PropertyPath;
 
-import com.github.dfr.filter.ParameterFilterMetadata;
+import com.github.dfr.filter.FilterParameter;
 
 class PredicateUtils {
 
 	/**
 	 * 
-	 * @param metadata
+	 * @param filterParameter
 	 * @param root
 	 * @return
 	 */
-	public static final Path<?> computeAttributePath(ParameterFilterMetadata metadata, Root<?> root) {
-		String pathToField = getPropertyPathFromMetadata(metadata);
-		PropertyPath propertyPath = PropertyPath.from(pathToField, root.getJavaType());
+	public static final Path<?> computeAttributePath(FilterParameter filterParameter, Root<?> root) {
+		PropertyPath propertyPath = PropertyPath.from(filterParameter.getPath(), root.getJavaType());
 		From<?, ?> from = root;
 		boolean graphFromFetch = false;
 		if (propertyPath.isCollection()) {
@@ -32,9 +31,9 @@ class PredicateUtils {
 					from = (From<?, ?>) fetchAttribute;
 					graphFromFetch = true;
 				} else if (graphFromFetch) {
-					from = (From<?, ?>) from.fetch(propertyPath.getSegment(), JoinType.LEFT);
+					from = (From<?, ?>) from.fetch(propertyPath.getSegment(), filterParameter.findStateOrDefault(JoinType.class, JoinType.LEFT));
 				} else {
-					from = getOrCreateJoin(from, propertyPath.getSegment(), metadata.findStateOrDefault(JoinType.class, JoinType.INNER));
+					from = getOrCreateJoin(from, propertyPath.getSegment(), filterParameter.findStateOrDefault(JoinType.class, JoinType.INNER));
 				}
 				propertyPath = propertyPath.next();
 			} while (propertyPath.hasNext());
@@ -93,15 +92,6 @@ class PredicateUtils {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * 
-	 * @param metadata
-	 * @return
-	 */
-	public static final String getPropertyPathFromMetadata(ParameterFilterMetadata metadata) {
-		return metadata.getPath() != null && !metadata.getPath().isEmpty() ? metadata.getPath() : metadata.getName();
 	}
 
 }

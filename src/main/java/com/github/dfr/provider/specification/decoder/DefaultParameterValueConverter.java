@@ -3,7 +3,7 @@ package com.github.dfr.provider.specification.decoder;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.format.support.DefaultFormattingConversionService;
 
-import com.github.dfr.decoder.ParameterConverter;
+import com.github.dfr.decoder.ParameterValueConverter;
 import com.github.dfr.provider.specification.converters.StringToInstantConverter;
 import com.github.dfr.provider.specification.converters.StringToLocalDateConverter;
 import com.github.dfr.provider.specification.converters.StringToLocalDateTimeConverter;
@@ -14,17 +14,17 @@ import com.github.dfr.provider.specification.converters.StringToOffsetTimeConver
 import com.github.dfr.provider.specification.converters.StringToYearConverter;
 import com.github.dfr.provider.specification.converters.StringToZonedDateTimeConverter;
 
-public class SpecificationParameterConverter implements ParameterConverter {
+public class DefaultParameterValueConverter implements ParameterValueConverter {
 
 	private final ConversionService localConversionService;
 	private final ConversionService conversionService;
 
-	public SpecificationParameterConverter() {
+	public DefaultParameterValueConverter() {
 		this.localConversionService = loadLocalConversionService();
 		this.conversionService = null;
 	}
 
-	public SpecificationParameterConverter(ConversionService conversionService) {
+	public DefaultParameterValueConverter(ConversionService conversionService) {
 		this.localConversionService = loadLocalConversionService();
 		this.conversionService = conversionService;
 	}

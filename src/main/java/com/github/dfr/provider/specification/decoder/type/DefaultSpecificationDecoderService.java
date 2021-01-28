@@ -6,12 +6,12 @@ import java.util.Map;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.github.dfr.decoder.FilterDecoder;
+import com.github.dfr.decoder.FilterDecoderService;
 import com.github.dfr.decoder.type.Equals;
 import com.github.dfr.decoder.type.Greater;
 import com.github.dfr.decoder.type.GreaterOrEquals;
-import com.github.dfr.provider.specification.decoder.SpecificationFilterDecoderService;
 
-public class DefaultSpecificationDecoderService<T> implements SpecificationFilterDecoderService<T> {
+public class DefaultSpecificationDecoderService<T> implements FilterDecoderService<Specification<T>> {
 
 	@SuppressWarnings("rawtypes")
 	private Map<Class<? extends FilterDecoder>, FilterDecoder<Specification<T>>> decoders;

@@ -4,8 +4,6 @@ import java.time.ZonedDateTime;
 
 import org.springframework.core.convert.converter.Converter;
 
-import com.github.dfr.provider.specification.converters.utils.DateConverterUtils;
-
 public class StringToZonedDateTimeConverter implements Converter<String, ZonedDateTime> {
 
 	@Override

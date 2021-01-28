@@ -4,8 +4,6 @@ import java.time.OffsetDateTime;
 
 import org.springframework.core.convert.converter.Converter;
 
-import com.github.dfr.provider.specification.converters.utils.DateConverterUtils;
-
 public class StringToOffsetDateTimeConverter implements Converter<String, OffsetDateTime> {
 
 	@Override
