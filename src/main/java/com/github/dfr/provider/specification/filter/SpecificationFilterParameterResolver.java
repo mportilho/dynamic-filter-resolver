@@ -30,20 +30,15 @@ public class SpecificationFilterParameterResolver<T> implements FilterParameterR
 			return Specification.where(null);
 		}
 		Map<String, Object> sharedContext = new HashMap<>();
-		Specification<T> rootSpecification = createPredicates(filterLogicContext.getCorrelatedFilterParameter(), sharedContext);
+		Specification<T> rootSpecification = Specification.where(createPredicates(filterLogicContext.getCorrelatedFilterParameter(), sharedContext));
 
 		for (CorrelatedFilterParameter correlatedFilterParameter : filterLogicContext.getOppositeCorrelatedFilterParameters()) {
 			Specification<T> specification = createPredicates(correlatedFilterParameter, sharedContext);
 			if (specification != null) {
-				if (rootSpecification == null) {
-					rootSpecification = Specification.where(specification);
-				} else {
-					rootSpecification = filterLogicContext.isConjunction() ? rootSpecification.and(specification)
-							: rootSpecification.or(specification);
-				}
+				rootSpecification = filterLogicContext.isConjunction() ? rootSpecification.and(specification) : rootSpecification.or(specification);
 			}
 		}
-		return rootSpecification == null ? Specification.where(null) : rootSpecification;
+		return rootSpecification;
 	}
 
 	/**
@@ -52,20 +47,16 @@ public class SpecificationFilterParameterResolver<T> implements FilterParameterR
 	 * @return
 	 */
 	private Specification<T> createPredicates(CorrelatedFilterParameter correlatedParameter, Map<String, Object> sharedContext) {
+		Specification<T> rootSpec = Specification.where(null);
 		if (correlatedParameter == null || correlatedParameter.getFilterParameters().isEmpty()) {
-			return null;
+			return rootSpec;
 		}
-		Specification<T> rootSpec = null;
 		for (FilterParameter filterParameter : correlatedParameter.getFilterParameters()) {
 			FilterDecoder<Specification<T>> decoder = filterDecoderService.getFilterDecoderFor(filterParameter.getDecoder());
 			Specification<T> spec = decoder.decode(filterParameter, parameterValueConverter, sharedContext);
 			if (spec != null) {
 				spec = filterParameter.isNegate() ? Specification.not(spec) : spec;
-				if (rootSpec == null) {
-					rootSpec = Specification.where(spec);
-				} else {
-					rootSpec = correlatedParameter.isConjunction() ? rootSpec.and(spec) : rootSpec.or(spec);
-				}
+				rootSpec = correlatedParameter.isConjunction() ? rootSpec.and(spec) : rootSpec.or(spec);
 			}
 		}
 		return rootSpec;
