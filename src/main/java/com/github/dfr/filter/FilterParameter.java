@@ -32,6 +32,8 @@ public class FilterParameter {
 	 */
 	private final Class<? extends FilterDecoder<?>> decoder;
 
+	private final boolean negate;
+
 	/**
 	 * The provided parameter values from the caller
 	 */
@@ -50,23 +52,25 @@ public class FilterParameter {
 	private Map<Object, Object> state = new HashMap<>();
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public FilterParameter(String path, String[] parameters, Class<?> targetType, Class<? extends FilterDecoder> decoder, Object[] value,
-			String[] valueFormats) {
+	public FilterParameter(String path, String[] parameters, Class<?> targetType, Class<? extends FilterDecoder> decoder, boolean negate,
+			Object[] value, String[] valueFormats) {
 		this.path = path;
 		this.parameters = parameters;
 		this.targetType = targetType;
 		this.decoder = (Class<? extends FilterDecoder<?>>) decoder;
+		this.negate = negate;
 		this.values = value;
 		this.valueFormats = valueFormats;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public FilterParameter(String path, String parameter, Class<?> targetType, Class<? extends FilterDecoder> decoder, Object value,
+	public FilterParameter(String path, String parameter, Class<?> targetType, Class<? extends FilterDecoder> decoder, boolean negate, Object value,
 			String valueFormat) {
 		this.path = path;
 		this.parameters = new String[] { parameter };
 		this.targetType = targetType;
 		this.decoder = (Class<? extends FilterDecoder<?>>) decoder;
+		this.negate = negate;
 		this.values = new Object[] { value };
 		this.valueFormats = new String[] { valueFormat };
 	}
@@ -77,6 +81,10 @@ public class FilterParameter {
 
 	public Class<?> getTargetType() {
 		return targetType;
+	}
+
+	public boolean isNegate() {
+		return negate;
 	}
 
 	public Object[] getValues() {

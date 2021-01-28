@@ -40,11 +40,11 @@ public class TestProgramEntries {
 		ParameterValueConverter parameterValueConverter = new DefaultParameterValueConverter();
 
 		List<FilterParameter> parameters = new ArrayList<>();
-		parameters.add(new FilterParameter("name", "clientName", String.class, GreaterOrEquals.class, "Fulano", null));
-		parameters.add(new FilterParameter("height", "clientHeight", BigDecimal.class, Equals.class, BigDecimal.valueOf(3), null));
-		parameters.add(new FilterParameter("addresses.location.city", "birthCity", String.class, Equals.class, "Belem", null));
-		parameters.add(new FilterParameter("addresses.street", "address", String.class, Equals.class, "rua", null));
-		parameters.add(new FilterParameter("phones.number", "phoneNumber", String.class, Equals.class, "1345", null));
+		parameters.add(new FilterParameter("name", "clientName", String.class, GreaterOrEquals.class, false, "Fulano", null));
+		parameters.add(new FilterParameter("height", "clientHeight", BigDecimal.class, Equals.class, false, BigDecimal.valueOf(3), null));
+		parameters.add(new FilterParameter("addresses.location.city", "birthCity", String.class, Equals.class, false, "Belem", null));
+		parameters.add(new FilterParameter("addresses.street", "address", String.class, Equals.class, false, "rua", null));
+		parameters.add(new FilterParameter("phones.number", "phoneNumber", String.class, Equals.class, false, "1345", null));
 
 		FilterLogicContext logicWrapper = new FilterLogicContext(LogicType.CONJUNCTION, new CorrelatedFilterParameter(LogicType.CONJUNCTION, parameters),
 				Collections.emptyList());

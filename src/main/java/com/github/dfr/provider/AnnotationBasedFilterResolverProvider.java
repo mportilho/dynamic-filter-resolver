@@ -81,8 +81,13 @@ public class AnnotationBasedFilterResolverProvider {
 						values[index++] = values[index] != null ? values[index] : defaultValues[index];
 					}
 				}
+				
+				String[] expressionLanguage = (String[]) computeSpringExpressionLanguage(new String[] { filter.negate() });
+				boolean negate = Boolean.parseBoolean(expressionLanguage[0]);
 				String[] formats = (String[]) computeSpringExpressionLanguage(filter.formats());
-				filterParameters.add(new FilterParameter(filter.path(), filter.parameters(), filter.targetType(), filter.decoder(), values, formats));
+				
+				filterParameters
+						.add(new FilterParameter(filter.path(), filter.parameters(), filter.targetType(), filter.decoder(), negate, values, formats));
 			}
 		}
 		return filterParameters;

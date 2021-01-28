@@ -40,6 +40,22 @@ public @interface Filter {
 	Class<? extends FilterDecoder<?>> decoder();
 
 	/**
+	 * Indicates that the logic of this filter must be negated.
+	 * 
+	 * <table>
+	 * <tr>
+	 * <th>Normal Logic</th>
+	 * <th>Negated Logic</th>
+	 * </tr>
+	 * <tr>
+	 * <th>A & B</th>
+	 * <th>!(A & B)</th>
+	 * </tr>
+	 * </table>
+	 */
+	String negate() default "false";
+
+	/**
 	 * Default values for each parameter, each at the same position as
 	 * <code>parameters</code>
 	 */

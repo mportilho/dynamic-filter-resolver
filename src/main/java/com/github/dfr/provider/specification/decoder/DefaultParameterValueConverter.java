@@ -5,12 +5,15 @@ import org.springframework.format.support.DefaultFormattingConversionService;
 
 import com.github.dfr.decoder.ParameterValueConverter;
 import com.github.dfr.provider.specification.converters.StringToInstantConverter;
+import com.github.dfr.provider.specification.converters.StringToJavaSqlDateConverter;
+import com.github.dfr.provider.specification.converters.StringToJavaUtilDateConverter;
 import com.github.dfr.provider.specification.converters.StringToLocalDateConverter;
 import com.github.dfr.provider.specification.converters.StringToLocalDateTimeConverter;
 import com.github.dfr.provider.specification.converters.StringToLocalTimeConverter;
 import com.github.dfr.provider.specification.converters.StringToMonthYearConverter;
 import com.github.dfr.provider.specification.converters.StringToOffsetDateTimeConverter;
 import com.github.dfr.provider.specification.converters.StringToOffsetTimeConverter;
+import com.github.dfr.provider.specification.converters.StringToTimestampConverter;
 import com.github.dfr.provider.specification.converters.StringToYearConverter;
 import com.github.dfr.provider.specification.converters.StringToZonedDateTimeConverter;
 
@@ -45,6 +48,9 @@ public class DefaultParameterValueConverter implements ParameterValueConverter {
 		localConverter.addConverter(new StringToOffsetTimeConverter());
 		localConverter.addConverter(new StringToYearConverter());
 		localConverter.addConverter(new StringToZonedDateTimeConverter());
+		localConverter.addConverter(new StringToJavaUtilDateConverter());
+		localConverter.addConverter(new StringToJavaSqlDateConverter());
+		localConverter.addConverter(new StringToTimestampConverter());
 		return localConverter;
 	}
 

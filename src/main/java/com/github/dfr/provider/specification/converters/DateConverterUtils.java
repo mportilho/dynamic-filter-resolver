@@ -2,6 +2,7 @@ package com.github.dfr.provider.specification.converters;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 
 class DateConverterUtils {
 
@@ -9,6 +10,7 @@ class DateConverterUtils {
 	public static final DateTimeFormatter GENERIC_DATE_FORMATTER;
 	public static final DateTimeFormatter GENERIC_TIME_FORMATTER;
 	public static final DateTimeFormatter GENERIC_DATETIME_FORMATTER;
+	public static final DateTimeFormatter GENERIC_DATETIME_FORMATTER_PADDING_HOURS;
 
 	static {
 		String DEF_YEAR_MONTH = "yyyyMM";
@@ -46,6 +48,10 @@ class DateConverterUtils {
 		appendOptional(sb, String.format("%s[%s%s][%s]", DEF_DASH_DATE_PTBR, DEF_DATE_TIME_SEPARATOR, DEF_TIME, DEF_TIMEZONE));
 		GENERIC_DATETIME_FORMATTER = new DateTimeFormatterBuilder().append(DateTimeFormatter.BASIC_ISO_DATE).appendPattern(sb.toString())
 				.toFormatter();
+
+		GENERIC_DATETIME_FORMATTER_PADDING_HOURS = new DateTimeFormatterBuilder().append(GENERIC_DATETIME_FORMATTER)
+				.parseDefaulting(ChronoField.HOUR_OF_DAY, 0).parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+				.parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0).parseDefaulting(ChronoField.NANO_OF_SECOND, 0).toFormatter();
 	}
 
 	private static final void appendOptional(StringBuilder sb, String... values) {

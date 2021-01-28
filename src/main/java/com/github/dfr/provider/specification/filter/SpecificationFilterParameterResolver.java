@@ -9,9 +9,9 @@ import com.github.dfr.decoder.FilterDecoder;
 import com.github.dfr.decoder.FilterDecoderService;
 import com.github.dfr.decoder.ParameterValueConverter;
 import com.github.dfr.filter.CorrelatedFilterParameter;
+import com.github.dfr.filter.FilterLogicContext;
 import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.filter.FilterParameterResolver;
-import com.github.dfr.filter.FilterLogicContext;
 
 public class SpecificationFilterParameterResolver<T> implements FilterParameterResolver<Specification<T>> {
 
@@ -38,7 +38,8 @@ public class SpecificationFilterParameterResolver<T> implements FilterParameterR
 				if (rootSpecification == null) {
 					rootSpecification = Specification.where(specification);
 				} else {
-					rootSpecification = filterLogicContext.isConjunction() ? rootSpecification.and(specification) : rootSpecification.or(specification);
+					rootSpecification = filterLogicContext.isConjunction() ? rootSpecification.and(specification)
+							: rootSpecification.or(specification);
 				}
 			}
 		}
@@ -55,10 +56,11 @@ public class SpecificationFilterParameterResolver<T> implements FilterParameterR
 			return null;
 		}
 		Specification<T> rootSpec = null;
-		for (FilterParameter parameter : correlatedParameter.getFilterParameters()) {
-			FilterDecoder<Specification<T>> decoder = filterDecoderService.getFilterDecoderFor(parameter.getDecoder());
-			Specification<T> spec = decoder.decode(parameter, parameterValueConverter, sharedContext);
+		for (FilterParameter filterParameter : correlatedParameter.getFilterParameters()) {
+			FilterDecoder<Specification<T>> decoder = filterDecoderService.getFilterDecoderFor(filterParameter.getDecoder());
+			Specification<T> spec = decoder.decode(filterParameter, parameterValueConverter, sharedContext);
 			if (spec != null) {
+				spec = filterParameter.isNegate() ? Specification.not(spec) : spec;
 				if (rootSpec == null) {
 					rootSpec = Specification.where(spec);
 				} else {
