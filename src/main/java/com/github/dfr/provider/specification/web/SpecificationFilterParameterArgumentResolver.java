@@ -3,7 +3,6 @@ package com.github.dfr.provider.specification.web;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,16 +17,21 @@ import com.github.dfr.annotation.Conjunction;
 import com.github.dfr.annotation.Disjunction;
 import com.github.dfr.annotation.Filter;
 import com.github.dfr.annotation.Or;
-import com.github.dfr.filter.LogicType;
-import com.github.dfr.filter.LogicalContext;
-import com.github.dfr.filter.FilterParameter;
+import com.github.dfr.filter.FilterLogicalContext;
 import com.github.dfr.filter.FilterParameterResolver;
-import com.github.dfr.filter.CorrelatedFilterParameter;
+import com.github.dfr.filter.LogicType;
+import com.github.dfr.provider.AnnotationBasedFilterResolverProvider;
 
 public class SpecificationFilterParameterArgumentResolver implements HandlerMethodArgumentResolver {
 
-	private StringValueResolver stringValueResolver;
+	private AnnotationBasedFilterResolverProvider filterResolverProvider;
 	private FilterParameterResolver<Specification<?>> parameterFilter;
+
+	public SpecificationFilterParameterArgumentResolver(StringValueResolver stringValueResolver,
+			FilterParameterResolver<Specification<?>> parameterFilter) {
+		this.filterResolverProvider = new AnnotationBasedFilterResolverProvider(stringValueResolver);
+		this.parameterFilter = parameterFilter;
+	}
 
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
@@ -35,7 +39,7 @@ public class SpecificationFilterParameterArgumentResolver implements HandlerMeth
 		int annotationQuantity = countPresentAnnotations(parameter);
 		if (annotationQuantity > 1) {
 			throw new IllegalStateException(
-					"The annotations Or, And, Conjunction and Disjunction cannot be used at the same time, found on parameter + "
+					"The annotations Or, And, Conjunction and Disjunction cannot be used at the same time, as seen on parameter + "
 							+ parameter.getParameterName());
 		}
 		return Specification.class.isAssignableFrom(parameterType) && annotationQuantity == 1;
@@ -44,101 +48,39 @@ public class SpecificationFilterParameterArgumentResolver implements HandlerMeth
 	@Override
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest,
 			WebDataBinderFactory binderFactory) throws Exception {
-		LogicalContext logicWrapper = null;
+		FilterLogicalContext logicalContext = null;
 
 		And andAnnot;
 		if ((andAnnot = parameter.getParameterAnnotation(And.class)) != null) {
-			logicWrapper = createConnectiveLogicWrapper(LogicType.CONJUNCTION, andAnnot.values(), null, webRequest.getParameterMap());
+			logicalContext = filterResolverProvider.createLogicContext(LogicType.CONJUNCTION, andAnnot.values(), null, webRequest.getParameterMap());
 		}
 
 		Or orAnnot;
-		if (logicWrapper == null && (orAnnot = parameter.getParameterAnnotation(Or.class)) != null) {
-			logicWrapper = createConnectiveLogicWrapper(LogicType.DISJUNCTION, orAnnot.values(), null, webRequest.getParameterMap());
+		if (logicalContext == null && (orAnnot = parameter.getParameterAnnotation(Or.class)) != null) {
+			logicalContext = filterResolverProvider.createLogicContext(LogicType.DISJUNCTION, orAnnot.values(), null, webRequest.getParameterMap());
 		}
 
 		Conjunction conjAnnot;
-		if (logicWrapper == null && (conjAnnot = parameter.getParameterAnnotation(Conjunction.class)) != null) {
+		if (logicalContext == null && (conjAnnot = parameter.getParameterAnnotation(Conjunction.class)) != null) {
 			List<Filter[]> filtersList = new ArrayList<>(conjAnnot.values().length);
 			for (Or or : conjAnnot.values()) {
 				filtersList.add(or.values());
 			}
-			logicWrapper = createConnectiveLogicWrapper(LogicType.CONJUNCTION, conjAnnot.and(), filtersList, webRequest.getParameterMap());
+			logicalContext = filterResolverProvider.createLogicContext(LogicType.CONJUNCTION, conjAnnot.and(), filtersList,
+					webRequest.getParameterMap());
 		}
 
 		Disjunction disjAnnot;
-		if (logicWrapper == null && (disjAnnot = parameter.getParameterAnnotation(Disjunction.class)) != null) {
+		if (logicalContext == null && (disjAnnot = parameter.getParameterAnnotation(Disjunction.class)) != null) {
 			List<Filter[]> filtersList = new ArrayList<>(disjAnnot.values().length);
 			for (And and : disjAnnot.values()) {
 				filtersList.add(and.values());
 			}
-			logicWrapper = createConnectiveLogicWrapper(LogicType.DISJUNCTION, disjAnnot.or(), filtersList, webRequest.getParameterMap());
+			logicalContext = filterResolverProvider.createLogicContext(LogicType.DISJUNCTION, disjAnnot.or(), filtersList,
+					webRequest.getParameterMap());
 		}
 
-		return parameterFilter.convertTo(logicWrapper);
-	}
-
-	private <T> LogicalContext createConnectiveLogicWrapper(LogicType logicType, Filter[] currentLogicTypeFilters,
-			List<Filter[]> oppositeLogicTypeFilters, Map<String, T[]> parametersMap) {
-		List<CorrelatedFilterParameter> oppositeLogicParameterList = new ArrayList<>();
-		if (oppositeLogicTypeFilters != null) {
-			for (Filter[] filters : oppositeLogicTypeFilters) {
-				List<FilterParameter> parameters = createWrappers(filters, parametersMap);
-				if (!parameters.isEmpty()) {
-					oppositeLogicParameterList.add(new CorrelatedFilterParameter(logicType.getOppositeLogicType(), parameters));
-				}
-			}
-		}
-
-		List<FilterParameter> parameterList = createWrappers(currentLogicTypeFilters, parametersMap);
-		if (oppositeLogicParameterList.isEmpty() && parameterList.isEmpty()) {
-			return null;
-		}
-		CorrelatedFilterParameter correlatedFilterParameter = new CorrelatedFilterParameter(logicType, parameterList);
-		return new LogicalContext(logicType, correlatedFilterParameter, oppositeLogicParameterList);
-	}
-
-	/**
-	 * 
-	 * @param <T>
-	 * @param filters
-	 * @param parametersMap
-	 * @return
-	 */
-	private <T> List<FilterParameter> createWrappers(Filter[] filters, Map<String, T[]> parametersMap) {
-		List<FilterParameter> filterParameters = new ArrayList<>();
-		if (filters == null || parametersMap == null || parametersMap.isEmpty()) {
-			return filterParameters;
-		}
-
-		for (Filter filter : filters) {
-			boolean foundAnyParameter = false;
-			for (String filterParams : filter.parameters()) {
-				if (parametersMap.keySet().contains(filterParams)) {
-					foundAnyParameter = true;
-					break;
-				}
-			}
-
-			if (foundAnyParameter) {
-				Object values[] = new Object[filter.parameters().length];
-				for (int i = 0; i < values.length; i++) {
-					Object[] paramValues = parametersMap.get(filter.parameters()[i]);
-					if (paramValues != null && paramValues.length != 0) {
-						if (paramValues.length == 1) {
-							values[i] = paramValues[0];
-						} else {
-							values[i] = paramValues;
-						}
-					} else {
-						values[i] = null;
-					}
-
-				}
-				filterParameters.add(
-						new FilterParameter(filter.path(), filter.parameters(), filter.targetType(), filter.decoder(), values, filter.formats()));
-			}
-		}
-		return filterParameters;
+		return parameterFilter.convertTo(logicalContext);
 	}
 
 	/**

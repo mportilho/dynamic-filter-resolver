@@ -22,7 +22,7 @@ import com.github.dfr.filter.CorrelatedFilterParameter;
 import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.filter.FilterParameterResolver;
 import com.github.dfr.filter.LogicType;
-import com.github.dfr.filter.LogicalContext;
+import com.github.dfr.filter.FilterLogicalContext;
 import com.github.dfr.provider.specification.decoder.DefaultParameterValueConverter;
 import com.github.dfr.provider.specification.decoder.type.DefaultSpecificationDecoderService;
 import com.github.dfr.provider.specification.filter.SpecificationFilterParameterResolver;
@@ -46,7 +46,7 @@ public class TestProgramEntries {
 		parameters.add(new FilterParameter("addresses.street", "address", String.class, Equals.class, "rua", null));
 		parameters.add(new FilterParameter("phones.number", "phoneNumber", String.class, Equals.class, "1345", null));
 
-		LogicalContext logicWrapper = new LogicalContext(LogicType.CONJUNCTION, new CorrelatedFilterParameter(LogicType.CONJUNCTION, parameters),
+		FilterLogicalContext logicWrapper = new FilterLogicalContext(LogicType.CONJUNCTION, new CorrelatedFilterParameter(LogicType.CONJUNCTION, parameters),
 				Collections.emptyList());
 
 		FilterParameterResolver<Specification<Person>> parameterFilter = new SpecificationFilterParameterResolver<>(decoderService,
