@@ -2,6 +2,7 @@ package com.github.dfr.filter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import com.github.dfr.decoder.FilterDecoder;
 
@@ -44,7 +45,7 @@ public class FilterParameter {
 	 * recommended that each parameter has its own provided format for configuration
 	 * clarity
 	 */
-	private final String[] valueFormats;
+	private final String[] format;
 
 	/**
 	 * The parameter's mutable state during filter resolution
@@ -60,7 +61,7 @@ public class FilterParameter {
 		this.decoder = (Class<? extends FilterDecoder<?>>) decoder;
 		this.negate = negate;
 		this.values = value;
-		this.valueFormats = valueFormats;
+		this.format = valueFormats;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -72,7 +73,7 @@ public class FilterParameter {
 		this.decoder = (Class<? extends FilterDecoder<?>>) decoder;
 		this.negate = negate;
 		this.values = new Object[] { value };
-		this.valueFormats = new String[] { valueFormat };
+		this.format = new String[] { valueFormat };
 	}
 
 	public String getPath() {
@@ -99,8 +100,8 @@ public class FilterParameter {
 		return decoder;
 	}
 
-	public String[] getValueFormats() {
-		return valueFormats;
+	public String[] getFormat() {
+		return format;
 	}
 
 	public void addState(Object key, Object value) {
@@ -118,7 +119,7 @@ public class FilterParameter {
 		return stateValue != null ? stateValue : defaultValue;
 	}
 
-	public Object findSingleValue() {
+	public Object findValue() {
 		if (values == null) {
 			return null;
 		} else if (values.length > 1) {
@@ -126,5 +127,10 @@ public class FilterParameter {
 		}
 		return values[0];
 	}
+
+//	public Object findValue(Function<Object, Object> tranform) {
+//		Object value = findValue();
+//		return value == null ? null : tranform.apply(value);
+//	}
 
 }

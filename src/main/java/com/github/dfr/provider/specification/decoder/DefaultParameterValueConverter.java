@@ -59,14 +59,14 @@ public class DefaultParameterValueConverter implements ParameterValueConverter {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <R> R convert(Object value, Class<?> expectedType) {
+	public <R> R convert(Object value, Class<?> expectedType, Object format) {
 		if (value == null) {
 			return null;
 		}
 		if (expectedType == null) {
 			throw new IllegalStateException("The expected type for conversion must be informed");
 		}
-		return (R) convertValue(value, expectedType);
+		return (R) convertValue(value, expectedType, format);
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class DefaultParameterValueConverter implements ParameterValueConverter {
 	 * @return The converted value if a converter was found, null is a converter was
 	 *         not found or <code>null</code> if value parameter
 	 */
-	private Object convertValue(Object value, Class<?> targetClass) {
+	private Object convertValue(Object value, Class<?> targetClass, Object format) {
 		if (value == null) {
 			return null;
 		}

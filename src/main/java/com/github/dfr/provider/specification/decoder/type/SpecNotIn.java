@@ -8,13 +8,16 @@ import com.github.dfr.decoder.ParameterValueConverter;
 import com.github.dfr.decoder.type.NotIn;
 import com.github.dfr.filter.FilterParameter;
 
-public class SpecNotIn<T> implements NotIn<Specification<T>>{
+public class SpecNotIn<T> implements NotIn<Specification<T>> {
+
+	@SuppressWarnings("rawtypes")
+	private static final SpecIn IN_STATIC = new SpecIn<>();
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Specification<T> decode(FilterParameter filterParameter, ParameterValueConverter parameterValueConverter,
 			Map<String, Object> sharedContext) {
-		// TODO Auto-generated method stub
-		return null;
+		return Specification.not(IN_STATIC.decode(filterParameter, parameterValueConverter, sharedContext));
 	}
 
 }

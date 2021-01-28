@@ -8,9 +8,10 @@ public interface ParameterValueConverter {
 	 * @param <R>
 	 * @param value
 	 * @param expectedClass
+	 * @param format
 	 * @return The converted value to an expected type. Returns null if parameter
 	 *         value is null.
 	 */
-	<R> R convert(Object value, Class<?> expectedType);
+	<R> R convert(Object value, Class<?> expectedType, Object format);
 
 }

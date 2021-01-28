@@ -15,10 +15,11 @@ import com.github.dfr.filter.FilterParameter;
 class SpecNotEquals<T> implements NotEquals<Specification<T>> {
 
 	@Override
-	public Specification<T> decode(FilterParameter metadata, ParameterValueConverter parameterValueConverter, Map<String, Object> sharedContext) {
+	public Specification<T> decode(FilterParameter filterParameter, ParameterValueConverter parameterValueConverter,
+			Map<String, Object> sharedContext) {
 		return (root, query, criteriaBuilder) -> {
-			Path<?> path = computeAttributePath(metadata, root);
-			Object value = parameterValueConverter.convert(metadata.findSingleValue(), path.getJavaType());
+			Path<?> path = computeAttributePath(filterParameter, root);
+			Object value = parameterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.getFormat());
 			return criteriaBuilder.notEqual(path, value);
 		};
 	}

@@ -20,7 +20,7 @@ class PredicateUtils {
 	 * @param root
 	 * @return
 	 */
-	public static final Path<?> computeAttributePath(FilterParameter filterParameter, Root<?> root) {
+	public static final <T> Path<T> computeAttributePath(FilterParameter filterParameter, Root<?> root) {
 		PropertyPath propertyPath = PropertyPath.from(filterParameter.getPath(), root.getJavaType());
 		From<?, ?> from = root;
 		boolean graphFromFetch = false;

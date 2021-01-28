@@ -1,5 +1,7 @@
 package com.github.dfr.provider.specification.decoder.type;
 
+import static com.github.dfr.provider.specification.decoder.type.PredicateUtils.computeAttributePath;
+
 import java.util.Map;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -13,8 +15,7 @@ public class SpecIsNotNull<T> implements IsNotNull<Specification<T>> {
 	@Override
 	public Specification<T> decode(FilterParameter filterParameter, ParameterValueConverter parameterValueConverter,
 			Map<String, Object> sharedContext) {
-		// TODO Auto-generated method stub
-		return null;
+		return (root, query, criteriaBuilder) -> criteriaBuilder.isNotNull(computeAttributePath(filterParameter, root));
 	}
 
 }
