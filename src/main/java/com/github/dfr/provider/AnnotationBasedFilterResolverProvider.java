@@ -9,7 +9,7 @@ import org.springframework.util.StringValueResolver;
 
 import com.github.dfr.annotation.Filter;
 import com.github.dfr.filter.CorrelatedFilterParameter;
-import com.github.dfr.filter.FilterLogicalContext;
+import com.github.dfr.filter.FilterLogicContext;
 import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.filter.LogicType;
 
@@ -31,7 +31,7 @@ public class AnnotationBasedFilterResolverProvider {
 	 * @param parametersMap
 	 * @return
 	 */
-	public <T> FilterLogicalContext createLogicContext(LogicType logicType, Filter[] filters, List<Filter[]> oppositeFiltersList,
+	public <T> FilterLogicContext createLogicContext(LogicType logicType, Filter[] filters, List<Filter[]> oppositeFiltersList,
 			Map<String, T[]> parametersMap) {
 		List<CorrelatedFilterParameter> oppositeCorrelatedFilterList = new ArrayList<>();
 		if (oppositeFiltersList != null) {
@@ -48,7 +48,7 @@ public class AnnotationBasedFilterResolverProvider {
 			return null;
 		}
 		CorrelatedFilterParameter correlatedFilterParameter = new CorrelatedFilterParameter(logicType, parameterList);
-		return new FilterLogicalContext(logicType, correlatedFilterParameter, oppositeCorrelatedFilterList);
+		return new FilterLogicContext(logicType, correlatedFilterParameter, oppositeCorrelatedFilterList);
 	}
 
 	/**

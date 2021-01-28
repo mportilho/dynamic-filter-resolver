@@ -11,7 +11,7 @@ import com.github.dfr.decoder.ParameterValueConverter;
 import com.github.dfr.filter.CorrelatedFilterParameter;
 import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.filter.FilterParameterResolver;
-import com.github.dfr.filter.FilterLogicalContext;
+import com.github.dfr.filter.FilterLogicContext;
 
 public class SpecificationFilterParameterResolver<T> implements FilterParameterResolver<Specification<T>> {
 
@@ -25,20 +25,20 @@ public class SpecificationFilterParameterResolver<T> implements FilterParameterR
 	}
 
 	@Override
-	public Specification<T> convertTo(FilterLogicalContext filterLogicalContext) {
-		if (filterLogicalContext == null) {
+	public Specification<T> convertTo(FilterLogicContext filterLogicContext) {
+		if (filterLogicContext == null) {
 			return Specification.where(null);
 		}
 		Map<String, Object> sharedContext = new HashMap<>();
-		Specification<T> rootSpecification = createPredicates(filterLogicalContext.getCorrelatedFilterParameter(), sharedContext);
+		Specification<T> rootSpecification = createPredicates(filterLogicContext.getCorrelatedFilterParameter(), sharedContext);
 
-		for (CorrelatedFilterParameter correlatedFilterParameter : filterLogicalContext.getOppositeCorrelatedFilterParameters()) {
+		for (CorrelatedFilterParameter correlatedFilterParameter : filterLogicContext.getOppositeCorrelatedFilterParameters()) {
 			Specification<T> specification = createPredicates(correlatedFilterParameter, sharedContext);
 			if (specification != null) {
 				if (rootSpecification == null) {
 					rootSpecification = Specification.where(specification);
 				} else {
-					rootSpecification = filterLogicalContext.isConjunction() ? rootSpecification.and(specification) : rootSpecification.or(specification);
+					rootSpecification = filterLogicContext.isConjunction() ? rootSpecification.and(specification) : rootSpecification.or(specification);
 				}
 			}
 		}
