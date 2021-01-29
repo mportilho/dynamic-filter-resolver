@@ -1,72 +1,54 @@
 package com.github.dfr.provider.specification.filter;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.github.dfr.filter.AbstractDynamicFilterResolver;
 import com.github.dfr.filter.ConditionalStatement;
-import com.github.dfr.filter.DynamicFilterResolver;
 import com.github.dfr.filter.FilterParameter;
+import com.github.dfr.filter.LogicType;
 import com.github.dfr.operator.FilterOperator;
 import com.github.dfr.operator.FilterOperatorService;
 import com.github.dfr.operator.FilterValueConverter;
 
-public class SpecificationDynamicFilterResolver<T> implements DynamicFilterResolver<Specification<T>> {
+public class SpecificationDynamicFilterResolver<T> extends AbstractDynamicFilterResolver<Specification<T>> {
 
 	private final FilterOperatorService<Specification<T>> filterOperatorService;
 	private final FilterValueConverter filterValueConverter;
 
-	public SpecificationDynamicFilterResolver(FilterOperatorService<Specification<T>> operatorService,
-			FilterValueConverter filterValueConverter) {
+	public SpecificationDynamicFilterResolver(FilterOperatorService<Specification<T>> operatorService, FilterValueConverter filterValueConverter) {
 		this.filterOperatorService = operatorService;
 		this.filterValueConverter = filterValueConverter;
 	}
 
 	@Override
-	public Specification<T> convertTo(ConditionalStatement conditionalStatement) {
-		return conditionalStatement == null || !conditionalStatement.hasAnyCondition() ? Specification.where(null)
-				: convertRecursively(conditionalStatement, new ConcurrentHashMap<>());
+	public Specification<T> emptyPredicate() {
+		return Specification.where(null);
 	}
 
-	/**
-	 * 
-	 * @param conditionalStatement
-	 * @param sharedContext
-	 * @return
-	 */
-	public Specification<T> convertRecursively(ConditionalStatement conditionalStatement, Map<String, Object> sharedContext) {
-		if (conditionalStatement == null || !conditionalStatement.hasAnyCondition()) {
-			return Specification.where(null);
-		}
-		Specification<T> rootSpecification = Specification.where(createSpecifications(conditionalStatement, sharedContext));
-
-		if (conditionalStatement.hasInverseStatements()) {
-			for (ConditionalStatement inverseStatement : conditionalStatement.getInverseStatements()) {
-				Specification<T> spec = convertRecursively(inverseStatement, sharedContext);
-				rootSpecification = inverseStatement.isConjunction() ? rootSpecification.and(spec) : rootSpecification.or(spec);
-			}
-		}
-		return rootSpecification;
-	}
-
-	/**
-	 * 
-	 * @param conditionalStatement
-	 * @param sharedContext
-	 * @return
-	 */
-	private Specification<T> createSpecifications(ConditionalStatement conditionalStatement, Map<String, Object> sharedContext) {
+	@Override
+	public Specification<T> createPredicate(ConditionalStatement conditionalStatement) {
 		Specification<T> rootSpec = Specification.where(null);
 		for (FilterParameter clause : conditionalStatement.getClauses()) {
 			FilterOperator<Specification<T>> operator = filterOperatorService.getOperatorFor(clause.getOperator());
-			Specification<T> spec = operator.createFilter(clause, filterValueConverter, sharedContext);
+			Specification<T> spec = operator.createFilter(clause, filterValueConverter, null);
 			if (spec != null) {
 				spec = clause.isNegate() ? Specification.not(spec) : spec;
 				rootSpec = conditionalStatement.isConjunction() ? rootSpec.and(spec) : rootSpec.or(spec);
 			}
 		}
 		return conditionalStatement.isNegate() ? Specification.not(rootSpec) : rootSpec;
+	}
+
+	@Override
+	public Specification<T> postCondicionalStatementResolving(LogicType logicType, Specification<T> predicate,
+			List<Specification<T>> subStatementPredicates) {
+		Specification<T> currentPredicate = predicate;
+		for (Specification<T> subPredicate : subStatementPredicates) {
+			currentPredicate = logicType.isConjunction() ? currentPredicate.and(subPredicate) : currentPredicate.or(subPredicate);
+		}
+		return currentPredicate;
 	}
 
 }
