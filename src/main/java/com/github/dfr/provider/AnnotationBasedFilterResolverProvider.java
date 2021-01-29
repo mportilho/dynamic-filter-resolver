@@ -87,7 +87,7 @@ public class AnnotationBasedFilterResolverProvider {
 				String[] formats = (String[]) computeSpringExpressionLanguage(filter.formats());
 				
 				filterParameters
-						.add(new FilterParameter(filter.path(), filter.parameters(), filter.targetType(), filter.decoder(), negate, values, formats));
+						.add(new FilterParameter(filter.path(), filter.parameters(), filter.targetType(), filter.operator(), negate, values, formats));
 			}
 		}
 		return filterParameters;

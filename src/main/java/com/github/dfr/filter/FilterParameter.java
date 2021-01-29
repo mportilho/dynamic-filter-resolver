@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.github.dfr.decoder.FilterDecoder;
+import com.github.dfr.operator.FilterOperator;
 
 public class FilterParameter {
 
@@ -29,9 +29,9 @@ public class FilterParameter {
 	private final Class<?> targetType;
 
 	/**
-	 * Action to be used as a query filter
+	 * Operation to be used as a query filter
 	 */
-	private final Class<? extends FilterDecoder<?>> decoder;
+	private final Class<? extends FilterOperator<?>> operator;
 
 	private final boolean negate;
 
@@ -53,24 +53,24 @@ public class FilterParameter {
 	private Map<Object, Object> state = new HashMap<>();
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public FilterParameter(String path, String[] parameters, Class<?> targetType, Class<? extends FilterDecoder> decoder, boolean negate,
+	public FilterParameter(String path, String[] parameters, Class<?> targetType, Class<? extends FilterOperator> operator, boolean negate,
 			Object[] value, String[] valueFormats) {
 		this.path = path;
 		this.parameters = parameters;
 		this.targetType = targetType;
-		this.decoder = (Class<? extends FilterDecoder<?>>) decoder;
+		this.operator = (Class<? extends FilterOperator<?>>) operator;
 		this.negate = negate;
 		this.values = value;
 		this.format = valueFormats;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public FilterParameter(String path, String parameter, Class<?> targetType, Class<? extends FilterDecoder> decoder, boolean negate, Object value,
+	public FilterParameter(String path, String parameter, Class<?> targetType, Class<? extends FilterOperator> operator, boolean negate, Object value,
 			String valueFormat) {
 		this.path = path;
 		this.parameters = new String[] { parameter };
 		this.targetType = targetType;
-		this.decoder = (Class<? extends FilterDecoder<?>>) decoder;
+		this.operator = (Class<? extends FilterOperator<?>>) operator;
 		this.negate = negate;
 		this.values = new Object[] { value };
 		this.format = new String[] { valueFormat };
@@ -96,8 +96,8 @@ public class FilterParameter {
 		return parameters;
 	}
 
-	public Class<? extends FilterDecoder<?>> getDecoder() {
-		return decoder;
+	public Class<? extends FilterOperator<?>> getOperator() {
+		return operator;
 	}
 
 	public String[] getFormat() {

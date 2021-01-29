@@ -5,22 +5,22 @@ import java.util.Map;
 
 import org.springframework.data.jpa.domain.Specification;
 
-import com.github.dfr.decoder.FilterDecoder;
-import com.github.dfr.decoder.FilterDecoderService;
-import com.github.dfr.decoder.ParameterValueConverter;
 import com.github.dfr.filter.CorrelatedFilterParameter;
 import com.github.dfr.filter.FilterLogicContext;
 import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.filter.FilterParameterResolver;
+import com.github.dfr.operator.FilterOperator;
+import com.github.dfr.operator.FilterOperatorService;
+import com.github.dfr.operator.ParameterValueConverter;
 
 public class SpecificationFilterParameterResolver<T> implements FilterParameterResolver<Specification<T>> {
 
-	private final FilterDecoderService<Specification<T>> filterDecoderService;
+	private final FilterOperatorService<Specification<T>> filterOperatorService;
 	private final ParameterValueConverter parameterValueConverter;
 
-	public SpecificationFilterParameterResolver(FilterDecoderService<Specification<T>> decoderService,
+	public SpecificationFilterParameterResolver(FilterOperatorService<Specification<T>> operatorService,
 			ParameterValueConverter parameterValueConverter) {
-		this.filterDecoderService = decoderService;
+		this.filterOperatorService = operatorService;
 		this.parameterValueConverter = parameterValueConverter;
 	}
 
@@ -52,8 +52,8 @@ public class SpecificationFilterParameterResolver<T> implements FilterParameterR
 			return rootSpec;
 		}
 		for (FilterParameter filterParameter : correlatedParameter.getFilterParameters()) {
-			FilterDecoder<Specification<T>> decoder = filterDecoderService.getFilterDecoderFor(filterParameter.getDecoder());
-			Specification<T> spec = decoder.decode(filterParameter, parameterValueConverter, sharedContext);
+			FilterOperator<Specification<T>> operator = filterOperatorService.getOperatorFor(filterParameter.getOperator());
+			Specification<T> spec = operator.createFilter(filterParameter, parameterValueConverter, sharedContext);
 			if (spec != null) {
 				spec = filterParameter.isNegate() ? Specification.not(spec) : spec;
 				rootSpec = correlatedParameter.isConjunction() ? rootSpec.and(spec) : rootSpec.or(spec);

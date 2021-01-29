@@ -14,18 +14,18 @@ import org.springframework.test.context.ContextConfiguration;
 import com.github.dfr.apptest.TestingApplication;
 import com.github.dfr.apptest.domain.model.Person;
 import com.github.dfr.apptest.repository.PersonRepository;
-import com.github.dfr.decoder.FilterDecoderService;
-import com.github.dfr.decoder.ParameterValueConverter;
-import com.github.dfr.decoder.type.Equals;
-import com.github.dfr.decoder.type.GreaterOrEquals;
 import com.github.dfr.filter.CorrelatedFilterParameter;
 import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.filter.FilterParameterResolver;
 import com.github.dfr.filter.LogicType;
+import com.github.dfr.operator.FilterOperatorService;
+import com.github.dfr.operator.ParameterValueConverter;
+import com.github.dfr.operator.type.Equals;
+import com.github.dfr.operator.type.GreaterOrEquals;
 import com.github.dfr.filter.FilterLogicContext;
-import com.github.dfr.provider.specification.decoder.DefaultParameterValueConverter;
-import com.github.dfr.provider.specification.decoder.type.DefaultSpecificationDecoderService;
 import com.github.dfr.provider.specification.filter.SpecificationFilterParameterResolver;
+import com.github.dfr.provider.specification.operator.DefaultParameterValueConverter;
+import com.github.dfr.provider.specification.operator.type.SpecificationFilterOperatorService;
 
 @DataJpaTest
 @ContextConfiguration(classes = TestingApplication.class)
@@ -36,7 +36,7 @@ public class TestProgramEntries {
 
 	@Test
 	public void test() {
-		FilterDecoderService<Specification<Person>> decoderService = new DefaultSpecificationDecoderService<>();
+		FilterOperatorService<Specification<Person>> decoderService = new SpecificationFilterOperatorService<>();
 		ParameterValueConverter parameterValueConverter = new DefaultParameterValueConverter();
 
 		List<FilterParameter> parameters = new ArrayList<>();

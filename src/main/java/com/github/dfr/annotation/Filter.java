@@ -7,7 +7,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import com.github.dfr.decoder.FilterDecoder;
+import com.github.dfr.operator.FilterOperator;
 
 @Documented
 @Retention(RUNTIME)
@@ -35,9 +35,9 @@ public @interface Filter {
 	Class<?> targetType() default Void.class;
 
 	/**
-	 * Action to be used as a query filter
+	 * Operation to be used as a query filter
 	 */
-	Class<? extends FilterDecoder<?>> decoder();
+	Class<? extends FilterOperator<?>> operator();
 
 	/**
 	 * Indicates that the logic of this filter must be negated.
