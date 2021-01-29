@@ -20,6 +20,7 @@ public @interface Filter {
 	 * <p>
 	 * <b>Path</b> is the notation which the target attribute can be found from a
 	 * specified root attribute, like <code>Person.addresses.streetName</code>
+	 * 
 	 */
 	String path();
 
@@ -52,12 +53,18 @@ public @interface Filter {
 	 * <th>!(A & B)</th>
 	 * </tr>
 	 * </table>
+	 * 
+	 * <p>
+	 * Can be parsed by the Spring Expression Language
 	 */
 	String negate() default "false";
 
 	/**
 	 * Default values for each parameter, each at the same position as
 	 * <code>parameters</code>
+	 * 
+	 * <p>
+	 * Can be parsed by the Spring Expression Language
 	 */
 	String[] defaultValues() default {};
 
@@ -65,6 +72,9 @@ public @interface Filter {
 	 * Constant values for each parameter. If this field has any value, the
 	 * corresponding filter must not be requested from the user, as it will be used
 	 * only internally
+	 * 
+	 * <p>
+	 * Can be parsed by the Spring Expression Language
 	 */
 	String[] constantValues() default {};
 
@@ -72,6 +82,9 @@ public @interface Filter {
 	 * Optional format pattern to assist data conversion for each parameter. It's
 	 * recommended that each parameter has its own provided format for configuration
 	 * clarity
+	 * 
+	 * <p>
+	 * Can be parsed by the Spring Expression Language
 	 */
 	String[] formats() default {};
 
