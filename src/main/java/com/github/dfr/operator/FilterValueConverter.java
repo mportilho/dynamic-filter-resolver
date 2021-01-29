@@ -1,6 +1,6 @@
 package com.github.dfr.operator;
 
-public interface ParameterValueConverter {
+public interface FilterValueConverter {
 
 	/**
 	 * Convert the value provided as parameter to an expected class

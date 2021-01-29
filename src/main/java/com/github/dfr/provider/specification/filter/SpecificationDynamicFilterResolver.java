@@ -10,17 +10,17 @@ import com.github.dfr.filter.DynamicFilterResolver;
 import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.operator.FilterOperator;
 import com.github.dfr.operator.FilterOperatorService;
-import com.github.dfr.operator.ParameterValueConverter;
+import com.github.dfr.operator.FilterValueConverter;
 
 public class SpecificationDynamicFilterResolver<T> implements DynamicFilterResolver<Specification<T>> {
 
 	private final FilterOperatorService<Specification<T>> filterOperatorService;
-	private final ParameterValueConverter parameterValueConverter;
+	private final FilterValueConverter filterValueConverter;
 
 	public SpecificationDynamicFilterResolver(FilterOperatorService<Specification<T>> operatorService,
-			ParameterValueConverter parameterValueConverter) {
+			FilterValueConverter filterValueConverter) {
 		this.filterOperatorService = operatorService;
-		this.parameterValueConverter = parameterValueConverter;
+		this.filterValueConverter = filterValueConverter;
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class SpecificationDynamicFilterResolver<T> implements DynamicFilterResol
 		Specification<T> rootSpec = Specification.where(null);
 		for (FilterParameter clause : conditionalStatement.getClauses()) {
 			FilterOperator<Specification<T>> operator = filterOperatorService.getOperatorFor(clause.getOperator());
-			Specification<T> spec = operator.createFilter(clause, parameterValueConverter, sharedContext);
+			Specification<T> spec = operator.createFilter(clause, filterValueConverter, sharedContext);
 			if (spec != null) {
 				spec = clause.isNegate() ? Specification.not(spec) : spec;
 				rootSpec = conditionalStatement.isConjunction() ? rootSpec.and(spec) : rootSpec.or(spec);

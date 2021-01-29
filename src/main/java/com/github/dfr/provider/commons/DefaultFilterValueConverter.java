@@ -3,7 +3,7 @@ package com.github.dfr.provider.commons;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.format.support.DefaultFormattingConversionService;
 
-import com.github.dfr.operator.ParameterValueConverter;
+import com.github.dfr.operator.FilterValueConverter;
 import com.github.dfr.provider.commons.converter.StringToInstantConverter;
 import com.github.dfr.provider.commons.converter.StringToJavaSqlDateConverter;
 import com.github.dfr.provider.commons.converter.StringToJavaUtilDateConverter;
@@ -17,17 +17,17 @@ import com.github.dfr.provider.commons.converter.StringToTimestampConverter;
 import com.github.dfr.provider.commons.converter.StringToYearConverter;
 import com.github.dfr.provider.commons.converter.StringToZonedDateTimeConverter;
 
-public class DefaultParameterValueConverter implements ParameterValueConverter {
+public class DefaultFilterValueConverter implements FilterValueConverter {
 
 	private final ConversionService localConversionService;
 	private final ConversionService conversionService;
 
-	public DefaultParameterValueConverter() {
+	public DefaultFilterValueConverter() {
 		this.localConversionService = loadLocalConversionService();
 		this.conversionService = null;
 	}
 
-	public DefaultParameterValueConverter(ConversionService conversionService) {
+	public DefaultFilterValueConverter(ConversionService conversionService) {
 		this.localConversionService = loadLocalConversionService();
 		this.conversionService = conversionService;
 	}

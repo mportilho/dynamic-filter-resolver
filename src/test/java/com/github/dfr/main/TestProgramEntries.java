@@ -18,10 +18,10 @@ import com.github.dfr.filter.DynamicFilterResolver;
 import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.filter.LogicType;
 import com.github.dfr.operator.FilterOperatorService;
-import com.github.dfr.operator.ParameterValueConverter;
+import com.github.dfr.operator.FilterValueConverter;
 import com.github.dfr.operator.type.Equals;
 import com.github.dfr.operator.type.GreaterOrEquals;
-import com.github.dfr.provider.commons.DefaultParameterValueConverter;
+import com.github.dfr.provider.commons.DefaultFilterValueConverter;
 import com.github.dfr.provider.specification.filter.SpecificationDynamicFilterResolver;
 import com.github.dfr.provider.specification.operator.SpecificationFilterOperatorService;
 
@@ -35,7 +35,7 @@ public class TestProgramEntries {
 	@Test
 	public void test() {
 		FilterOperatorService<Specification<Person>> decoderService = new SpecificationFilterOperatorService<>();
-		ParameterValueConverter parameterValueConverter = new DefaultParameterValueConverter();
+		FilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
 
 		List<FilterParameter> parameters = new ArrayList<>();
 		parameters.add(new FilterParameter("name", "clientName", String.class, GreaterOrEquals.class, false, "Fulano", null));
@@ -47,7 +47,7 @@ public class TestProgramEntries {
 		ConditionalStatement logicWrapper = new ConditionalStatement(LogicType.CONJUNCTION, parameters);
 
 		DynamicFilterResolver<Specification<Person>> parameterFilter = new SpecificationDynamicFilterResolver<>(decoderService,
-				parameterValueConverter);
+				filterValueConverter);
 
 		List<Person> list = personRepo.findAll(parameterFilter.convertTo(logicWrapper));
 		System.out.println(list);
