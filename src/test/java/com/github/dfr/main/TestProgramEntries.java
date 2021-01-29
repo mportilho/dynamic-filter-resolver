@@ -23,9 +23,9 @@ import com.github.dfr.operator.ParameterValueConverter;
 import com.github.dfr.operator.type.Equals;
 import com.github.dfr.operator.type.GreaterOrEquals;
 import com.github.dfr.filter.FilterLogicContext;
+import com.github.dfr.provider.commons.DefaultParameterValueConverter;
 import com.github.dfr.provider.specification.filter.SpecificationDynamicFilterResolver;
-import com.github.dfr.provider.specification.operator.DefaultParameterValueConverter;
-import com.github.dfr.provider.specification.operator.type.SpecificationFilterOperatorService;
+import com.github.dfr.provider.specification.operator.SpecificationFilterOperatorService;
 
 @DataJpaTest
 @ContextConfiguration(classes = TestingApplication.class)
