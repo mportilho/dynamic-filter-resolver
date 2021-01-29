@@ -1,5 +1,8 @@
 package com.github.dfr.provider.specification.web;
 
+import static com.github.dfr.filter.LogicType.CONJUNCTION;
+import static com.github.dfr.filter.LogicType.DISJUNCTION;
+
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +20,8 @@ import com.github.dfr.annotation.Conjunction;
 import com.github.dfr.annotation.Disjunction;
 import com.github.dfr.annotation.Filter;
 import com.github.dfr.annotation.Or;
+import com.github.dfr.filter.ConditionalStatement;
 import com.github.dfr.filter.DynamicFilterResolver;
-import com.github.dfr.filter.FilterLogicContext;
-import com.github.dfr.filter.LogicType;
 import com.github.dfr.provider.AnnotationBasedFilterLogicContextProvider;
 
 public class SpecificationFilterParameterArgumentResolver implements HandlerMethodArgumentResolver {
@@ -48,37 +50,37 @@ public class SpecificationFilterParameterArgumentResolver implements HandlerMeth
 	@Override
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest,
 			WebDataBinderFactory binderFactory) throws Exception {
-		FilterLogicContext logicContext = null;
+		ConditionalStatement statement = null;
 
 		And andAnnot;
 		if ((andAnnot = parameter.getParameterAnnotation(And.class)) != null) {
-			logicContext = logicContextProvider.createLogicContext(LogicType.CONJUNCTION, andAnnot.values(), null, webRequest.getParameterMap());
+			statement = logicContextProvider.createLogicContext(CONJUNCTION, andAnnot.values(), null, webRequest.getParameterMap());
 		}
 
 		Or orAnnot;
-		if (logicContext == null && (orAnnot = parameter.getParameterAnnotation(Or.class)) != null) {
-			logicContext = logicContextProvider.createLogicContext(LogicType.DISJUNCTION, orAnnot.values(), null, webRequest.getParameterMap());
+		if (statement == null && (orAnnot = parameter.getParameterAnnotation(Or.class)) != null) {
+			statement = logicContextProvider.createLogicContext(DISJUNCTION, orAnnot.values(), null, webRequest.getParameterMap());
 		}
 
 		Conjunction conjAnnot;
-		if (logicContext == null && (conjAnnot = parameter.getParameterAnnotation(Conjunction.class)) != null) {
-			List<Filter[]> filtersList = new ArrayList<>(conjAnnot.values().length);
+		if (statement == null && (conjAnnot = parameter.getParameterAnnotation(Conjunction.class)) != null) {
+			List<Filter[]> disjunctions = new ArrayList<>(conjAnnot.values().length);
 			for (Or or : conjAnnot.values()) {
-				filtersList.add(or.values());
+				disjunctions.add(or.values());
 			}
-			logicContext = logicContextProvider.createLogicContext(LogicType.CONJUNCTION, conjAnnot.and(), filtersList, webRequest.getParameterMap());
+			statement = logicContextProvider.createLogicContext(CONJUNCTION, conjAnnot.and(), disjunctions, webRequest.getParameterMap());
 		}
 
 		Disjunction disjAnnot;
-		if (logicContext == null && (disjAnnot = parameter.getParameterAnnotation(Disjunction.class)) != null) {
-			List<Filter[]> filtersList = new ArrayList<>(disjAnnot.values().length);
+		if (statement == null && (disjAnnot = parameter.getParameterAnnotation(Disjunction.class)) != null) {
+			List<Filter[]> conjunctions = new ArrayList<>(disjAnnot.values().length);
 			for (And and : disjAnnot.values()) {
-				filtersList.add(and.values());
+				conjunctions.add(and.values());
 			}
-			logicContext = logicContextProvider.createLogicContext(LogicType.DISJUNCTION, disjAnnot.or(), filtersList, webRequest.getParameterMap());
+			statement = logicContextProvider.createLogicContext(DISJUNCTION, disjAnnot.or(), conjunctions, webRequest.getParameterMap());
 		}
 
-		return dynamicFilterResolver.convertTo(logicContext);
+		return dynamicFilterResolver.convertTo(statement);
 	}
 
 	/**

@@ -2,14 +2,16 @@ package com.github.dfr.provider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.util.StringValueResolver;
 
 import com.github.dfr.annotation.Filter;
-import com.github.dfr.filter.CorrelatedFilterParameter;
-import com.github.dfr.filter.FilterLogicContext;
+import com.github.dfr.filter.ConditionalStatement;
 import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.filter.LogicType;
 
@@ -31,24 +33,20 @@ public class AnnotationBasedFilterLogicContextProvider {
 	 * @param parametersMap
 	 * @return
 	 */
-	public <T> FilterLogicContext createLogicContext(LogicType logicType, Filter[] filters, List<Filter[]> oppositeFiltersList,
+	public <T> ConditionalStatement createLogicContext(LogicType logicType, Filter[] filters, List<Filter[]> inversedConditionFilters,
 			Map<String, T[]> parametersMap) {
-		List<CorrelatedFilterParameter> oppositeCorrelatedFilterList = new ArrayList<>();
-		if (oppositeFiltersList != null) {
-			for (Filter[] oppositeFilters : oppositeFiltersList) {
-				List<FilterParameter> parameters = createFilterParameters(oppositeFilters, parametersMap);
-				if (!parameters.isEmpty()) {
-					oppositeCorrelatedFilterList.add(new CorrelatedFilterParameter(logicType.getOppositeLogicType(), parameters));
-				}
-			}
-		}
 
-		List<FilterParameter> parameterList = createFilterParameters(filters, parametersMap);
-		if (oppositeCorrelatedFilterList.isEmpty() && parameterList.isEmpty()) {
-			return null;
-		}
-		CorrelatedFilterParameter correlatedFilterParameter = new CorrelatedFilterParameter(logicType, parameterList);
-		return new FilterLogicContext(logicType, correlatedFilterParameter, oppositeCorrelatedFilterList);
+		List<ConditionalStatement> inversedStatements = inversedConditionFilters == null ? null : //@formatter:off
+			inversedConditionFilters
+				.stream()
+				.filter(Objects::isNull)
+				.map(filter -> createFilterParameters(filters, parametersMap))
+				.filter(List::isEmpty)
+				.map(params -> new ConditionalStatement(logicType.opposite(), params))
+				.collect(Collectors.toList())
+		;//@formatter:on
+
+		return new ConditionalStatement(logicType, createFilterParameters(filters, parametersMap), inversedStatements);
 	}
 
 	/**
@@ -59,11 +57,11 @@ public class AnnotationBasedFilterLogicContextProvider {
 	 * @return
 	 */
 	private <T> List<FilterParameter> createFilterParameters(Filter[] filters, Map<String, T[]> parametersMap) {
-		List<FilterParameter> filterParameters = new ArrayList<>();
-		if (filters == null || parametersMap == null || parametersMap.isEmpty()) {
-			return filterParameters;
+		if (filters == null || filters.length == 0 || parametersMap == null || parametersMap.isEmpty()) {
+			return Collections.emptyList();
 		}
 
+		List<FilterParameter> filterParameters = new ArrayList<>();
 		for (Filter filter : filters) {
 			if (hasAnyParameterProvided(parametersMap, filter)) {
 				Object[] values = null;

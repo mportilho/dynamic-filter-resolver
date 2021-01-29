@@ -2,7 +2,6 @@ package com.github.dfr.main;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -14,15 +13,14 @@ import org.springframework.test.context.ContextConfiguration;
 import com.github.dfr.apptest.TestingApplication;
 import com.github.dfr.apptest.domain.model.Person;
 import com.github.dfr.apptest.repository.PersonRepository;
-import com.github.dfr.filter.CorrelatedFilterParameter;
-import com.github.dfr.filter.FilterParameter;
+import com.github.dfr.filter.ConditionalStatement;
 import com.github.dfr.filter.DynamicFilterResolver;
+import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.filter.LogicType;
 import com.github.dfr.operator.FilterOperatorService;
 import com.github.dfr.operator.ParameterValueConverter;
 import com.github.dfr.operator.type.Equals;
 import com.github.dfr.operator.type.GreaterOrEquals;
-import com.github.dfr.filter.FilterLogicContext;
 import com.github.dfr.provider.commons.DefaultParameterValueConverter;
 import com.github.dfr.provider.specification.filter.SpecificationDynamicFilterResolver;
 import com.github.dfr.provider.specification.operator.SpecificationFilterOperatorService;
@@ -46,8 +44,7 @@ public class TestProgramEntries {
 		parameters.add(new FilterParameter("addresses.street", "address", String.class, Equals.class, false, "rua", null));
 		parameters.add(new FilterParameter("phones.number", "phoneNumber", String.class, Equals.class, false, "1345", null));
 
-		FilterLogicContext logicWrapper = new FilterLogicContext(LogicType.CONJUNCTION, new CorrelatedFilterParameter(LogicType.CONJUNCTION, parameters),
-				Collections.emptyList());
+		ConditionalStatement logicWrapper = new ConditionalStatement(LogicType.CONJUNCTION, parameters);
 
 		DynamicFilterResolver<Specification<Person>> parameterFilter = new SpecificationDynamicFilterResolver<>(decoderService,
 				parameterValueConverter);

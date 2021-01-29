@@ -1,14 +1,13 @@
 package com.github.dfr.provider.specification.filter;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.data.jpa.domain.Specification;
 
-import com.github.dfr.filter.CorrelatedFilterParameter;
-import com.github.dfr.filter.FilterLogicContext;
-import com.github.dfr.filter.FilterParameter;
+import com.github.dfr.filter.ConditionalStatement;
 import com.github.dfr.filter.DynamicFilterResolver;
+import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.operator.FilterOperator;
 import com.github.dfr.operator.FilterOperatorService;
 import com.github.dfr.operator.ParameterValueConverter;
@@ -25,17 +24,26 @@ public class SpecificationDynamicFilterResolver<T> implements DynamicFilterResol
 	}
 
 	@Override
-	public Specification<T> convertTo(FilterLogicContext filterLogicContext) {
-		if (filterLogicContext == null) {
+	public Specification<T> convertTo(ConditionalStatement conditionalStatement) {
+		return convertRecursively(conditionalStatement, new ConcurrentHashMap<>());
+	}
+
+	/**
+	 * 
+	 * @param conditionalStatement
+	 * @param sharedContext
+	 * @return
+	 */
+	public Specification<T> convertRecursively(ConditionalStatement conditionalStatement, Map<String, Object> sharedContext) {
+		if (conditionalStatement == null) {
 			return Specification.where(null);
 		}
-		Map<String, Object> sharedContext = new HashMap<>();
-		Specification<T> rootSpecification = Specification.where(createPredicates(filterLogicContext.getCorrelatedFilterParameter(), sharedContext));
+		Specification<T> rootSpecification = Specification.where(createSpecifications(conditionalStatement, sharedContext));
 
-		for (CorrelatedFilterParameter correlatedFilterParameter : filterLogicContext.getOppositeCorrelatedFilterParameters()) {
-			Specification<T> specification = createPredicates(correlatedFilterParameter, sharedContext);
-			if (specification != null) {
-				rootSpecification = filterLogicContext.isConjunction() ? rootSpecification.and(specification) : rootSpecification.or(specification);
+		if (conditionalStatement.hasInverseStatements()) {
+			for (ConditionalStatement inverseStatement : conditionalStatement.getInverseStatements()) {
+				Specification<T> spec = convertRecursively(inverseStatement, sharedContext);
+				rootSpecification = inverseStatement.isConjunction() ? rootSpecification.and(spec) : rootSpecification.or(spec);
 			}
 		}
 		return rootSpecification;
@@ -43,23 +51,21 @@ public class SpecificationDynamicFilterResolver<T> implements DynamicFilterResol
 
 	/**
 	 * 
-	 * @param correlatedParameter
+	 * @param conditionalStatement
+	 * @param sharedContext
 	 * @return
 	 */
-	private Specification<T> createPredicates(CorrelatedFilterParameter correlatedParameter, Map<String, Object> sharedContext) {
+	private Specification<T> createSpecifications(ConditionalStatement conditionalStatement, Map<String, Object> sharedContext) {
 		Specification<T> rootSpec = Specification.where(null);
-		if (correlatedParameter == null || correlatedParameter.getFilterParameters().isEmpty()) {
-			return rootSpec;
-		}
-		for (FilterParameter filterParameter : correlatedParameter.getFilterParameters()) {
-			FilterOperator<Specification<T>> operator = filterOperatorService.getOperatorFor(filterParameter.getOperator());
-			Specification<T> spec = operator.createFilter(filterParameter, parameterValueConverter, sharedContext);
+		for (FilterParameter clause : conditionalStatement.getClauses()) {
+			FilterOperator<Specification<T>> operator = filterOperatorService.getOperatorFor(clause.getOperator());
+			Specification<T> spec = operator.createFilter(clause, parameterValueConverter, sharedContext);
 			if (spec != null) {
-				spec = filterParameter.isNegate() ? Specification.not(spec) : spec;
-				rootSpec = correlatedParameter.isConjunction() ? rootSpec.and(spec) : rootSpec.or(spec);
+				spec = clause.isNegate() ? Specification.not(spec) : spec;
+				rootSpec = conditionalStatement.isConjunction() ? rootSpec.and(spec) : rootSpec.or(spec);
 			}
 		}
-		return rootSpec;
+		return conditionalStatement.isNegate() ? Specification.not(rootSpec) : rootSpec;
 	}
 
 }
