@@ -1,14 +1,18 @@
 package com.github.dfr.provider.commons.converter;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
-import org.springframework.core.convert.converter.Converter;
+import com.github.dfr.provider.commons.AbstractFormattedValueConverter;
 
-public class StringToZonedDateTimeConverter implements Converter<String, ZonedDateTime> {
+public class StringToZonedDateTimeConverter extends AbstractFormattedValueConverter<String, ZonedDateTime, String> {
 
 	@Override
-	public ZonedDateTime convert(String source) {
-		return DateConverterUtils.GENERIC_DATETIME_FORMATTER.parse(source, ZonedDateTime::from);
+	public ZonedDateTime convert(String source, String format) {
+		if (format == null || format.isEmpty()) {
+			return DateConverterUtils.GENERIC_DATETIME_FORMATTER.parse(source, ZonedDateTime::from);
+		}
+		return cache(format, DateTimeFormatter::ofPattern).parse(source, ZonedDateTime::from);
 	}
 
 }

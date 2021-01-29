@@ -21,8 +21,15 @@ class SpecBetween<T> implements Between<Specification<T>> {
 			Comparable<Object> lowerValue = (Comparable<Object>) filterParameter.getValues()[0];
 			Comparable<Object> upperValue = (Comparable<Object>) filterParameter.getValues()[1];
 
-			lowerValue = filterValueConverter.convert(lowerValue, path.getJavaType(), filterParameter.getFormat()[0]);
-			upperValue = filterValueConverter.convert(upperValue, path.getJavaType(), filterParameter.getFormat()[1]);
+			String lowerValueFormat = null;
+			String upperValueFormat = null;
+			if (filterParameter.getFormats() != null || filterParameter.getFormats().length > 0) {
+				lowerValueFormat = filterParameter.getFormats()[0];
+				upperValueFormat = filterParameter.getFormats().length == 2 ? filterParameter.getFormats()[1] : upperValueFormat;
+			}
+
+			lowerValue = filterValueConverter.convert(lowerValue, path.getJavaType(), lowerValueFormat);
+			upperValue = filterValueConverter.convert(upperValue, path.getJavaType(), upperValueFormat);
 
 			return criteriaBuilder.between(path, lowerValue, upperValue);
 		};

@@ -1,7 +1,20 @@
 package com.github.dfr.provider.commons;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZonedDateTime;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.core.convert.ConversionService;
-import org.springframework.format.support.DefaultFormattingConversionService;
 
 import com.github.dfr.operator.FilterValueConverter;
 import com.github.dfr.provider.commons.converter.StringToInstantConverter;
@@ -10,25 +23,25 @@ import com.github.dfr.provider.commons.converter.StringToJavaUtilDateConverter;
 import com.github.dfr.provider.commons.converter.StringToLocalDateConverter;
 import com.github.dfr.provider.commons.converter.StringToLocalDateTimeConverter;
 import com.github.dfr.provider.commons.converter.StringToLocalTimeConverter;
-import com.github.dfr.provider.commons.converter.StringToMonthYearConverter;
 import com.github.dfr.provider.commons.converter.StringToOffsetDateTimeConverter;
 import com.github.dfr.provider.commons.converter.StringToOffsetTimeConverter;
 import com.github.dfr.provider.commons.converter.StringToTimestampConverter;
 import com.github.dfr.provider.commons.converter.StringToYearConverter;
+import com.github.dfr.provider.commons.converter.StringToYearMonthConverter;
 import com.github.dfr.provider.commons.converter.StringToZonedDateTimeConverter;
 
 public class DefaultFilterValueConverter implements FilterValueConverter {
 
-	private final ConversionService localConversionService;
+	Map<Pair<Class<?>, Class<?>>, AbstractFormattedValueConverter<?, ?, String>> abstractFormattedValueConverters;
 	private final ConversionService conversionService;
 
 	public DefaultFilterValueConverter() {
-		this.localConversionService = loadLocalConversionService();
+		this.abstractFormattedValueConverters = loadFormattedValueConverters();
 		this.conversionService = null;
 	}
 
 	public DefaultFilterValueConverter(ConversionService conversionService) {
-		this.localConversionService = loadLocalConversionService();
+		this.abstractFormattedValueConverters = loadFormattedValueConverters();
 		this.conversionService = conversionService;
 	}
 
@@ -37,21 +50,21 @@ public class DefaultFilterValueConverter implements FilterValueConverter {
 	 * @param valueResolver
 	 * @return
 	 */
-	private ConversionService loadLocalConversionService() {
-		DefaultFormattingConversionService localConverter = new DefaultFormattingConversionService(null, true);
-		localConverter.addConverter(new StringToInstantConverter());
-		localConverter.addConverter(new StringToLocalDateConverter());
-		localConverter.addConverter(new StringToLocalDateTimeConverter());
-		localConverter.addConverter(new StringToLocalTimeConverter());
-		localConverter.addConverter(new StringToMonthYearConverter());
-		localConverter.addConverter(new StringToOffsetDateTimeConverter());
-		localConverter.addConverter(new StringToOffsetTimeConverter());
-		localConverter.addConverter(new StringToYearConverter());
-		localConverter.addConverter(new StringToZonedDateTimeConverter());
-		localConverter.addConverter(new StringToJavaUtilDateConverter());
-		localConverter.addConverter(new StringToJavaSqlDateConverter());
-		localConverter.addConverter(new StringToTimestampConverter());
-		return localConverter;
+	private Map<Pair<Class<?>, Class<?>>, AbstractFormattedValueConverter<?, ?, String>> loadFormattedValueConverters() {
+		abstractFormattedValueConverters = new HashMap<>();
+		abstractFormattedValueConverters.put(Pair.of(String.class, Instant.class), new StringToInstantConverter());
+		abstractFormattedValueConverters.put(Pair.of(String.class, LocalDate.class), new StringToLocalDateConverter());
+		abstractFormattedValueConverters.put(Pair.of(String.class, LocalDateTime.class), new StringToLocalDateTimeConverter());
+		abstractFormattedValueConverters.put(Pair.of(String.class, LocalTime.class), new StringToLocalTimeConverter());
+		abstractFormattedValueConverters.put(Pair.of(String.class, YearMonth.class), new StringToYearMonthConverter());
+		abstractFormattedValueConverters.put(Pair.of(String.class, OffsetDateTime.class), new StringToOffsetDateTimeConverter());
+		abstractFormattedValueConverters.put(Pair.of(String.class, OffsetTime.class), new StringToOffsetTimeConverter());
+		abstractFormattedValueConverters.put(Pair.of(String.class, Year.class), new StringToYearConverter());
+		abstractFormattedValueConverters.put(Pair.of(String.class, ZonedDateTime.class), new StringToZonedDateTimeConverter());
+		abstractFormattedValueConverters.put(Pair.of(String.class, Date.class), new StringToJavaUtilDateConverter());
+		abstractFormattedValueConverters.put(Pair.of(String.class, java.sql.Date.class), new StringToJavaSqlDateConverter());
+		abstractFormattedValueConverters.put(Pair.of(String.class, Timestamp.class), new StringToTimestampConverter());
+		return abstractFormattedValueConverters;
 	}
 
 	/**
@@ -59,7 +72,7 @@ public class DefaultFilterValueConverter implements FilterValueConverter {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public <R> R convert(Object value, Class<?> expectedType, Object format) {
+	public <R> R convert(Object value, Class<?> expectedType, String format) {
 		if (value == null) {
 			return null;
 		}
@@ -77,12 +90,14 @@ public class DefaultFilterValueConverter implements FilterValueConverter {
 	 * @return The converted value if a converter was found, null is a converter was
 	 *         not found or <code>null</code> if value parameter
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private Object convertValue(Object value, Class<?> targetClass, Object format) {
 		if (value == null) {
 			return null;
 		}
-		if (localConversionService.canConvert(value.getClass(), targetClass)) {
-			return localConversionService.convert(value, targetClass);
+		AbstractFormattedValueConverter abstractFormattedValueConverter;
+		if ((abstractFormattedValueConverter = this.abstractFormattedValueConverters.get(Pair.of(String.class, targetClass))) != null) {
+			return abstractFormattedValueConverter.convert(value, format);
 		} else if (conversionService != null && conversionService.canConvert(value.getClass(), targetClass)) {
 			return conversionService.convert(value, targetClass);
 		}

@@ -1,14 +1,18 @@
 package com.github.dfr.provider.commons.converter;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
-import org.springframework.core.convert.converter.Converter;
+import com.github.dfr.provider.commons.AbstractFormattedValueConverter;
 
-public class StringToLocalTimeConverter implements Converter<String, LocalTime> {
+public class StringToLocalTimeConverter extends AbstractFormattedValueConverter<String, LocalTime, String> {
 
 	@Override
-	public LocalTime convert(String source) {
-		return DateConverterUtils.GENERIC_TIME_FORMATTER.parse(source, LocalTime::from);
+	public LocalTime convert(String source, String format) {
+		if (format == null || format.isEmpty()) {
+			return DateConverterUtils.GENERIC_TIME_FORMATTER.parse(source, LocalTime::from);
+		}
+		return cache(format, DateTimeFormatter::ofPattern).parse(source, LocalTime::from);
 	}
 
 }

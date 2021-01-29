@@ -20,7 +20,7 @@ class SpecNotEqualsIgnoreCase<T> implements NotEqualsIgnoreCase<Specification<T>
 			Map<String, Object> sharedContext) {
 		return (root, query, criteriaBuilder) -> {
 			Path<?> path = computeAttributePath(filterParameter, root);
-			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.getFormat());
+			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.findFormat());
 			if (String.class.equals(path.getJavaType())) {
 				return criteriaBuilder.equal(criteriaBuilder.upper((Path<String>) path), transformNonNull(value, v -> v.toString().toUpperCase()));
 			}

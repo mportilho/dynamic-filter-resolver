@@ -17,7 +17,7 @@ class SpecLike<T> implements Like<Specification<T>> {
 			Map<String, Object> sharedContext) {
 		return (root, query, criteriaBuilder) -> {
 			Path<String> path = PredicateUtils.computeAttributePath(filterParameter, root);
-			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.getFormat());
+			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.findFormat());
 			return criteriaBuilder.like(path, transformNonNull(value, v -> "%" + v.toString() + "%"));
 		};
 	}

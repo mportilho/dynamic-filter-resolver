@@ -12,6 +12,6 @@ public interface FilterValueConverter {
 	 * @return The converted value to an expected type. Returns null if parameter
 	 *         value is null.
 	 */
-	<R> R convert(Object value, Class<?> expectedType, Object format);
+	<R> R convert(Object value, Class<?> expectedType, String format);
 
 }

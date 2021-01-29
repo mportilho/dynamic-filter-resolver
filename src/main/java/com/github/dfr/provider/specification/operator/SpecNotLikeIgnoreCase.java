@@ -17,7 +17,7 @@ class SpecNotLikeIgnoreCase<T> implements NotLikeIgnoreCase<Specification<T>> {
 			Map<String, Object> sharedContext) {
 		return (root, query, criteriaBuilder) -> {
 			Path<String> path = PredicateUtils.computeAttributePath(filterParameter, root);
-			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.getFormat());
+			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.findFormat());
 			return criteriaBuilder.notLike(criteriaBuilder.upper(path), transformNonNull(value, v -> "%" + v.toString().toUpperCase() + "%"));
 		};
 	}

@@ -44,7 +44,7 @@ public class FilterParameter {
 	 * recommended that each parameter has its own provided format for configuration
 	 * clarity
 	 */
-	private final String[] format;
+	private final String[] formats;
 
 	/**
 	 * The parameter's mutable state during filter resolution
@@ -53,26 +53,26 @@ public class FilterParameter {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public FilterParameter(String path, String[] parameters, Class<?> targetType, Class<? extends FilterOperator> operator, boolean negate,
-			Object[] value, String[] valueFormats) {
+			Object[] value, String[] formats) {
 		this.path = path;
 		this.parameters = parameters;
 		this.targetType = targetType;
 		this.operator = (Class<? extends FilterOperator<?>>) operator;
 		this.negate = negate;
 		this.values = value;
-		this.format = valueFormats;
+		this.formats = formats;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public FilterParameter(String path, String parameter, Class<?> targetType, Class<? extends FilterOperator> operator, boolean negate, Object value,
-			String valueFormat) {
+			String format) {
 		this.path = path;
 		this.parameters = new String[] { parameter };
 		this.targetType = targetType;
 		this.operator = (Class<? extends FilterOperator<?>>) operator;
 		this.negate = negate;
 		this.values = new Object[] { value };
-		this.format = new String[] { valueFormat };
+		this.formats = new String[] { format };
 	}
 
 	public String getPath() {
@@ -99,8 +99,8 @@ public class FilterParameter {
 		return operator;
 	}
 
-	public String[] getFormat() {
-		return format;
+	public String[] getFormats() {
+		return formats;
 	}
 
 	public void addState(Object key, Object value) {
@@ -119,7 +119,7 @@ public class FilterParameter {
 	}
 
 	public Object findValue() {
-		if (values == null) {
+		if (values == null || values.length == 0) {
 			return null;
 		} else if (values.length > 1) {
 			throw new IllegalStateException("Cannot get single value because multiple values are present");
@@ -127,9 +127,13 @@ public class FilterParameter {
 		return values[0];
 	}
 
-//	public Object findValue(Function<Object, Object> tranform) {
-//		Object value = findValue();
-//		return value == null ? null : tranform.apply(value);
-//	}
+	public String findFormat() {
+		if (formats == null || formats.length == 0) {
+			return null;
+		} else if (formats.length > 1) {
+			throw new IllegalStateException("Cannot get single value because multiple values are present");
+		}
+		return formats[0];
+	}
 
 }

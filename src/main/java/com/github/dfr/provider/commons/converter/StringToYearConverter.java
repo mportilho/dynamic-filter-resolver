@@ -1,14 +1,18 @@
 package com.github.dfr.provider.commons.converter;
 
 import java.time.Year;
+import java.time.format.DateTimeFormatter;
 
-import org.springframework.core.convert.converter.Converter;
+import com.github.dfr.provider.commons.AbstractFormattedValueConverter;
 
-public class StringToYearConverter implements Converter<String, Year> {
+public class StringToYearConverter extends AbstractFormattedValueConverter<String, Year, String> {
 
 	@Override
-	public Year convert(String source) {
-		return Year.parse(source);
+	public Year convert(String source, String format) {
+		if (format == null || format.isEmpty()) {
+			return Year.parse(source);
+		}
+		return cache(format, DateTimeFormatter::ofPattern).parse(source, Year::from);
 	}
 
 }

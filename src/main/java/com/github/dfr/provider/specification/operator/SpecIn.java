@@ -20,7 +20,7 @@ class SpecIn<T> implements In<Specification<T>> {
 			Map<String, Object> sharedContext) {
 		return (root, query, criteriaBuilder) -> {
 			Path<?> path = computeAttributePath(filterParameter, root);
-			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.getFormat());
+			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.findFormat());
 			if (value == null || !value.getClass().isArray() || !Collection.class.isAssignableFrom(value.getClass())) {
 				throw new IllegalArgumentException("No list of elements found for 'in' operation");
 			}
