@@ -1,7 +1,5 @@
 package com.github.dfr.provider.specification.operator;
 
-import java.util.Map;
-
 import org.springframework.data.jpa.domain.Specification;
 
 import com.github.dfr.filter.FilterParameter;
@@ -15,9 +13,8 @@ class SpecNotIn<T> implements NotIn<Specification<T>> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter,
-			Map<String, Object> sharedContext) {
-		return Specification.not(IN_STATIC.createFilter(filterParameter, filterValueConverter, sharedContext));
+	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
+		return Specification.not(IN_STATIC.createFilter(filterParameter, filterValueConverter));
 	}
 
 }

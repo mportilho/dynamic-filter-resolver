@@ -2,8 +2,6 @@ package com.github.dfr.provider.specification.operator;
 
 import static com.github.dfr.provider.specification.operator.PredicateUtils.computeAttributePath;
 
-import java.util.Map;
-
 import javax.persistence.criteria.Path;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -16,8 +14,7 @@ class SpecEqualsIgnoreCase<T> implements EqualsIgnoreCase<Specification<T>> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter,
-			Map<String, Object> sharedContext) {
+	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		return (root, query, criteriaBuilder) -> {
 			Path<?> path = computeAttributePath(filterParameter, root);
 			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.findFormat());

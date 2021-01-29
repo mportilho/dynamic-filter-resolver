@@ -1,7 +1,5 @@
 package com.github.dfr.provider.specification.operator;
 
-import java.util.Map;
-
 import javax.persistence.criteria.Path;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -14,8 +12,7 @@ class SpecBetween<T> implements Between<Specification<T>> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter,
-			Map<String, Object> sharedContext) {
+	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		return (root, query, criteriaBuilder) -> {
 			Path<Comparable<Object>> path = PredicateUtils.computeAttributePath(filterParameter, root);
 			Comparable<Object> lowerValue = (Comparable<Object>) filterParameter.getValues()[0];

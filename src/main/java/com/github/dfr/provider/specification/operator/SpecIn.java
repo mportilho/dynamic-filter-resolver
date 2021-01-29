@@ -3,7 +3,6 @@ package com.github.dfr.provider.specification.operator;
 import static com.github.dfr.provider.specification.operator.PredicateUtils.computeAttributePath;
 
 import java.util.Collection;
-import java.util.Map;
 
 import javax.persistence.criteria.Path;
 
@@ -16,8 +15,7 @@ import com.github.dfr.operator.type.In;
 class SpecIn<T> implements In<Specification<T>> {
 
 	@Override
-	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter,
-			Map<String, Object> sharedContext) {
+	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		return (root, query, criteriaBuilder) -> {
 			Path<?> path = computeAttributePath(filterParameter, root);
 			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.findFormat());

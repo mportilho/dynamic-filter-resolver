@@ -32,7 +32,7 @@ public class SpecificationDynamicFilterResolver<T> extends AbstractDynamicFilter
 		Specification<T> rootSpec = Specification.where(null);
 		for (FilterParameter clause : conditionalStatement.getClauses()) {
 			FilterOperator<Specification<T>> operator = filterOperatorService.getOperatorFor(clause.getOperator());
-			Specification<T> spec = operator.createFilter(clause, filterValueConverter, null);
+			Specification<T> spec = operator.createFilter(clause, filterValueConverter);
 			if (spec != null) {
 				spec = clause.isNegate() ? Specification.not(spec) : spec;
 				rootSpec = conditionalStatement.isConjunction() ? rootSpec.and(spec) : rootSpec.or(spec);
