@@ -6,6 +6,9 @@ import static com.github.dfr.filter.LogicType.DISJUNCTION;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.web.servlet.HandlerMapping;
 
 import com.github.dfr.annotation.And;
 import com.github.dfr.annotation.Conjunction;
@@ -52,14 +56,17 @@ public class SpecificationFilterParameterArgumentResolver implements HandlerMeth
 			WebDataBinderFactory binderFactory) throws Exception {
 		ConditionalStatement statement = null;
 
+		Map<String, String[]> parameterMap = webRequest.getParameterMap();
+		parameterMap.putAll(getPathVariables(webRequest));
+
 		And andAnnot;
 		if ((andAnnot = parameter.getParameterAnnotation(And.class)) != null) {
-			statement = logicContextProvider.createLogicContext(CONJUNCTION, andAnnot.values(), null, webRequest.getParameterMap());
+			statement = logicContextProvider.createLogicContext(CONJUNCTION, andAnnot.values(), null, parameterMap);
 		}
 
 		Or orAnnot;
 		if (statement == null && (orAnnot = parameter.getParameterAnnotation(Or.class)) != null) {
-			statement = logicContextProvider.createLogicContext(DISJUNCTION, orAnnot.values(), null, webRequest.getParameterMap());
+			statement = logicContextProvider.createLogicContext(DISJUNCTION, orAnnot.values(), null, parameterMap);
 		}
 
 		Conjunction conjAnnot;
@@ -68,7 +75,7 @@ public class SpecificationFilterParameterArgumentResolver implements HandlerMeth
 			for (Or or : conjAnnot.values()) {
 				disjunctions.add(or.values());
 			}
-			statement = logicContextProvider.createLogicContext(CONJUNCTION, conjAnnot.and(), disjunctions, webRequest.getParameterMap());
+			statement = logicContextProvider.createLogicContext(CONJUNCTION, conjAnnot.and(), disjunctions, parameterMap);
 		}
 
 		Disjunction disjAnnot;
@@ -77,10 +84,16 @@ public class SpecificationFilterParameterArgumentResolver implements HandlerMeth
 			for (And and : disjAnnot.values()) {
 				conjunctions.add(and.values());
 			}
-			statement = logicContextProvider.createLogicContext(DISJUNCTION, disjAnnot.or(), conjunctions, webRequest.getParameterMap());
+			statement = logicContextProvider.createLogicContext(DISJUNCTION, disjAnnot.or(), conjunctions, parameterMap);
 		}
 
 		return dynamicFilterResolver.convertTo(statement);
+	}
+
+	@SuppressWarnings("unchecked")
+	private Map<String, String[]> getPathVariables(NativeWebRequest webRequest) {
+		HttpServletRequest httpServletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
+		return (Map<String, String[]>) httpServletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 	}
 
 	/**

@@ -2,7 +2,6 @@ package com.github.dfr.filter;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 import com.github.dfr.operator.FilterOperator;
 
