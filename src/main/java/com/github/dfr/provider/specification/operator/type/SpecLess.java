@@ -12,7 +12,7 @@ import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.operator.ParameterValueConverter;
 import com.github.dfr.operator.type.Less;
 
-public class SpecLess<T> implements Less<Specification<T>>, SpecComparablePredicate {
+class SpecLess<T> implements Less<Specification<T>>, SpecComparablePredicate {
 
 	@Override
 	public Specification<T> createFilter(FilterParameter filterParameter, ParameterValueConverter parameterValueConverter,

@@ -10,7 +10,7 @@ import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.operator.ParameterValueConverter;
 import com.github.dfr.operator.type.IsNotNull;
 
-public class SpecIsNotNull<T> implements IsNotNull<Specification<T>> {
+class SpecIsNotNull<T> implements IsNotNull<Specification<T>> {
 
 	@Override
 	public Specification<T> createFilter(FilterParameter filterParameter, ParameterValueConverter parameterValueConverter,

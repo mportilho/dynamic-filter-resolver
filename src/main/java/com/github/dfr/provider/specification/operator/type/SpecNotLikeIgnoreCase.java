@@ -10,7 +10,7 @@ import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.operator.ParameterValueConverter;
 import com.github.dfr.operator.type.NotLikeIgnoreCase;
 
-public class SpecNotLikeIgnoreCase<T> implements NotLikeIgnoreCase<Specification<T>> {
+class SpecNotLikeIgnoreCase<T> implements NotLikeIgnoreCase<Specification<T>> {
 
 	@Override
 	public Specification<T> createFilter(FilterParameter filterParameter, ParameterValueConverter parameterValueConverter,

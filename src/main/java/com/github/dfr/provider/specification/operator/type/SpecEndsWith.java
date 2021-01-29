@@ -10,7 +10,7 @@ import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.operator.ParameterValueConverter;
 import com.github.dfr.operator.type.EndsWith;
 
-public class SpecEndsWith<T> implements EndsWith<Specification<T>> {
+class SpecEndsWith<T> implements EndsWith<Specification<T>> {
 
 	@Override
 	public Specification<T> createFilter(FilterParameter filterParameter, ParameterValueConverter parameterValueConverter,

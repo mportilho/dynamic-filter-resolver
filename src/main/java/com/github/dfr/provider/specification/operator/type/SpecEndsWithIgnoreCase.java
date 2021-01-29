@@ -10,7 +10,7 @@ import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.operator.ParameterValueConverter;
 import com.github.dfr.operator.type.EndsWithIgnoreCase;
 
-public class SpecEndsWithIgnoreCase<T> implements EndsWithIgnoreCase<Specification<T>> {
+class SpecEndsWithIgnoreCase<T> implements EndsWithIgnoreCase<Specification<T>> {
 
 	@Override
 	public Specification<T> createFilter(FilterParameter filterParameter, ParameterValueConverter parameterValueConverter,

@@ -7,7 +7,7 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 
-public interface SpecComparablePredicate {
+interface SpecComparablePredicate {
 
 	@SuppressWarnings({ "unchecked" })
 	default Predicate toComparablePredicate(CriteriaBuilder criteriaBuilder, Path<?> path, Object value,

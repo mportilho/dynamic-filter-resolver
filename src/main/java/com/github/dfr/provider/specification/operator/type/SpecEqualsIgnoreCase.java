@@ -12,7 +12,7 @@ import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.operator.ParameterValueConverter;
 import com.github.dfr.operator.type.EqualsIgnoreCase;
 
-public class SpecEqualsIgnoreCase<T> implements EqualsIgnoreCase<Specification<T>> {
+class SpecEqualsIgnoreCase<T> implements EqualsIgnoreCase<Specification<T>> {
 
 	@Override
 	@SuppressWarnings("unchecked")

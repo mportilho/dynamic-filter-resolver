@@ -8,7 +8,7 @@ import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.operator.ParameterValueConverter;
 import com.github.dfr.operator.type.NotIn;
 
-public class SpecNotIn<T> implements NotIn<Specification<T>> {
+class SpecNotIn<T> implements NotIn<Specification<T>> {
 
 	@SuppressWarnings("rawtypes")
 	private static final SpecIn IN_STATIC = new SpecIn<>();
