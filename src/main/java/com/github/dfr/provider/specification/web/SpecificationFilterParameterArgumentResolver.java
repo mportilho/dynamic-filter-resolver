@@ -17,20 +17,20 @@ import com.github.dfr.annotation.Conjunction;
 import com.github.dfr.annotation.Disjunction;
 import com.github.dfr.annotation.Filter;
 import com.github.dfr.annotation.Or;
+import com.github.dfr.filter.DynamicFilterResolver;
 import com.github.dfr.filter.FilterLogicContext;
-import com.github.dfr.filter.FilterParameterResolver;
 import com.github.dfr.filter.LogicType;
-import com.github.dfr.provider.AnnotationBasedFilterResolverProvider;
+import com.github.dfr.provider.AnnotationBasedFilterLogicContextProvider;
 
 public class SpecificationFilterParameterArgumentResolver implements HandlerMethodArgumentResolver {
 
-	private AnnotationBasedFilterResolverProvider filterResolverProvider;
-	private FilterParameterResolver<Specification<?>> parameterFilter;
+	private AnnotationBasedFilterLogicContextProvider logicContextProvider;
+	private DynamicFilterResolver<Specification<?>> dynamicFilterResolver;
 
 	public SpecificationFilterParameterArgumentResolver(StringValueResolver stringValueResolver,
-			FilterParameterResolver<Specification<?>> parameterFilter) {
-		this.filterResolverProvider = new AnnotationBasedFilterResolverProvider(stringValueResolver);
-		this.parameterFilter = parameterFilter;
+			DynamicFilterResolver<Specification<?>> parameterFilter) {
+		this.logicContextProvider = new AnnotationBasedFilterLogicContextProvider(stringValueResolver);
+		this.dynamicFilterResolver = parameterFilter;
 	}
 
 	@Override
@@ -52,12 +52,12 @@ public class SpecificationFilterParameterArgumentResolver implements HandlerMeth
 
 		And andAnnot;
 		if ((andAnnot = parameter.getParameterAnnotation(And.class)) != null) {
-			logicContext = filterResolverProvider.createLogicContext(LogicType.CONJUNCTION, andAnnot.values(), null, webRequest.getParameterMap());
+			logicContext = logicContextProvider.createLogicContext(LogicType.CONJUNCTION, andAnnot.values(), null, webRequest.getParameterMap());
 		}
 
 		Or orAnnot;
 		if (logicContext == null && (orAnnot = parameter.getParameterAnnotation(Or.class)) != null) {
-			logicContext = filterResolverProvider.createLogicContext(LogicType.DISJUNCTION, orAnnot.values(), null, webRequest.getParameterMap());
+			logicContext = logicContextProvider.createLogicContext(LogicType.DISJUNCTION, orAnnot.values(), null, webRequest.getParameterMap());
 		}
 
 		Conjunction conjAnnot;
@@ -66,8 +66,7 @@ public class SpecificationFilterParameterArgumentResolver implements HandlerMeth
 			for (Or or : conjAnnot.values()) {
 				filtersList.add(or.values());
 			}
-			logicContext = filterResolverProvider.createLogicContext(LogicType.CONJUNCTION, conjAnnot.and(), filtersList,
-					webRequest.getParameterMap());
+			logicContext = logicContextProvider.createLogicContext(LogicType.CONJUNCTION, conjAnnot.and(), filtersList, webRequest.getParameterMap());
 		}
 
 		Disjunction disjAnnot;
@@ -76,11 +75,10 @@ public class SpecificationFilterParameterArgumentResolver implements HandlerMeth
 			for (And and : disjAnnot.values()) {
 				filtersList.add(and.values());
 			}
-			logicContext = filterResolverProvider.createLogicContext(LogicType.DISJUNCTION, disjAnnot.or(), filtersList,
-					webRequest.getParameterMap());
+			logicContext = logicContextProvider.createLogicContext(LogicType.DISJUNCTION, disjAnnot.or(), filtersList, webRequest.getParameterMap());
 		}
 
-		return parameterFilter.convertTo(logicContext);
+		return dynamicFilterResolver.convertTo(logicContext);
 	}
 
 	/**

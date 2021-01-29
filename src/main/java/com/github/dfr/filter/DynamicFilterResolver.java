@@ -1,6 +1,6 @@
 package com.github.dfr.filter;
 
-public interface FilterParameterResolver<T> {
+public interface DynamicFilterResolver<T> {
 
 	T convertTo(FilterLogicContext filterLogicContext);
 

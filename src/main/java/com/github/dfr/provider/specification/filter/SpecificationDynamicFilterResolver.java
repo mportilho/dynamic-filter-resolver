@@ -8,17 +8,17 @@ import org.springframework.data.jpa.domain.Specification;
 import com.github.dfr.filter.CorrelatedFilterParameter;
 import com.github.dfr.filter.FilterLogicContext;
 import com.github.dfr.filter.FilterParameter;
-import com.github.dfr.filter.FilterParameterResolver;
+import com.github.dfr.filter.DynamicFilterResolver;
 import com.github.dfr.operator.FilterOperator;
 import com.github.dfr.operator.FilterOperatorService;
 import com.github.dfr.operator.ParameterValueConverter;
 
-public class SpecificationFilterParameterResolver<T> implements FilterParameterResolver<Specification<T>> {
+public class SpecificationDynamicFilterResolver<T> implements DynamicFilterResolver<Specification<T>> {
 
 	private final FilterOperatorService<Specification<T>> filterOperatorService;
 	private final ParameterValueConverter parameterValueConverter;
 
-	public SpecificationFilterParameterResolver(FilterOperatorService<Specification<T>> operatorService,
+	public SpecificationDynamicFilterResolver(FilterOperatorService<Specification<T>> operatorService,
 			ParameterValueConverter parameterValueConverter) {
 		this.filterOperatorService = operatorService;
 		this.parameterValueConverter = parameterValueConverter;

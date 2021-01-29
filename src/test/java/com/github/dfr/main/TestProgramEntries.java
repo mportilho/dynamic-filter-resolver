@@ -16,14 +16,14 @@ import com.github.dfr.apptest.domain.model.Person;
 import com.github.dfr.apptest.repository.PersonRepository;
 import com.github.dfr.filter.CorrelatedFilterParameter;
 import com.github.dfr.filter.FilterParameter;
-import com.github.dfr.filter.FilterParameterResolver;
+import com.github.dfr.filter.DynamicFilterResolver;
 import com.github.dfr.filter.LogicType;
 import com.github.dfr.operator.FilterOperatorService;
 import com.github.dfr.operator.ParameterValueConverter;
 import com.github.dfr.operator.type.Equals;
 import com.github.dfr.operator.type.GreaterOrEquals;
 import com.github.dfr.filter.FilterLogicContext;
-import com.github.dfr.provider.specification.filter.SpecificationFilterParameterResolver;
+import com.github.dfr.provider.specification.filter.SpecificationDynamicFilterResolver;
 import com.github.dfr.provider.specification.operator.DefaultParameterValueConverter;
 import com.github.dfr.provider.specification.operator.type.SpecificationFilterOperatorService;
 
@@ -49,7 +49,7 @@ public class TestProgramEntries {
 		FilterLogicContext logicWrapper = new FilterLogicContext(LogicType.CONJUNCTION, new CorrelatedFilterParameter(LogicType.CONJUNCTION, parameters),
 				Collections.emptyList());
 
-		FilterParameterResolver<Specification<Person>> parameterFilter = new SpecificationFilterParameterResolver<>(decoderService,
+		DynamicFilterResolver<Specification<Person>> parameterFilter = new SpecificationDynamicFilterResolver<>(decoderService,
 				parameterValueConverter);
 
 		List<Person> list = personRepo.findAll(parameterFilter.convertTo(logicWrapper));

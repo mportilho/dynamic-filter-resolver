@@ -13,11 +13,11 @@ import com.github.dfr.filter.FilterLogicContext;
 import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.filter.LogicType;
 
-public class AnnotationBasedFilterResolverProvider {
+public class AnnotationBasedFilterLogicContextProvider {
 
 	private StringValueResolver stringValueResolver;
 
-	public AnnotationBasedFilterResolverProvider(StringValueResolver stringValueResolver) {
+	public AnnotationBasedFilterLogicContextProvider(StringValueResolver stringValueResolver) {
 		super();
 		this.stringValueResolver = stringValueResolver;
 	}
@@ -81,13 +81,13 @@ public class AnnotationBasedFilterResolverProvider {
 						values[index++] = values[index] != null ? values[index] : defaultValues[index];
 					}
 				}
-				
+
 				String[] expressionLanguage = (String[]) computeSpringExpressionLanguage(new String[] { filter.negate() });
 				boolean negate = Boolean.parseBoolean(expressionLanguage[0]);
 				String[] formats = (String[]) computeSpringExpressionLanguage(filter.formats());
-				
-				filterParameters
-						.add(new FilterParameter(filter.path(), filter.parameters(), filter.targetType(), filter.operator(), negate, values, formats));
+
+				filterParameters.add(
+						new FilterParameter(filter.path(), filter.parameters(), filter.targetType(), filter.operator(), negate, values, formats));
 			}
 		}
 		return filterParameters;
