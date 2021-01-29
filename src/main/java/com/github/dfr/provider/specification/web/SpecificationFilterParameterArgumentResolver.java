@@ -42,13 +42,16 @@ public class SpecificationFilterParameterArgumentResolver implements HandlerMeth
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		Class<?> parameterType = parameter.getParameterType();
+		if (!parameterType.isInterface() || !Specification.class.isAssignableFrom(parameterType)) {
+			return false;
+		}
 		int annotationQuantity = countPresentAnnotations(parameter);
 		if (annotationQuantity > 1) {
 			throw new IllegalStateException(
 					"The annotations Or, And, Conjunction and Disjunction cannot be used at the same time, as seen on parameter + "
 							+ parameter.getParameterName());
 		}
-		return Specification.class.isAssignableFrom(parameterType) && annotationQuantity == 1;
+		return annotationQuantity == 1;
 	}
 
 	@Override
