@@ -25,7 +25,8 @@ public class SpecificationDynamicFilterResolver<T> implements DynamicFilterResol
 
 	@Override
 	public Specification<T> convertTo(ConditionalStatement conditionalStatement) {
-		return convertRecursively(conditionalStatement, new ConcurrentHashMap<>());
+		return conditionalStatement == null || !conditionalStatement.hasAnyCondition() ? Specification.where(null)
+				: convertRecursively(conditionalStatement, new ConcurrentHashMap<>());
 	}
 
 	/**
@@ -35,7 +36,7 @@ public class SpecificationDynamicFilterResolver<T> implements DynamicFilterResol
 	 * @return
 	 */
 	public Specification<T> convertRecursively(ConditionalStatement conditionalStatement, Map<String, Object> sharedContext) {
-		if (conditionalStatement == null) {
+		if (conditionalStatement == null || !conditionalStatement.hasAnyCondition()) {
 			return Specification.where(null);
 		}
 		Specification<T> rootSpecification = Specification.where(createSpecifications(conditionalStatement, sharedContext));
