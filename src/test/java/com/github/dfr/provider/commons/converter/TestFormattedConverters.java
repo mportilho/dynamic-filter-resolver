@@ -22,19 +22,19 @@ public class TestFormattedConverters {
 	public void testStringToInstantConverter() {
 		StringToInstantConverter converter = new StringToInstantConverter();
 		Instant value;
-		
+
 		value = converter.convert("03-12-2011T10:15:30Z", null);
 		assertThat(value).isEqualTo("2011-12-03T10:15:30Z");
-		
+
 		value = converter.convert("03/12/2011T10:15:30Z", null);
 		assertThat(value).isEqualTo("2011-12-03T10:15:30Z");
-		
+
 		value = converter.convert("2011-12-03T10:15:30Z", null);
 		assertThat(value).isEqualTo("2011-12-03T10:15:30Z");
-		
+
 		value = converter.convert("2011/12/03T10:15:30Z", null);
 		assertThat(value).isEqualTo("2011-12-03T10:15:30Z");
-		
+
 		value = converter.convert("2011/12/03T10:15Z", null);
 		assertThat(value).isEqualTo("2011-12-03T10:15:00Z");
 	}
@@ -42,15 +42,40 @@ public class TestFormattedConverters {
 	@Test
 	public void testStringToJavaSqlDate() {
 		StringToJavaSqlDateConverter converter = new StringToJavaSqlDateConverter();
-		Date value = converter.convert("21/12/2014", null);
+		Date value;
+
+		value = converter.convert("21/12/2014", null);
+		assertThat(value).isEqualTo("2014-12-21");
+
+		value = converter.convert("21-12-2014", null);
+		assertThat(value).isEqualTo("2014-12-21");
+
+		value = converter.convert("2014/12/21", null);
+		assertThat(value).isEqualTo("2014-12-21");
+
+		value = converter.convert("2014-12-21", null);
 		assertThat(value).isEqualTo("2014-12-21");
 	}
 
 	@Test
 	public void testStringToJavaUtilDate() {
 		StringToJavaUtilDateConverter converter = new StringToJavaUtilDateConverter();
-		java.util.Date value = converter.convert("21/12/2014", null);
+		java.util.Date value;
+
+		value = converter.convert("21/12/2014", null);
 		assertThat(value).isEqualTo("2014-12-21");
+
+		value = converter.convert("21-12-2014", null);
+		assertThat(value).isEqualTo("2014-12-21");
+
+		value = converter.convert("2014/12/21", null);
+		assertThat(value).isEqualTo("2014-12-21");
+
+		value = converter.convert("2014-12-21", null);
+		assertThat(value).isEqualTo("2014-12-21");
+
+		value = converter.convert("2011/12/03T10:15:00+01:00", null);
+		assertThat(value).isEqualTo("2011-12-03T10:15:00-02:00");
 	}
 
 	@Test
@@ -60,13 +85,13 @@ public class TestFormattedConverters {
 
 		value = converter.convert("21/12/2014", null);
 		assertThat(value).isEqualTo("2014-12-21");
-		
+
 		value = converter.convert("21-12-2014", null);
 		assertThat(value).isEqualTo("2014-12-21");
-		
+
 		value = converter.convert("2014-12-21", null);
 		assertThat(value).isEqualTo("2014-12-21");
-		
+
 		value = converter.convert("2014/12/21", null);
 		assertThat(value).isEqualTo("2014-12-21");
 	}
@@ -78,13 +103,13 @@ public class TestFormattedConverters {
 
 		value = converter.convert("21/12/2011T10:15:30Z", null);
 		assertThat(value).isEqualTo("2011-12-21T10:15:30");
-		
+
 		value = converter.convert("21-12-2011T10:15:30Z", null);
 		assertThat(value).isEqualTo("2011-12-21T10:15:30");
-		
+
 		value = converter.convert("2011/12/21T10:15:30Z", null);
 		assertThat(value).isEqualTo("2011-12-21T10:15:30");
-		
+
 		value = converter.convert("2011-12-21T10:15:30Z", null);
 		assertThat(value).isEqualTo("2011-12-21T10:15:30");
 	}
@@ -96,13 +121,13 @@ public class TestFormattedConverters {
 
 		value = converter.convert("10:15:30Z", null);
 		assertThat(value).isEqualTo("10:15:30");
-		
+
 		value = converter.convert("10:15:30", null);
 		assertThat(value).isEqualTo("10:15:30");
-		
+
 		value = converter.convert("10:15", null);
 		assertThat(value).isEqualTo("10:15:00");
-		
+
 		value = converter.convert("10:15Z", null);
 		assertThat(value).isEqualTo("10:15:00");
 	}
@@ -114,19 +139,19 @@ public class TestFormattedConverters {
 
 		value = converter.convert("03-12-2007T10:15:30+01:00", null);
 		assertThat(value).isEqualTo("2007-12-03T10:15:30+01:00");
-		
+
 		value = converter.convert("03/12/2007T10:15:30+01:00", null);
 		assertThat(value).isEqualTo("2007-12-03T10:15:30+01:00");
-		
+
 		value = converter.convert("2007/12/03T10:15:30+01:00", null);
 		assertThat(value).isEqualTo("2007-12-03T10:15:30+01:00");
-		
+
 		value = converter.convert("2007-12-03T10:15:30+01:00", null);
 		assertThat(value).isEqualTo("2007-12-03T10:15:30+01:00");
-		
+
 		value = converter.convert("2007-12-03T10:15+01:00", null);
 		assertThat(value).isEqualTo("2007-12-03T10:15:00+01:00");
-		
+
 		value = converter.convert("2007-12-03T10:15:30-01:00", null);
 		assertThat(value).isEqualTo("2007-12-03T10:15:30-01:00");
 	}
@@ -150,25 +175,25 @@ public class TestFormattedConverters {
 
 		value = converter.convert("03-12-2011T10:15:30Z", null);
 		assertThat(value).isEqualTo(Timestamp.valueOf(LocalDateTime.of(2011, 12, 3, 10, 15, 30, 0)));
-		
+
 		value = converter.convert("03/12/2011T10:15:30Z", null);
 		assertThat(value).isEqualTo(Timestamp.valueOf(LocalDateTime.of(2011, 12, 3, 10, 15, 30, 0)));
-		
+
 		value = converter.convert("2011/12/03T10:15:30Z", null);
 		assertThat(value).isEqualTo(Timestamp.valueOf(LocalDateTime.of(2011, 12, 3, 10, 15, 30, 0)));
-		
+
 		value = converter.convert("2011-12-03T10:15:30Z", null);
 		assertThat(value).isEqualTo(Timestamp.valueOf(LocalDateTime.of(2011, 12, 3, 10, 15, 30, 0)));
-		
+
 		value = converter.convert("2011-12-03T10:15:30Z", null);
 		assertThat(value).isEqualTo(Timestamp.valueOf(LocalDateTime.of(2011, 12, 3, 10, 15, 30, 0)));
-		
+
 		value = converter.convert("2011-12-03T10:15:30", null);
 		assertThat(value).isEqualTo(Timestamp.valueOf(LocalDateTime.of(2011, 12, 3, 10, 15, 30, 0)));
-		
+
 		value = converter.convert("2011-12-03T10:15Z", null);
 		assertThat(value).isEqualTo(Timestamp.valueOf(LocalDateTime.of(2011, 12, 3, 10, 15, 0, 0)));
-		
+
 		value = converter.convert("2011-12-03T10:15", null);
 		assertThat(value).isEqualTo(Timestamp.valueOf(LocalDateTime.of(2011, 12, 3, 10, 15, 0, 0)));
 	}
@@ -189,10 +214,10 @@ public class TestFormattedConverters {
 
 		value = converter.convert("12/2012", null);
 		assertThat(value).isEqualByComparingTo(YearMonth.of(2012, 12));
-		
+
 		value = converter.convert("2012/12", null);
 		assertThat(value).isEqualByComparingTo(YearMonth.of(2012, 12));
-		
+
 		value = converter.convert("201203", null);
 		assertThat(value).isEqualByComparingTo(YearMonth.of(2012, 3));
 	}
@@ -204,19 +229,19 @@ public class TestFormattedConverters {
 
 		value = converter.convert("03-12-2011T10:15:30Z", null);
 		assertThat(value).isEqualTo("2011-12-03T10:15:30Z");
-		
+
 		value = converter.convert("03/12/2011T10:15:30Z", null);
 		assertThat(value).isEqualTo("2011-12-03T10:15:30Z");
-		
+
 		value = converter.convert("2011-12-03T10:15:30Z", null);
 		assertThat(value).isEqualTo("2011-12-03T10:15:30Z");
-		
+
 		value = converter.convert("2011/12/03T10:15:30Z", null);
 		assertThat(value).isEqualTo("2011-12-03T10:15:30Z");
-		
+
 		value = converter.convert("2011/12/03T10:15:30Z", null);
 		assertThat(value).isEqualTo("2011-12-03T10:15:30Z");
-		
+
 		value = converter.convert("2011/12/03T10:15Z", null);
 		assertThat(value).isEqualTo("2011-12-03T10:15:00Z");
 	}
