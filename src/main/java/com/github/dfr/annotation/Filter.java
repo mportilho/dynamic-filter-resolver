@@ -33,12 +33,13 @@ public @interface Filter {
 	/**
 	 * Target attribute type for convertion
 	 */
-	Class<?> targetType() default Void.class;
+	Class<?> targetType() default Object.class;
 
 	/**
 	 * Operation to be used as a query filter
 	 */
-	Class<? extends FilterOperator<?>> operator();
+	@SuppressWarnings("rawtypes")
+	Class<? extends FilterOperator> operator();
 
 	/**
 	 * Indicates that the logic of this filter must be negated.

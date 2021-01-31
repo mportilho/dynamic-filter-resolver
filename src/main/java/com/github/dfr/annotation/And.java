@@ -13,6 +13,6 @@ import java.lang.annotation.Target;
 @Target({ PARAMETER, TYPE })
 public @interface And {
 
-	Filter[] values();
+	Filter[] value();
 
 }

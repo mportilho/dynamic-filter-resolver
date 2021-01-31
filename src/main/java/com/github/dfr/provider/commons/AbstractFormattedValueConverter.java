@@ -8,9 +8,8 @@ public abstract class AbstractFormattedValueConverter<S, T, F> implements Format
 
 	private Map<F, Object> cache = new WeakHashMap<>();
 
-	@Override
 	@SuppressWarnings("unchecked")
-	public <U> U cache(F format, Function<F, U> supplier) {
+	protected <U> U cache(F format, Function<F, U> supplier) {
 		return (U) cache.computeIfAbsent(format, supplier);
 	}
 

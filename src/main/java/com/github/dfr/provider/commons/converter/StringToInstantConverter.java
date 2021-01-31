@@ -10,7 +10,7 @@ public class StringToInstantConverter extends AbstractFormattedValueConverter<St
 	@Override
 	public Instant convert(String source, String format) {
 		if (format == null || format.isEmpty()) {
-			return Instant.parse(source);
+			return DateConverterUtils.GENERIC_DATETIME_FORMATTER.parse(source, Instant::from);
 		}
 		return cache(format, DateTimeFormatter::ofPattern).parse(source, Instant::from);
 	}

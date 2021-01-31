@@ -16,6 +16,8 @@ class DateConverterUtils {
 		String DEF_YEAR_MONTH = "yyyyMM";
 		String DEF_SLASH_YEAR_MONTH = "MM/yyyy";
 		String DEF_DASH_YEAR_MONTH = "MM-yyyy";
+		String DEF_SLASH_YEAR_MONTH_INVERTED = "yyyy/MM";
+		String DEF_DASH_YEAR_MONTH_INVERTED = "yyyy-MM";
 
 		String DEF_SLASH_DATE = "yyyy/MM[/dd]";
 		String DEF_DASH_DATE = "yyyy-MM[-dd]";
@@ -24,18 +26,19 @@ class DateConverterUtils {
 
 		String DEF_DATE_TIME_SEPARATOR = "['Z']['T']['z']['t'][ ][-]";
 
-		String DEF_TIME = "HH:mm[:ss[.SSS]]";
+		String DEF_TIME = "HH:mm[:ss[.SSSSSSSSS]]";
 		String DEF_TIMEZONE = "[ Z][Z][XXX]['Z']";
 
 		StringBuilder sb;
 
 		sb = new StringBuilder();
-		appendOptional(sb, DEF_YEAR_MONTH, DEF_SLASH_YEAR_MONTH, DEF_DASH_YEAR_MONTH);
+		appendOptional(sb, DEF_YEAR_MONTH, DEF_SLASH_YEAR_MONTH, DEF_DASH_YEAR_MONTH, DEF_SLASH_YEAR_MONTH_INVERTED, DEF_DASH_YEAR_MONTH_INVERTED);
 		GENERIC_MONTH_YEAR_FORMATTER = new DateTimeFormatterBuilder().appendPattern(sb.toString()).toFormatter();
 
 		sb = new StringBuilder();
 		appendOptional(sb, DEF_SLASH_DATE, DEF_DASH_DATE, DEF_SLASH_DATE_PTBR, DEF_DASH_DATE_PTBR);
-		GENERIC_DATE_FORMATTER = new DateTimeFormatterBuilder().append(DateTimeFormatter.BASIC_ISO_DATE).appendPattern(sb.toString()).toFormatter();
+		GENERIC_DATE_FORMATTER = new DateTimeFormatterBuilder().appendOptional(DateTimeFormatter.BASIC_ISO_DATE).appendPattern(sb.toString())
+				.toFormatter();
 
 		sb = new StringBuilder();
 		appendOptional(sb, String.format("%s[%s]", DEF_TIME, DEF_TIMEZONE));
@@ -46,7 +49,7 @@ class DateConverterUtils {
 		appendOptional(sb, String.format("%s[%s%s][%s]", DEF_DASH_DATE, DEF_DATE_TIME_SEPARATOR, DEF_TIME, DEF_TIMEZONE));
 		appendOptional(sb, String.format("%s[%s%s][%s]", DEF_SLASH_DATE_PTBR, DEF_DATE_TIME_SEPARATOR, DEF_TIME, DEF_TIMEZONE));
 		appendOptional(sb, String.format("%s[%s%s][%s]", DEF_DASH_DATE_PTBR, DEF_DATE_TIME_SEPARATOR, DEF_TIME, DEF_TIMEZONE));
-		GENERIC_DATETIME_FORMATTER = new DateTimeFormatterBuilder().append(DateTimeFormatter.BASIC_ISO_DATE).appendPattern(sb.toString())
+		GENERIC_DATETIME_FORMATTER = new DateTimeFormatterBuilder().appendOptional(DateTimeFormatter.BASIC_ISO_DATE).appendPattern(sb.toString())
 				.toFormatter();
 
 		GENERIC_DATETIME_FORMATTER_PADDING_HOURS = new DateTimeFormatterBuilder().append(GENERIC_DATETIME_FORMATTER)

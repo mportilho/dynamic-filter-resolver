@@ -53,4 +53,10 @@ public class ConditionalStatement {
 		return subStatements != null && !subStatements.isEmpty();
 	}
 
+	@Override
+	public String toString() {
+		return "ConditionalStatement [logicType=" + logicType + ", negate=" + negate + ", clauses=" + (clauses == null ? null : clauses.size())
+				+ ", subStatements=" + (subStatements == null ? null : subStatements.size()) + "]";
+	}
+
 }

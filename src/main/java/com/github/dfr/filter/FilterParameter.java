@@ -1,5 +1,6 @@
 package com.github.dfr.filter;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +33,9 @@ public class FilterParameter {
 	 */
 	private final Class<? extends FilterOperator<?>> operator;
 
+	/**
+	 * Negates the logic result of this filter
+	 */
 	private final boolean negate;
 
 	/**
@@ -134,6 +138,13 @@ public class FilterParameter {
 			throw new IllegalStateException("Cannot get single value because multiple values are present");
 		}
 		return formats[0];
+	}
+
+	@Override
+	public String toString() {
+		return "FilterParameter [path=" + path + ", parameters=" + Arrays.toString(parameters) + ", targetType=" + targetType.getSimpleName()
+				+ ", operator=" + operator.getSimpleName() + ", negate=" + negate + ", values=" + Arrays.toString(values) + ", formats="
+				+ Arrays.toString(formats) + "]";
 	}
 
 }

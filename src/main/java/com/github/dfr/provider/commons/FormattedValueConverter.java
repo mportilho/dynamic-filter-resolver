@@ -1,7 +1,5 @@
 package com.github.dfr.provider.commons;
 
-import java.util.function.Function;
-
 import org.springframework.lang.Nullable;
 
 public interface FormattedValueConverter<S, T, F> {
@@ -19,9 +17,5 @@ public interface FormattedValueConverter<S, T, F> {
 	 */
 	@Nullable
 	T convert(S source, F format);
-
-	default <U> U cache(F format, Function<F, U> supplier) {
-		return supplier.apply(format);
-	}
 
 }
