@@ -1,4 +1,4 @@
-package com.github.dfr.provider.commons.converter;
+package com.github.dfr.provider.commons;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,7 +17,6 @@ import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
 
 import com.github.dfr.operator.FilterValueConverter;
-import com.github.dfr.provider.commons.DefaultFilterValueConverter;
 
 public class TestDefaultFilterValueConverter {
 

@@ -1,4 +1,4 @@
-package com.github.dfr.apptest;
+package net.apptest;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

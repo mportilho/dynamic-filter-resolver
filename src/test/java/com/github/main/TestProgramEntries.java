@@ -1,4 +1,4 @@
-package com.github.dfr.main;
+package com.github.main;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,9 +10,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.ContextConfiguration;
 
-import com.github.dfr.apptest.TestingApplication;
-import com.github.dfr.apptest.domain.model.Person;
-import com.github.dfr.apptest.repository.PersonRepository;
 import com.github.dfr.filter.ConditionalStatement;
 import com.github.dfr.filter.DynamicFilterResolver;
 import com.github.dfr.filter.FilterParameter;
@@ -24,6 +21,10 @@ import com.github.dfr.operator.type.GreaterOrEquals;
 import com.github.dfr.provider.commons.DefaultFilterValueConverter;
 import com.github.dfr.provider.specification.filter.SpecificationDynamicFilterResolver;
 import com.github.dfr.provider.specification.operator.SpecificationFilterOperatorService;
+
+import net.apptest.TestingApplication;
+import net.apptest.domain.model.Person;
+import net.apptest.repository.PersonRepository;
 
 @DataJpaTest
 @ContextConfiguration(classes = TestingApplication.class)

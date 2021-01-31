@@ -1,4 +1,4 @@
-package com.github.dfr.apptest.domain.model;
+package net.apptest.domain.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

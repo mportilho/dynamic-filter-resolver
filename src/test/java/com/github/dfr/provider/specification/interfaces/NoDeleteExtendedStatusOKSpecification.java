@@ -1,4 +1,4 @@
-package com.github.dfr.provider.interfaces;
+package com.github.dfr.provider.specification.interfaces;
 
 import java.io.Serializable;
 

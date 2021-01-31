@@ -10,12 +10,12 @@ import com.github.dfr.filter.ConditionalStatement;
 import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.filter.LogicType;
 import com.github.dfr.operator.type.Equals;
-import com.github.dfr.provider.interfaces.NoDeleteAndStatusOkSpecification;
-import com.github.dfr.provider.interfaces.NoDeleteExtendedStatusOKSpecification;
-import com.github.dfr.provider.interfaces.NoDeleteSpecification;
-import com.github.dfr.provider.interfaces.StatusEnum;
+import com.github.dfr.provider.specification.interfaces.NoDeleteAndStatusOkSpecification;
+import com.github.dfr.provider.specification.interfaces.NoDeleteExtendedStatusOKSpecification;
+import com.github.dfr.provider.specification.interfaces.NoDeleteSpecification;
+import com.github.dfr.provider.specification.interfaces.StatusEnum;
 
-public class TestAnnotationContextProvider {
+public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testOneExtendedInterfaceWithOneDefaultParameter() {

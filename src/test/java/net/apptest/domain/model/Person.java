@@ -1,4 +1,4 @@
-package com.github.dfr.apptest.domain.model;
+package net.apptest.domain.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

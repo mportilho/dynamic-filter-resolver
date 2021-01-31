@@ -1,4 +1,4 @@
-package com.github.dfr.apptest.domain.dto;
+package net.apptest.domain.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
