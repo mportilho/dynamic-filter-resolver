@@ -13,8 +13,8 @@ import java.lang.annotation.Target;
 @Target({ PARAMETER, TYPE })
 public @interface Conjunction {
 
-	Filter[] and() default {};
+	Filter[] value() default {};
 
-	Or[] values();
+	Or[] disjunctions() default {};
 
 }
