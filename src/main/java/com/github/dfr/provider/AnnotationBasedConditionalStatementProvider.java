@@ -92,27 +92,39 @@ public class AnnotationBasedConditionalStatementProvider {
 			}
 		}
 
-		LogicType logicType = null;
+		LogicType logicTypeTemp = null;
 		Filter[] filters = null;
 		List<Filter[]> inversedConditionFilters = null;
 		if (Conjunction.class.equals(parameterAnnotation.annotationType())) {
-			logicType = LogicType.CONJUNCTION;
+			logicTypeTemp = LogicType.CONJUNCTION;
 			Conjunction conjunction = (Conjunction) parameterAnnotation;
 			filters = conjunction.value();
 			inversedConditionFilters = Stream.of(conjunction.disjunctions()).filter(or -> or.value().length > 0).map(Or::value)
 					.collect(Collectors.toList());
 		} else if (Disjunction.class.equals(parameterAnnotation.annotationType())) {
-			logicType = LogicType.DISJUNCTION;
+			logicTypeTemp = LogicType.DISJUNCTION;
 			Disjunction disjunction = (Disjunction) parameterAnnotation;
 			filters = disjunction.value();
 			inversedConditionFilters = Stream.of(disjunction.conjunctions()).filter(and -> and.value().length > 0).map(And::value)
 					.collect(Collectors.toList());
 		}
-		if (logicType != null) {
-			ConditionalStatement stmtFromFilters = createConditionalStatementsFromFilters(logicType, filters, inversedConditionFilters,
-					parametersMap);
-			if (stmtFromFilters != null && stmtFromFilters.hasAnyCondition()) {
-				statements.add(stmtFromFilters);
+		if (logicTypeTemp != null) {
+			LogicType logicType = logicTypeTemp;
+			List<FilterParameter> clauses = createFilterParameters(filters, parametersMap);
+			List<ConditionalStatement> invertedStatements = (inversedConditionFilters == null) ? Collections.emptyList() : //@formatter:off
+				inversedConditionFilters
+					.stream()
+					.filter(Objects::nonNull)
+					.map(filter -> createFilterParameters(filter, parametersMap))
+					.filter(l -> l.size() > 0)
+					.map(params -> new ConditionalStatement(logicType.opposite(), params))
+					.collect(Collectors.toList())
+			;//@formatter:on
+
+			if (clauses.isEmpty() && !invertedStatements.isEmpty() && invertedStatements.size() == 1) {
+				statements.add(invertedStatements.get(0));
+			} else if (!clauses.isEmpty() || !invertedStatements.isEmpty()) {
+				statements.add(new ConditionalStatement(logicType, clauses, invertedStatements));
 			}
 		}
 
@@ -161,31 +173,6 @@ public class AnnotationBasedConditionalStatementProvider {
 	/**
 	 * 
 	 * @param <T>
-	 * @param logicType
-	 * @param filters
-	 * @param oppositeFiltersList
-	 * @param parametersMap
-	 * @return
-	 */
-	private <T> ConditionalStatement createConditionalStatementsFromFilters(LogicType logicType, Filter[] filters,
-			List<Filter[]> inversedConditionFilters, Map<String, T[]> parametersMap) {
-		Map<String, T[]> filterValueMap = parametersMap == null ? Collections.emptyMap() : parametersMap;
-		List<ConditionalStatement> inversedStatements = inversedConditionFilters == null ? null : //@formatter:off
-			inversedConditionFilters
-				.stream()
-				.filter(Objects::isNull)
-				.map(filter -> createFilterParameters(filters, filterValueMap))
-				.filter(List::isEmpty)
-				.map(params -> new ConditionalStatement(logicType.opposite(), params))
-				.collect(Collectors.toList())
-		;//@formatter:on
-
-		return new ConditionalStatement(logicType, createFilterParameters(filters, filterValueMap), inversedStatements);
-	}
-
-	/**
-	 * 
-	 * @param <T>
 	 * @param filters
 	 * @param parametersMap
 	 * @return
@@ -199,7 +186,7 @@ public class AnnotationBasedConditionalStatementProvider {
 		for (Filter filter : filters) {
 			if (hasAnyParameterProvidedOrConstants(parametersMap, filter)) {
 				Object[] values = null;
-				if (hasAnyConstant(filter)) {
+				if (hasAnyConstantValue(filter)) {
 					values = generateValuesFromConstants(filter);
 				} else {
 					values = generateValuesFromProvidedParameters(filter, parametersMap);
@@ -224,11 +211,12 @@ public class AnnotationBasedConditionalStatementProvider {
 	 */
 	private <T> Object[] generateValuesFromProvidedParameters(Filter filter, Map<String, T[]> parametersMap) {
 		Object[] values = computeProvidedValues(filter, parametersMap);
-		String[] defaultValues = filter.defaultValues();
-
-		if (values != null && values.length != 0 && defaultValues != null && defaultValues.length != 0) {
-			for (int i = 0; i < values.length && i < defaultValues.length; i++) {
-				values[i] = values[i] != null ? values[i] : computeSpringExpressionLanguage(defaultValues[i]);
+		if (values.length > 0) {
+			String[] defaultValues = filter.defaultValues();
+			for (int i = 0; i < values.length; i++) {
+				if (values[i] == null && defaultValues.length > i) {
+					values[i] = computeSpringExpressionLanguage(defaultValues[i]);
+				}
 			}
 		}
 		return values;
@@ -255,13 +243,15 @@ public class AnnotationBasedConditionalStatementProvider {
 	 * @return
 	 */
 	private <T> Object[] computeProvidedValues(Filter filter, Map<String, T[]> parametersMap) {
-		Object values[] = new Object[filter.parameters().length];
-		for (int i = 0; i < values.length; i++) {
-			Object[] paramValues = parametersMap.get(filter.parameters()[i]);
-			if (paramValues != null && paramValues.length != 0) {
-				values[i] = paramValues.length == 1 ? paramValues[0] : paramValues;
-			} else {
-				values[i] = paramValues;
+		Object[] values = new Object[filter.parameters().length];
+		if (parametersMap != null && !parametersMap.isEmpty()) {
+			for (int i = 0; i < values.length; i++) {
+				Object[] paramValues = parametersMap.get(filter.parameters()[i]);
+				if (paramValues != null && paramValues.length != 0) {
+					values[i] = paramValues.length == 1 ? paramValues[0] : paramValues;
+				} else {
+					values[i] = paramValues;
+				}
 			}
 		}
 		return values;
@@ -306,7 +296,7 @@ public class AnnotationBasedConditionalStatementProvider {
 	 * @return
 	 */
 	private <T> boolean hasAnyParameterProvidedOrConstants(Map<String, T[]> parametersMap, Filter filter) {
-		if (hasAnyConstant(filter)) {
+		if (hasAnyConstantValue(filter) || hasAnyDefaultValue(filter)) {
 			return true;
 		}
 		for (String filterParams : filter.parameters()) {
@@ -322,8 +312,20 @@ public class AnnotationBasedConditionalStatementProvider {
 	 * @param filter
 	 * @return
 	 */
-	private boolean hasAnyConstant(Filter filter) {
+	private boolean hasAnyConstantValue(Filter filter) {
 		if (filter.constantValues() != null && filter.constantValues().length > 0) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * 
+	 * @param filter
+	 * @return
+	 */
+	private boolean hasAnyDefaultValue(Filter filter) {
+		if (filter.defaultValues() != null && filter.defaultValues().length > 0) {
 			return true;
 		}
 		return false;

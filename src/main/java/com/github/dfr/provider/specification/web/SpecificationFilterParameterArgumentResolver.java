@@ -23,12 +23,12 @@ import com.github.dfr.provider.AnnotationBasedConditionalStatementProvider;
 
 public class SpecificationFilterParameterArgumentResolver implements HandlerMethodArgumentResolver {
 
-	private AnnotationBasedConditionalStatementProvider logicContextProvider;
+	private AnnotationBasedConditionalStatementProvider conditionalStatementProvider;
 	private DynamicFilterResolver<Specification<?>> dynamicFilterResolver;
 
 	public SpecificationFilterParameterArgumentResolver(StringValueResolver stringValueResolver,
 			DynamicFilterResolver<Specification<?>> parameterFilter) {
-		this.logicContextProvider = new AnnotationBasedConditionalStatementProvider(stringValueResolver);
+		this.conditionalStatementProvider = new AnnotationBasedConditionalStatementProvider(stringValueResolver);
 		this.dynamicFilterResolver = parameterFilter;
 	}
 
@@ -57,7 +57,7 @@ public class SpecificationFilterParameterArgumentResolver implements HandlerMeth
 		providedParameterValuesMap.putAll(webRequest.getParameterMap());
 		providedParameterValuesMap.putAll((Map<String, String[]>) httpServletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE));
 
-		ConditionalStatement statement = logicContextProvider.createConditionalStatements(parameter.getParameterType(),
+		ConditionalStatement statement = conditionalStatementProvider.createConditionalStatements(parameter.getParameterType(),
 				parameter.getMethodAnnotations(), providedParameterValuesMap);
 		return (statement != null && statement.hasAnyCondition()) ? dynamicFilterResolver.convertTo(statement) : Specification.where(null);
 	}

@@ -14,9 +14,16 @@ import com.github.dfr.operator.type.Equals;
 import com.github.dfr.provider.AnnotationBasedConditionalStatementProvider;
 import com.github.dfr.provider.specification.annotation.AnnotationContainerInterface;
 import com.github.dfr.provider.specification.annotation.MethodArgumentAnnotations;
+import com.github.dfr.provider.specification.interfaces.FullyRequiringConjunctionInterface;
+import com.github.dfr.provider.specification.interfaces.FullyRequiringDisjunctionInterface;
 import com.github.dfr.provider.specification.interfaces.NoDeleteAndStatusOkSpecification;
 import com.github.dfr.provider.specification.interfaces.NoDeleteExtendedStatusOKSpecification;
 import com.github.dfr.provider.specification.interfaces.NoDeleteSpecification;
+import com.github.dfr.provider.specification.interfaces.RequiringSomeMoreValuesInterface;
+import com.github.dfr.provider.specification.interfaces.RequiringSomeValuesAndSomeDefaultsInterface;
+import com.github.dfr.provider.specification.interfaces.RequiringSomeValuesInterface;
+import com.github.dfr.provider.specification.interfaces.RequiringValuesDefaultDataInterface;
+import com.github.dfr.provider.specification.interfaces.RequiringValuesInterface;
 import com.github.dfr.provider.specification.interfaces.StatusEnum;
 
 public class TestAnnotationBasedFilterLogicContextProvider {
@@ -170,6 +177,160 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 		assertThat(stmt_0_0_2.getLogicType()).isEqualByComparingTo(LogicType.CONJUNCTION);
 		assertThat(stmt_0_0_2.getClauses()).isNotEmpty().hasSize(1);
 		assertThat(stmt_0_0_2.getSubStatements()).isEmpty();
+	}
+
+	@Test
+	public void testWithRequiredValuesProvided() {
+		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		ConditionalStatement statement;
+
+		statement = provider.createConditionalStatements(RequiringValuesInterface.class, null,
+				Collections.singletonMap("delete", new String[] { "true" }));
+		assertThat(statement).isNotNull();
+		assertThat(statement.getClauses()).isNotNull().isNotEmpty().hasSize(1);
+		assertThat(statement.getClauses().get(0).getValues()).isNotEmpty().hasSize(1).contains("true");
+
+		statement = provider.createConditionalStatements(RequiringValuesInterface.class, null,
+				Collections.singletonMap("delete", new String[] { "false" }));
+		assertThat(statement).isNotNull();
+		assertThat(statement.getClauses()).isNotNull().isNotEmpty().hasSize(1);
+		assertThat(statement.getClauses().get(0).getValues()).isNotEmpty().hasSize(1).contains("false");
+	}
+
+	@Test
+	public void testWithRequiredValuesNotProvided() {
+		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		ConditionalStatement statement = provider.createConditionalStatements(RequiringValuesInterface.class, null, Collections.emptyMap());
+		assertThat(statement).isNull();
+	}
+
+	@Test
+	public void testWithSomeRequiredValuesProvided() {
+		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		ConditionalStatement statement = provider.createConditionalStatements(RequiringSomeValuesInterface.class, null, Collections.emptyMap());
+		assertThat(statement).isNotNull();
+		assertThat(statement.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.CONJUNCTION);
+		assertThat(statement.getClauses()).isNotEmpty().hasSize(1);
+		assertThat(statement.getClauses().get(0).getPath()).isEqualTo("deleted");
+		assertThat(statement.getSubStatements()).isEmpty();
+	}
+
+	@Test
+	public void testWithSomeMoreRequiredValuesProvided() {
+		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		ConditionalStatement statement = provider.createConditionalStatements(RequiringSomeMoreValuesInterface.class, null, Collections.emptyMap());
+
+		assertThat(statement).isNotNull();
+		assertThat(statement.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.CONJUNCTION);
+		assertThat(statement.getClauses()).isNotEmpty().hasSize(1);
+		assertThat(statement.getClauses().get(0).getPath()).isEqualTo("deleted");
+		assertThat(statement.getSubStatements()).isNotEmpty().hasSize(1);
+
+		ConditionalStatement or1 = statement.getSubStatements().get(0);
+		assertThat(or1).isNotNull();
+		assertThat(or1.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.DISJUNCTION);
+		assertThat(or1.getClauses()).isNotEmpty().hasSize(1);
+		assertThat(or1.getClauses().get(0).getPath()).isEqualTo("weight");
+		assertThat(or1.getSubStatements()).isEmpty();
+	}
+
+	@Test
+	public void testWithSomeMoreRequiredValuesAndSomeDefaultsProvided() {
+		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		ConditionalStatement statement = provider.createConditionalStatements(RequiringSomeValuesAndSomeDefaultsInterface.class, null,
+				Collections.emptyMap());
+
+		assertThat(statement).isNotNull();
+		assertThat(statement.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.DISJUNCTION);
+		assertThat(statement.getClauses()).isNotEmpty().hasSize(1);
+		assertThat(statement.getClauses().get(0).getPath()).isEqualTo("deleted");
+		assertThat(statement.getSubStatements()).isNotEmpty().hasSize(2);
+
+		ConditionalStatement or1 = statement.getSubStatements().get(0);
+		assertThat(or1).isNotNull();
+		assertThat(or1.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.CONJUNCTION);
+		assertThat(or1.getClauses()).isNotEmpty().hasSize(1);
+		assertThat(or1.getClauses().get(0).getPath()).isEqualTo("birthday");
+		assertThat(or1.getSubStatements()).isEmpty();
+
+		ConditionalStatement or2 = statement.getSubStatements().get(1);
+		assertThat(or2).isNotNull();
+		assertThat(or2.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.CONJUNCTION);
+		assertThat(or2.getClauses()).isNotEmpty().hasSize(1);
+		assertThat(or2.getClauses().get(0).getPath()).isEqualTo("student");
+		assertThat(or2.getSubStatements()).isEmpty();
+	}
+
+	@Test
+	public void testRequiredValuesWithDefaultDataProvided() {
+		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		ConditionalStatement statement;
+
+		statement = provider.createConditionalStatements(RequiringValuesDefaultDataInterface.class, null, Collections.emptyMap());
+		assertThat(statement).isNotNull();
+		assertThat(statement.getClauses()).isNotNull().isNotEmpty().hasSize(1);
+		assertThat(statement.getClauses().get(0).getValues()).isNotEmpty().hasSize(1).contains("true");
+
+		statement = provider.createConditionalStatements(RequiringValuesInterface.class, null,
+				Collections.singletonMap("delete", new String[] { "false" }));
+		assertThat(statement).isNotNull();
+		assertThat(statement.getClauses()).isNotNull().isNotEmpty().hasSize(1);
+		assertThat(statement.getClauses().get(0).getValues()).isNotEmpty().hasSize(1).contains("false");
+	}
+
+	@Test
+	public void testWithConjunctionAnnotationFullyProvided() {
+		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		ConditionalStatement statement = provider.createConditionalStatements(FullyRequiringConjunctionInterface.class, null, Collections.emptyMap());
+
+		assertThat(statement).isNotNull();
+		assertThat(statement.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.CONJUNCTION);
+		assertThat(statement.getClauses()).isNotEmpty().hasSize(2);
+		assertThat(statement.getClauses().get(0).getPath()).isEqualTo("deleted");
+		assertThat(statement.getClauses().get(1).getPath()).isEqualTo("name");
+		assertThat(statement.getSubStatements()).isNotEmpty().hasSize(2);
+
+		ConditionalStatement or1 = statement.getSubStatements().get(0);
+		assertThat(or1).isNotNull();
+		assertThat(or1.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.DISJUNCTION);
+		assertThat(or1.getClauses()).isNotEmpty().hasSize(1);
+		assertThat(or1.getClauses().get(0).getPath()).isEqualTo("status");
+		assertThat(or1.getSubStatements()).isEmpty();
+
+		ConditionalStatement or2 = statement.getSubStatements().get(1);
+		assertThat(or2).isNotNull();
+		assertThat(or2.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.DISJUNCTION);
+		assertThat(or2.getClauses()).isNotEmpty().hasSize(2);
+		assertThat(or2.getClauses().get(0).getPath()).isEqualTo("birthday");
+		assertThat(or2.getClauses().get(1).getPath()).isEqualTo("height");
+		assertThat(or2.getSubStatements()).isEmpty();
+	}
+
+	@Test
+	public void testWithDisjunctionAnnotationFullyProvided() {
+		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		ConditionalStatement statement = provider.createConditionalStatements(FullyRequiringDisjunctionInterface.class, null, Collections.emptyMap());
+		assertThat(statement).isNotNull();
+		assertThat(statement.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.DISJUNCTION);
+		assertThat(statement.getClauses()).isNotEmpty().hasSize(2);
+		assertThat(statement.getClauses().get(0).getPath()).isEqualTo("deleted");
+		assertThat(statement.getClauses().get(1).getPath()).isEqualTo("name");
+		assertThat(statement.getSubStatements()).isNotEmpty().hasSize(2);
+
+		ConditionalStatement or1 = statement.getSubStatements().get(0);
+		assertThat(or1).isNotNull();
+		assertThat(or1.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.CONJUNCTION);
+		assertThat(or1.getClauses()).isNotEmpty().hasSize(1);
+		assertThat(or1.getClauses().get(0).getPath()).isEqualTo("status");
+		assertThat(or1.getSubStatements()).isEmpty();
+
+		ConditionalStatement or2 = statement.getSubStatements().get(1);
+		assertThat(or2).isNotNull();
+		assertThat(or2.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.CONJUNCTION);
+		assertThat(or2.getClauses()).isNotEmpty().hasSize(2);
+		assertThat(or2.getClauses().get(0).getPath()).isEqualTo("birthday");
+		assertThat(or2.getClauses().get(1).getPath()).isEqualTo("height");
+		assertThat(or2.getSubStatements()).isEmpty();
 	}
 
 }
