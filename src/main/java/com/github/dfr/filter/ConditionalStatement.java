@@ -10,12 +10,8 @@ public class ConditionalStatement {
 	private final List<FilterParameter> clauses;
 	private final List<ConditionalStatement> subStatements;
 
-	public ConditionalStatement(LogicType logicType, List<FilterParameter> clauses) {
-		this(logicType, false, clauses, null);
-	}
-
-	public ConditionalStatement(LogicType logicType, List<FilterParameter> clauses, List<ConditionalStatement> statements) {
-		this(logicType, false, clauses, statements);
+	public ConditionalStatement(LogicType logicType, boolean negate, List<FilterParameter> clauses) {
+		this(logicType, negate, clauses, null);
 	}
 
 	public ConditionalStatement(LogicType logicType, boolean negate, List<FilterParameter> clauses, List<ConditionalStatement> statements) {

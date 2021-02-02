@@ -15,14 +15,13 @@ import java.util.stream.Stream;
 
 import org.springframework.util.StringValueResolver;
 
-import com.github.dfr.annotation.And;
 import com.github.dfr.annotation.Conjunction;
 import com.github.dfr.annotation.Disjunction;
 import com.github.dfr.annotation.Filter;
-import com.github.dfr.annotation.Or;
 import com.github.dfr.filter.ConditionalStatement;
 import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.filter.LogicType;
+import com.github.dfr.provider.commons.Pair;
 
 public class AnnotationBasedConditionalStatementProvider {
 
@@ -66,7 +65,7 @@ public class AnnotationBasedConditionalStatementProvider {
 		} else if (statements.size() == 1) {
 			return statements.get(0);
 		}
-		return new ConditionalStatement(LogicType.CONJUNCTION, null, statements);
+		return new ConditionalStatement(LogicType.CONJUNCTION, false, null, statements);
 	}
 
 	/**
@@ -94,19 +93,22 @@ public class AnnotationBasedConditionalStatementProvider {
 
 		LogicType logicTypeTemp = null;
 		Filter[] filters = null;
-		List<Filter[]> inversedConditionFilters = null;
+		List<Pair<Filter[], String>> inversedConditionFilters = null;
+		boolean negate = false;
 		if (Conjunction.class.equals(parameterAnnotation.annotationType())) {
 			logicTypeTemp = LogicType.CONJUNCTION;
 			Conjunction conjunction = (Conjunction) parameterAnnotation;
 			filters = conjunction.value();
-			inversedConditionFilters = Stream.of(conjunction.disjunctions()).filter(or -> or.value().length > 0).map(Or::value)
-					.collect(Collectors.toList());
+			negate = Boolean.parseBoolean(computeSpringExpressionLanguage(conjunction.negate()));
+			inversedConditionFilters = Stream.of(conjunction.disjunctions()).filter(or -> or.value().length > 0)
+					.map(or -> Pair.of(or.value(), or.negate())).collect(Collectors.toList());
 		} else if (Disjunction.class.equals(parameterAnnotation.annotationType())) {
 			logicTypeTemp = LogicType.DISJUNCTION;
 			Disjunction disjunction = (Disjunction) parameterAnnotation;
 			filters = disjunction.value();
-			inversedConditionFilters = Stream.of(disjunction.conjunctions()).filter(and -> and.value().length > 0).map(And::value)
-					.collect(Collectors.toList());
+			negate = Boolean.parseBoolean(computeSpringExpressionLanguage(disjunction.negate()));
+			inversedConditionFilters = Stream.of(disjunction.conjunctions()).filter(and -> and.value().length > 0)
+					.map(and -> Pair.of(and.value(), and.negate())).collect(Collectors.toList());
 		}
 		if (logicTypeTemp != null) {
 			LogicType logicType = logicTypeTemp;
@@ -115,16 +117,21 @@ public class AnnotationBasedConditionalStatementProvider {
 				inversedConditionFilters
 					.stream()
 					.filter(Objects::nonNull)
-					.map(filter -> createFilterParameters(filter, parametersMap))
-					.filter(l -> l.size() > 0)
-					.map(params -> new ConditionalStatement(logicType.opposite(), params))
+					.map(pair -> {
+						List<FilterParameter> parameters = createFilterParameters(pair.getLeft(), parametersMap);
+						if(parameters != null && !parameters.isEmpty()) {
+							return new ConditionalStatement(logicType.opposite(), Boolean.parseBoolean(computeSpringExpressionLanguage(pair.getRight())), parameters);
+						}
+						return null;
+					})
+					.filter(Objects::nonNull)
 					.collect(Collectors.toList())
 			;//@formatter:on
 
 			if (clauses.isEmpty() && !invertedStatements.isEmpty() && invertedStatements.size() == 1) {
 				statements.add(invertedStatements.get(0));
 			} else if (!clauses.isEmpty() || !invertedStatements.isEmpty()) {
-				statements.add(new ConditionalStatement(logicType, clauses, invertedStatements));
+				statements.add(new ConditionalStatement(logicType, negate, clauses, invertedStatements));
 			}
 		}
 
@@ -133,7 +140,7 @@ public class AnnotationBasedConditionalStatementProvider {
 		} else if (statements.size() == 1) {
 			return statements.get(0);
 		}
-		return new ConditionalStatement(LogicType.CONJUNCTION, null, statements);
+		return new ConditionalStatement(LogicType.CONJUNCTION, false, null, statements);
 	}
 
 	/**
@@ -167,7 +174,7 @@ public class AnnotationBasedConditionalStatementProvider {
 		} else if (statements.size() == 1) {
 			return statements.get(0);
 		}
-		return new ConditionalStatement(LogicType.CONJUNCTION, null, statements);
+		return new ConditionalStatement(LogicType.CONJUNCTION, false, null, statements);
 	}
 
 	/**

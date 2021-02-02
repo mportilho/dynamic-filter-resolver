@@ -45,10 +45,9 @@ public class TestProgramEntries {
 		parameters.add(new FilterParameter("addresses.street", "address", String.class, Equals.class, false, "rua", null));
 		parameters.add(new FilterParameter("phones.number", "phoneNumber", String.class, Equals.class, false, "1345", null));
 
-		ConditionalStatement logicWrapper = new ConditionalStatement(LogicType.CONJUNCTION, parameters);
+		ConditionalStatement logicWrapper = new ConditionalStatement(LogicType.CONJUNCTION, false, parameters);
 
-		DynamicFilterResolver<Specification<Person>> parameterFilter = new SpecificationDynamicFilterResolver<>(decoderService,
-				filterValueConverter);
+		DynamicFilterResolver<Specification<Person>> parameterFilter = new SpecificationDynamicFilterResolver<>(decoderService, filterValueConverter);
 
 		List<Person> list = personRepo.findAll(parameterFilter.convertTo(logicWrapper));
 		System.out.println(list);

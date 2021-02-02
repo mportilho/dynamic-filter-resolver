@@ -18,7 +18,7 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 		return result;
 	}
 
-	public final T convertRecursively(ConditionalStatement conditionalStatement) {
+	private final T convertRecursively(ConditionalStatement conditionalStatement) {
 		if (conditionalStatement == null || !conditionalStatement.hasAnyCondition()) {
 			return emptyPredicate();
 		}

@@ -19,6 +19,7 @@ import com.github.dfr.provider.specification.interfaces.FullyRequiringDisjunctio
 import com.github.dfr.provider.specification.interfaces.NoDeleteAndStatusOkSpecification;
 import com.github.dfr.provider.specification.interfaces.NoDeleteExtendedStatusOKSpecification;
 import com.github.dfr.provider.specification.interfaces.NoDeleteSpecification;
+import com.github.dfr.provider.specification.interfaces.NoDeleteSpecificationNegatingPredicate;
 import com.github.dfr.provider.specification.interfaces.RequiringSomeMoreValuesInterface;
 import com.github.dfr.provider.specification.interfaces.RequiringSomeValuesAndSomeDefaultsInterface;
 import com.github.dfr.provider.specification.interfaces.RequiringSomeValuesInterface;
@@ -41,6 +42,28 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 		FilterParameter filterParameter = statement.getClauses().get(0);
 		assertThat(filterParameter.getFormats()).isEmpty();
 		assertThat(filterParameter.getOperator()).isNotNull().isEqualTo(Equals.class);
+		assertThat(filterParameter.isNegate()).isFalse();
+		assertThat(filterParameter.getParameters()).isNotEmpty().hasSize(1).contains("delete");
+		assertThat(filterParameter.getPath()).isNotBlank().isEqualTo("deleted");
+		assertThat(filterParameter.getTargetType()).isNotNull().isEqualTo(Boolean.class);
+		assertThat(filterParameter.getValues()).isNotEmpty().containsOnly("false");
+	}
+
+	@Test
+	public void testOneExtendedInterfaceWithOneDefaultParameterNegatingPredicate() {
+		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		ConditionalStatement statement = provider.createConditionalStatements(NoDeleteSpecificationNegatingPredicate.class, null,
+				Collections.emptyMap());
+
+		assertThat(statement).isNotNull();
+		assertThat(statement.getLogicType()).isEqualByComparingTo(LogicType.CONJUNCTION);
+		assertThat(statement.getSubStatements()).isEmpty();
+		assertThat(statement.getClauses()).isNotEmpty().hasSize(1);
+
+		FilterParameter filterParameter = statement.getClauses().get(0);
+		assertThat(filterParameter.getFormats()).isEmpty();
+		assertThat(filterParameter.getOperator()).isNotNull().isEqualTo(Equals.class);
+		assertThat(filterParameter.isNegate()).isTrue();
 		assertThat(filterParameter.getParameters()).isNotEmpty().hasSize(1).contains("delete");
 		assertThat(filterParameter.getPath()).isNotBlank().isEqualTo("deleted");
 		assertThat(filterParameter.getTargetType()).isNotNull().isEqualTo(Boolean.class);
@@ -60,6 +83,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 		FilterParameter filterParameter = statement.getClauses().get(0);
 		assertThat(filterParameter.getFormats()).isEmpty();
 		assertThat(filterParameter.getOperator()).isNotNull().isEqualTo(Equals.class);
+		assertThat(filterParameter.isNegate()).isFalse();
 		assertThat(filterParameter.getParameters()).isNotEmpty().hasSize(1).contains("delete");
 		assertThat(filterParameter.getPath()).isNotBlank().isEqualTo("deleted");
 		assertThat(filterParameter.getTargetType()).isNotNull().isEqualTo(Boolean.class);
@@ -80,6 +104,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 		filterParameter = statement.getClauses().get(0);
 		assertThat(filterParameter.getFormats()).isEmpty();
 		assertThat(filterParameter.getOperator()).isNotNull().isEqualTo(Equals.class);
+		assertThat(filterParameter.isNegate()).isFalse();
 		assertThat(filterParameter.getParameters()).isNotEmpty().hasSize(1).contains("delete");
 		assertThat(filterParameter.getPath()).isNotBlank().isEqualTo("deleted");
 		assertThat(filterParameter.getTargetType()).isNotNull().isEqualTo(Boolean.class);
@@ -88,6 +113,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 		filterParameter = statement.getClauses().get(1);
 		assertThat(filterParameter.getFormats()).isEmpty();
 		assertThat(filterParameter.getOperator()).isNotNull().isEqualTo(Equals.class);
+		assertThat(filterParameter.isNegate()).isFalse();
 		assertThat(filterParameter.getParameters()).isNotEmpty().hasSize(1).contains("status");
 		assertThat(filterParameter.getPath()).isNotBlank().isEqualTo("status");
 		assertThat(filterParameter.getTargetType()).isNotNull().isEqualTo(StatusEnum.class);
@@ -121,6 +147,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 		filterParameter = stmt1.getClauses().get(0);
 		assertThat(filterParameter.getFormats()).isEmpty();
 		assertThat(filterParameter.getOperator()).isNotNull().isEqualTo(Equals.class);
+		assertThat(filterParameter.isNegate()).isFalse();
 		assertThat(filterParameter.getParameters()).isNotEmpty().hasSize(1).contains("delete");
 		assertThat(filterParameter.getPath()).isNotBlank().isEqualTo("deleted");
 		assertThat(filterParameter.getTargetType()).isNotNull().isEqualTo(Boolean.class);
@@ -129,6 +156,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 		filterParameter = stmt2.getClauses().get(0);
 		assertThat(filterParameter.getFormats()).isEmpty();
 		assertThat(filterParameter.getOperator()).isNotNull().isEqualTo(Equals.class);
+		assertThat(filterParameter.isNegate()).isFalse();
 		assertThat(filterParameter.getParameters()).isNotEmpty().hasSize(1).contains("status");
 		assertThat(filterParameter.getPath()).isNotBlank().isEqualTo("status");
 		assertThat(filterParameter.getTargetType()).isNotNull().isEqualTo(StatusEnum.class);

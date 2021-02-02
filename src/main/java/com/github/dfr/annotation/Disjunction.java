@@ -17,4 +17,6 @@ public @interface Disjunction {
 
 	And[] conjunctions() default {};
 
+	String negate() default "false";
+
 }
