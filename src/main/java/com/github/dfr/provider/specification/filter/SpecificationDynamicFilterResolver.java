@@ -14,12 +14,9 @@ import com.github.dfr.operator.FilterValueConverter;
 
 public class SpecificationDynamicFilterResolver<T> extends AbstractDynamicFilterResolver<Specification<T>> {
 
-	private final FilterOperatorService<Specification<T>> filterOperatorService;
-	private final FilterValueConverter filterValueConverter;
-
-	public SpecificationDynamicFilterResolver(FilterOperatorService<Specification<T>> operatorService, FilterValueConverter filterValueConverter) {
-		this.filterOperatorService = operatorService;
-		this.filterValueConverter = filterValueConverter;
+	public SpecificationDynamicFilterResolver(FilterOperatorService<Specification<T>> filterOperatorService,
+			FilterValueConverter filterValueConverter) {
+		super(filterOperatorService, filterValueConverter);
 	}
 
 	@Override
@@ -29,13 +26,17 @@ public class SpecificationDynamicFilterResolver<T> extends AbstractDynamicFilter
 
 	@Override
 	public Specification<T> createPredicate(ConditionalStatement conditionalStatement) {
-		Specification<T> rootSpec = Specification.where(null);
+		Specification<T> rootSpec = null;
 		for (FilterParameter clause : conditionalStatement.getClauses()) {
-			FilterOperator<Specification<T>> operator = filterOperatorService.getOperatorFor(clause.getOperator());
-			Specification<T> spec = operator.createFilter(clause, filterValueConverter);
+			FilterOperator<Specification<T>> operator = getFilterOperatorService().getOperatorFor(clause.getOperator());
+			Specification<T> spec = operator.createFilter(clause, getFilterValueConverter());
 			if (spec != null) {
 				spec = clause.isNegate() ? Specification.not(spec) : spec;
-				rootSpec = conditionalStatement.isConjunction() ? rootSpec.and(spec) : rootSpec.or(spec);
+				if (rootSpec == null) {
+					rootSpec = spec;
+				} else {
+					rootSpec = conditionalStatement.isConjunction() ? rootSpec.and(spec) : rootSpec.or(spec);
+				}
 			}
 		}
 		return conditionalStatement.isNegate() ? Specification.not(rootSpec) : rootSpec;

@@ -3,6 +3,7 @@ package com.github.dfr.provider.specification.web;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,7 +20,10 @@ import com.github.dfr.annotation.Conjunction;
 import com.github.dfr.annotation.Disjunction;
 import com.github.dfr.filter.ConditionalStatement;
 import com.github.dfr.filter.DynamicFilterResolver;
+import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.provider.AnnotationBasedConditionalStatementProvider;
+import com.github.dfr.provider.specification.annotation.Fetch;
+import com.github.dfr.provider.specification.annotation.Fetches;
 
 public class SpecificationFilterParameterArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -52,14 +56,39 @@ public class SpecificationFilterParameterArgumentResolver implements HandlerMeth
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest,
 			WebDataBinderFactory binderFactory) throws Exception {
 		Map<String, String[]> providedParameterValuesMap = new HashMap<>();
-		HttpServletRequest httpServletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
 
+		HttpServletRequest httpServletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
 		providedParameterValuesMap.putAll(webRequest.getParameterMap());
 		providedParameterValuesMap.putAll((Map<String, String[]>) httpServletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE));
 
+		Function<FilterParameter, FilterParameter> decorator = createParameterDecorator(parameter);
+
 		ConditionalStatement statement = conditionalStatementProvider.createConditionalStatements(parameter.getParameterType(),
-				parameter.getMethodAnnotations(), providedParameterValuesMap);
+				parameter.getMethodAnnotations(), providedParameterValuesMap, decorator);
 		return (statement != null && statement.hasAnyCondition()) ? dynamicFilterResolver.convertTo(statement) : Specification.where(null);
+	}
+
+	/**
+	 * 
+	 * @param parameter
+	 * @return
+	 */
+	private Function<FilterParameter, FilterParameter> createParameterDecorator(MethodParameter parameter) {
+		Function<FilterParameter, FilterParameter> decorator = null;
+		Fetches fetches = parameter.getMethodAnnotation(Fetches.class);
+		Map<String, Fetch> fetchingMap = new HashMap<>();
+		if (fetches != null && fetches.value() != null && fetches.value().length > 0) {
+			for (Fetch fetch : fetches.value()) {
+				for (String path : fetch.value()) {
+					fetchingMap.put(path, fetch);
+				}
+			}
+			decorator = param -> {
+				param.addState(Fetches.class, fetchingMap);
+				return param;
+			};
+		}
+		return decorator;
 	}
 
 	/**

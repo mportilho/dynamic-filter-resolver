@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -30,7 +31,6 @@ public class AnnotationBasedConditionalStatementProvider {
 	private StringValueResolver stringValueResolver;
 
 	public AnnotationBasedConditionalStatementProvider(StringValueResolver stringValueResolver) {
-		super();
 		this.stringValueResolver = stringValueResolver;
 	}
 
@@ -44,16 +44,30 @@ public class AnnotationBasedConditionalStatementProvider {
 	 */
 	public <T> ConditionalStatement createConditionalStatements(Class<?> parameterInterface, Annotation[] parameterAnnotations,
 			Map<String, T[]> parametersMap) {
+		return createConditionalStatements(parameterInterface, parameterAnnotations, parametersMap, null);
+	}
+
+	/**
+	 * 
+	 * @param <T>
+	 * @param parameterInterface
+	 * @param parameterAnnotations
+	 * @param parametersMap
+	 * @return
+	 */
+	public <T> ConditionalStatement createConditionalStatements(Class<?> parameterInterface, Annotation[] parameterAnnotations,
+			Map<String, T[]> parametersMap, Function<FilterParameter, FilterParameter> parameterDecorator) {
 		List<ConditionalStatement> statements = new ArrayList<>();
 
-		ConditionalStatement interfaceStatement = createConditionalStatementsFromParameterInterface(parameterInterface, parametersMap);
+		ConditionalStatement interfaceStatement = createConditionalStatementsFromParameterInterface(parameterInterface, parametersMap,
+				parameterDecorator);
 		if (interfaceStatement != null && interfaceStatement.hasAnyCondition()) {
 			statements.add(interfaceStatement);
 		}
 
 		if (parameterAnnotations != null && parameterAnnotations.length != 0) {
 			for (Annotation annotation : parameterAnnotations) {
-				ConditionalStatement annotationStatement = createConditionalStatementsFromAnnotations(annotation, parametersMap);
+				ConditionalStatement annotationStatement = createConditionalStatementsFromAnnotations(annotation, parametersMap, parameterDecorator);
 				if (annotationStatement != null && annotationStatement.hasAnyCondition()) {
 					statements.add(annotationStatement);
 				}
@@ -75,7 +89,8 @@ public class AnnotationBasedConditionalStatementProvider {
 	 * @param parametersMap
 	 * @return
 	 */
-	private <T> ConditionalStatement createConditionalStatementsFromAnnotations(Annotation parameterAnnotation, Map<String, T[]> parametersMap) {
+	private <T> ConditionalStatement createConditionalStatementsFromAnnotations(Annotation parameterAnnotation, Map<String, T[]> parametersMap,
+			Function<FilterParameter, FilterParameter> parameterDecorator) {
 		if (parameterAnnotation == null) {
 			return null;
 		}
@@ -83,7 +98,7 @@ public class AnnotationBasedConditionalStatementProvider {
 		if (!parameterAnnotation.annotationType().equals(Conjunction.class) && !parameterAnnotation.annotationType().equals(Disjunction.class)) {
 			for (Annotation annotation : parameterAnnotation.annotationType().getAnnotations()) {
 				if (!IGNORED_ANNOTATIONS.contains(annotation.annotationType())) {
-					ConditionalStatement stmt = createConditionalStatementsFromAnnotations(annotation, parametersMap);
+					ConditionalStatement stmt = createConditionalStatementsFromAnnotations(annotation, parametersMap, parameterDecorator);
 					if (stmt != null && stmt.hasAnyCondition()) {
 						statements.add(stmt);
 					}
@@ -112,13 +127,13 @@ public class AnnotationBasedConditionalStatementProvider {
 		}
 		if (logicTypeTemp != null) {
 			LogicType logicType = logicTypeTemp;
-			List<FilterParameter> clauses = createFilterParameters(filters, parametersMap);
+			List<FilterParameter> clauses = createFilterParameters(filters, parametersMap, parameterDecorator);
 			List<ConditionalStatement> invertedStatements = (inversedConditionFilters == null) ? Collections.emptyList() : //@formatter:off
 				inversedConditionFilters
 					.stream()
 					.filter(Objects::nonNull)
 					.map(pair -> {
-						List<FilterParameter> parameters = createFilterParameters(pair.getLeft(), parametersMap);
+						List<FilterParameter> parameters = createFilterParameters(pair.getLeft(), parametersMap, parameterDecorator);
 						if(parameters != null && !parameters.isEmpty()) {
 							return new ConditionalStatement(logicType.opposite(), Boolean.parseBoolean(computeSpringExpressionLanguage(pair.getRight())), parameters);
 						}
@@ -150,10 +165,11 @@ public class AnnotationBasedConditionalStatementProvider {
 	 * @param parametersMap
 	 * @return
 	 */
-	private <T> ConditionalStatement createConditionalStatementsFromParameterInterface(Class<?> parameterInterface, Map<String, T[]> parametersMap) {
+	private <T> ConditionalStatement createConditionalStatementsFromParameterInterface(Class<?> parameterInterface, Map<String, T[]> parametersMap,
+			Function<FilterParameter, FilterParameter> parameterDecorator) {
 		List<ConditionalStatement> statements = new ArrayList<>();
 		for (Class<?> subInterfaces : parameterInterface.getInterfaces()) {
-			ConditionalStatement stmt = createConditionalStatementsFromParameterInterface(subInterfaces, parametersMap);
+			ConditionalStatement stmt = createConditionalStatementsFromParameterInterface(subInterfaces, parametersMap, parameterDecorator);
 			if (stmt != null && stmt.hasAnyCondition()) {
 				statements.add(stmt);
 			}
@@ -162,7 +178,7 @@ public class AnnotationBasedConditionalStatementProvider {
 		Annotation[] parameterAnnotations = parameterInterface.getAnnotations();
 		if (parameterAnnotations != null && parameterAnnotations.length != 0) {
 			for (Annotation annotation : parameterAnnotations) {
-				ConditionalStatement annotationStatement = createConditionalStatementsFromAnnotations(annotation, parametersMap);
+				ConditionalStatement annotationStatement = createConditionalStatementsFromAnnotations(annotation, parametersMap, parameterDecorator);
 				if (annotationStatement != null && annotationStatement.hasAnyCondition()) {
 					statements.add(annotationStatement);
 				}
@@ -184,7 +200,8 @@ public class AnnotationBasedConditionalStatementProvider {
 	 * @param parametersMap
 	 * @return
 	 */
-	private <T> List<FilterParameter> createFilterParameters(Filter[] filters, Map<String, T[]> parametersMap) {
+	private <T> List<FilterParameter> createFilterParameters(Filter[] filters, Map<String, T[]> parametersMap,
+			Function<FilterParameter, FilterParameter> parameterDecorator) {
 		if (filters == null || filters.length == 0) {
 			return Collections.emptyList();
 		}
@@ -202,8 +219,12 @@ public class AnnotationBasedConditionalStatementProvider {
 				boolean negate = Boolean.parseBoolean(computeSpringExpressionLanguage(filter.negate()));
 				String[] formats = computeSpringExpressionLanguage(filter.formats());
 
-				filterParameters.add(
-						new FilterParameter(filter.path(), filter.parameters(), filter.targetType(), filter.operator(), negate, values, formats));
+				FilterParameter parameter = new FilterParameter(filter.path(), filter.parameters(), filter.targetType(), filter.operator(), negate,
+						values, formats);
+				if (parameterDecorator != null) {
+					parameter = parameterDecorator.apply(parameter);
+				}
+				filterParameters.add(parameter);
 			}
 		}
 		return filterParameters;

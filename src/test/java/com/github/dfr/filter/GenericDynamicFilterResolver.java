@@ -7,6 +7,10 @@ import java.util.stream.Collectors;
 
 public class GenericDynamicFilterResolver extends AbstractDynamicFilterResolver<List<String>> {
 
+	public GenericDynamicFilterResolver() {
+		super(null, null);
+	}
+
 	@Override
 	public List<String> emptyPredicate() {
 		return Collections.emptyList();

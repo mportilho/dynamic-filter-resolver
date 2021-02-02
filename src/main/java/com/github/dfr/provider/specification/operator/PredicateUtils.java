@@ -1,5 +1,7 @@
 package com.github.dfr.provider.specification.operator;
 
+import java.util.Map;
+
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
@@ -11,6 +13,8 @@ import javax.persistence.metamodel.Attribute;
 import org.springframework.data.mapping.PropertyPath;
 
 import com.github.dfr.filter.FilterParameter;
+import com.github.dfr.provider.specification.annotation.Fetches;
+import com.github.dfr.provider.specification.annotation.FetchingMode;
 
 class PredicateUtils {
 
@@ -24,6 +28,9 @@ class PredicateUtils {
 		PropertyPath propertyPath = PropertyPath.from(filterParameter.getPath(), root.getJavaType());
 		From<?, ?> from = root;
 		boolean graphFromFetch = false;
+
+		Map<String, FetchingMode> fetchingMap = filterParameter.findState(Fetches.class);
+
 		if (propertyPath.isCollection()) {
 			do {
 				Fetch<?, ?> fetchAttribute = getFetchAttribute(from, propertyPath.getSegment());

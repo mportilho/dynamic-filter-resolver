@@ -75,8 +75,8 @@ public class FilterParameter {
 		this.targetType = targetType;
 		this.operator = (Class<? extends FilterOperator<?>>) operator;
 		this.negate = negate;
-		this.values = new Object[] { value };
-		this.formats = new String[] { format };
+		this.values = value != null ? new Object[] { value } : null;
+		this.formats = format != null ? new String[] { format } : null;
 	}
 
 	public String getPath() {
