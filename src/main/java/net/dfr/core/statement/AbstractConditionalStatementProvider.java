@@ -21,7 +21,7 @@ import net.dfr.core.annotation.Disjunction;
 import net.dfr.core.annotation.Filter;
 import net.dfr.core.filter.FilterParameter;
 
-public abstract class AbstractConditionalStatementProvider<T> implements ConditionalStatementProvider<T> {
+public abstract class AbstractConditionalStatementProvider implements ConditionalStatementProvider {
 
 	private static final List<Class<?>> IGNORED_ANNOTATIONS = Arrays.asList(Documented.class, Retention.class, Target.class);
 
@@ -40,7 +40,7 @@ public abstract class AbstractConditionalStatementProvider<T> implements Conditi
 	 * @return
 	 */
 	@Override
-	public <K, V> ConditionalStatement createConditionalStatements(Class<T> parameterInterface, Annotation[] parameterAnnotations,
+	public <K, V> ConditionalStatement createConditionalStatements(Class<?> parameterInterface, Annotation[] parameterAnnotations,
 			Map<K, V[]> parametersMap) {
 		List<ConditionalStatement> statements = new ArrayList<>();
 

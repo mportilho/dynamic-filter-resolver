@@ -3,7 +3,6 @@ package net.dfr.providers.specification.statement;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringValueResolver;
 
 import net.dfr.core.filter.FilterParameter;
@@ -11,7 +10,7 @@ import net.dfr.core.statement.AbstractConditionalStatementProvider;
 import net.dfr.providers.specification.annotation.Fetch;
 import net.dfr.providers.specification.annotation.Fetches;
 
-public class SpecificationConditionalStatementProvider<T extends Specification<?>> extends AbstractConditionalStatementProvider<T> {
+public class SpecificationConditionalStatementProvider extends AbstractConditionalStatementProvider {
 
 	public SpecificationConditionalStatementProvider(StringValueResolver stringValueResolver) {
 		super(stringValueResolver);

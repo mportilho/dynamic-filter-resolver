@@ -24,11 +24,11 @@ import net.dfr.providers.specification.statement.SpecificationConditionalStateme
 
 public class SpecificationFilterParameterArgumentResolver implements HandlerMethodArgumentResolver {
 
-	private SpecificationConditionalStatementProvider<?> conditionalStatementProvider;
+	private SpecificationConditionalStatementProvider conditionalStatementProvider;
 	private DynamicFilterResolver<?> dynamicFilterResolver;
 
 	public SpecificationFilterParameterArgumentResolver(StringValueResolver stringValueResolver, DynamicFilterResolver<?> dynamicFilterResolver) {
-		this.conditionalStatementProvider = new SpecificationConditionalStatementProvider<>(stringValueResolver);
+		this.conditionalStatementProvider = new SpecificationConditionalStatementProvider(stringValueResolver);
 		this.dynamicFilterResolver = dynamicFilterResolver;
 	}
 
