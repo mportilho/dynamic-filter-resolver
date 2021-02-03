@@ -21,18 +21,18 @@ import com.github.dfr.annotation.Disjunction;
 import com.github.dfr.filter.ConditionalStatement;
 import com.github.dfr.filter.DynamicFilterResolver;
 import com.github.dfr.filter.FilterParameter;
-import com.github.dfr.provider.AnnotationBasedConditionalStatementProvider;
+import com.github.dfr.provider.SpecificationConditionalStatementProvider;
 import com.github.dfr.provider.specification.annotation.Fetch;
 import com.github.dfr.provider.specification.annotation.Fetches;
 
 public class SpecificationFilterParameterArgumentResolver implements HandlerMethodArgumentResolver {
 
-	private AnnotationBasedConditionalStatementProvider conditionalStatementProvider;
+	private SpecificationConditionalStatementProvider conditionalStatementProvider;
 	private DynamicFilterResolver<Specification<?>> dynamicFilterResolver;
 
 	public SpecificationFilterParameterArgumentResolver(StringValueResolver stringValueResolver,
 			DynamicFilterResolver<Specification<?>> parameterFilter) {
-		this.conditionalStatementProvider = new AnnotationBasedConditionalStatementProvider(stringValueResolver);
+		this.conditionalStatementProvider = new SpecificationConditionalStatementProvider(stringValueResolver);
 		this.dynamicFilterResolver = parameterFilter;
 	}
 
@@ -64,7 +64,7 @@ public class SpecificationFilterParameterArgumentResolver implements HandlerMeth
 		Function<FilterParameter, FilterParameter> decorator = createParameterDecorator(parameter);
 
 		ConditionalStatement statement = conditionalStatementProvider.createConditionalStatements(parameter.getParameterType(),
-				parameter.getMethodAnnotations(), providedParameterValuesMap, decorator);
+				parameter.getMethodAnnotations(), providedParameterValuesMap);
 		return (statement != null && statement.hasAnyCondition()) ? dynamicFilterResolver.convertTo(statement) : Specification.where(null);
 	}
 

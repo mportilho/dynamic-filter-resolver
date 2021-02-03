@@ -11,7 +11,7 @@ import com.github.dfr.filter.ConditionalStatement;
 import com.github.dfr.filter.FilterParameter;
 import com.github.dfr.filter.LogicType;
 import com.github.dfr.operator.type.Equals;
-import com.github.dfr.provider.AnnotationBasedConditionalStatementProvider;
+import com.github.dfr.provider.SpecificationConditionalStatementProvider;
 import com.github.dfr.provider.specification.annotation.AnnotationContainerInterface;
 import com.github.dfr.provider.specification.annotation.MethodArgumentAnnotations;
 import com.github.dfr.provider.specification.interfaces.FullyRequiringConjunctionInterface;
@@ -33,7 +33,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testOneExtendedInterfaceWithOneDefaultParameter() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(NoDeleteSpecification.class, null, Collections.emptyMap());
 
 		assertThat(statement).isNotNull();
@@ -54,7 +54,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testOneExtendedInterfaceWithOneDefaultParameterNegatingPredicate() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(NoDeleteSpecificationNegatingPredicate.class, null,
 				Collections.emptyMap());
 
@@ -76,7 +76,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testOneExtendedInterfaceWithOneDefaultParameterWithStringValueResolver() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(str -> str + "1");
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(str -> str + "1");
 		ConditionalStatement statement = provider.createConditionalStatements(NoDeleteSpecification.class, null, Collections.emptyMap());
 
 		assertThat(statement).isNotNull();
@@ -97,7 +97,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testOneExtendedInterfaceWithTwoDefaultParameters() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(NoDeleteAndStatusOkSpecification.class, null, Collections.emptyMap());
 		FilterParameter filterParameter;
 
@@ -128,7 +128,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testOneComposedExtendedInterfaceWithOneDefaultParametersEach() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(NoDeleteExtendedStatusOKSpecification.class, null,
 				Collections.emptyMap());
 		FilterParameter filterParameter;
@@ -174,7 +174,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testAnnotatedInterfaceAndAnnotatedParameter() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		Annotation[] methodArgumentAnnotations = MethodArgumentAnnotations.class.getAnnotations();
 
 		ConditionalStatement statement = provider.createConditionalStatements(AnnotationContainerInterface.class, methodArgumentAnnotations,
@@ -224,7 +224,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testWithRequiredValuesProvided() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		ConditionalStatement statement;
 
 		statement = provider.createConditionalStatements(RequiringValuesInterface.class, null,
@@ -250,14 +250,14 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testWithRequiredValuesNotProvided() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(RequiringValuesInterface.class, null, Collections.emptyMap());
 		assertThat(statement).isNull();
 	}
 
 	@Test
 	public void testWithSomeRequiredValuesProvided() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(RequiringSomeValuesInterface.class, null, Collections.emptyMap());
 		assertThat(statement).isNotNull();
 		assertThat(statement.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.CONJUNCTION);
@@ -269,7 +269,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testWithSomeMoreRequiredValuesProvided() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(RequiringSomeMoreValuesInterface.class, null, Collections.emptyMap());
 
 		assertThat(statement).isNotNull();
@@ -290,7 +290,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testWithSomeMoreRequiredValuesAndSomeDefaultsProvided() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(RequiringSomeValuesAndSomeDefaultsInterface.class, null,
 				Collections.emptyMap());
 
@@ -320,7 +320,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testRequiredValuesWithDefaultDataProvided() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		ConditionalStatement statement;
 
 		statement = provider.createConditionalStatements(RequiringValuesDefaultDataInterface.class, null, Collections.emptyMap());
@@ -347,7 +347,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testWithConjunctionAnnotationFullyProvided() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(FullyRequiringConjunctionInterface.class, null, Collections.emptyMap());
 
 		assertThat(statement).isNotNull();
@@ -378,7 +378,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testWithConjunctionAnnotationFullyProvidedNegatingAll() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(FullyRequiringConjunctionInterfaceNegatingAll.class, null,
 				Collections.emptyMap());
 
@@ -410,7 +410,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testWithDisjunctionAnnotationFullyProvided() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(FullyRequiringDisjunctionInterface.class, null, Collections.emptyMap());
 		assertThat(statement).isNotNull();
 		assertThat(statement.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.DISJUNCTION);
@@ -440,7 +440,7 @@ public class TestAnnotationBasedFilterLogicContextProvider {
 
 	@Test
 	public void testWithDisjunctionAnnotationFullyProvidedNegatingAll() {
-		AnnotationBasedConditionalStatementProvider provider = new AnnotationBasedConditionalStatementProvider(null);
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(FullyRequiringDisjunctionInterfaceNegatingAll.class, null,
 				Collections.emptyMap());
 		assertThat(statement).isNotNull();
