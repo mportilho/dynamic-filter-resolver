@@ -2,10 +2,10 @@ package net.dfr.provider.specification.annotation;
 
 import java.time.LocalDate;
 
-import net.dfr.annotation.Disjunction;
-import net.dfr.annotation.Filter;
-import net.dfr.operator.type.Greater;
-import net.dfr.operator.type.GreaterOrEquals;
+import net.dfr.core.annotation.Disjunction;
+import net.dfr.core.annotation.Filter;
+import net.dfr.core.operator.type.Greater;
+import net.dfr.core.operator.type.GreaterOrEquals;
 import net.dfr.provider.specification.interfaces.StatusEnum;
 
 /**

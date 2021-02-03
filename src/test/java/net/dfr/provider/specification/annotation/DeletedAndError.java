@@ -8,9 +8,9 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import net.dfr.annotation.Disjunction;
-import net.dfr.annotation.Filter;
-import net.dfr.operator.type.Equals;
+import net.dfr.core.annotation.Disjunction;
+import net.dfr.core.annotation.Filter;
+import net.dfr.core.operator.type.Equals;
 import net.dfr.provider.specification.interfaces.StatusEnum;
 
 @Documented

@@ -9,12 +9,12 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import net.dfr.filter.DynamicFilterResolver;
-import net.dfr.operator.FilterValueConverter;
-import net.dfr.provider.commons.DefaultFilterValueConverter;
-import net.dfr.provider.specification.filter.SpecificationDynamicFilterResolver;
-import net.dfr.provider.specification.operator.SpecificationFilterOperatorService;
-import net.dfr.provider.specification.web.SpecificationFilterParameterArgumentResolver;
+import net.dfr.core.converter.DefaultFilterValueConverter;
+import net.dfr.core.converter.FilterValueConverter;
+import net.dfr.core.filter.DynamicFilterResolver;
+import net.dfr.providers.specification.filter.SpecificationDynamicFilterResolver;
+import net.dfr.providers.specification.operator.SpecificationFilterOperatorService;
+import net.dfr.providers.specification.web.SpecificationFilterParameterArgumentResolver;
 
 @EnableWebMvc
 @SpringBootApplication

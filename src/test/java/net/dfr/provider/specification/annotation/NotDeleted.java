@@ -8,9 +8,9 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import net.dfr.annotation.Conjunction;
-import net.dfr.annotation.Filter;
-import net.dfr.operator.type.Equals;
+import net.dfr.core.annotation.Conjunction;
+import net.dfr.core.annotation.Filter;
+import net.dfr.core.operator.type.Equals;
 
 @Documented
 @Retention(RUNTIME)

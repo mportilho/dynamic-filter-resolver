@@ -7,11 +7,10 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
-import net.dfr.filter.ConditionalStatement;
-import net.dfr.filter.FilterParameter;
-import net.dfr.filter.LogicType;
-import net.dfr.operator.type.Equals;
-import net.dfr.provider.SpecificationConditionalStatementProvider;
+import net.dfr.core.filter.FilterParameter;
+import net.dfr.core.operator.type.Equals;
+import net.dfr.core.statement.ConditionalStatement;
+import net.dfr.core.statement.LogicType;
 import net.dfr.provider.specification.annotation.AnnotationContainerInterface;
 import net.dfr.provider.specification.annotation.MethodArgumentAnnotations;
 import net.dfr.provider.specification.interfaces.FullyRequiringConjunctionInterface;
@@ -28,6 +27,7 @@ import net.dfr.provider.specification.interfaces.RequiringSomeValuesInterface;
 import net.dfr.provider.specification.interfaces.RequiringValuesDefaultDataInterface;
 import net.dfr.provider.specification.interfaces.RequiringValuesInterface;
 import net.dfr.provider.specification.interfaces.StatusEnum;
+import net.dfr.providers.specification.statement.SpecificationConditionalStatementProvider;
 
 public class TestAnnotationBasedFilterLogicContextProvider {
 

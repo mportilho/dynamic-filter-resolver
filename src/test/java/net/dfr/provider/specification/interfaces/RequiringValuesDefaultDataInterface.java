@@ -1,8 +1,8 @@
 package net.dfr.provider.specification.interfaces;
 
-import net.dfr.annotation.Conjunction;
-import net.dfr.annotation.Filter;
-import net.dfr.operator.type.Equals;
+import net.dfr.core.annotation.Conjunction;
+import net.dfr.core.annotation.Filter;
+import net.dfr.core.operator.type.Equals;
 
 //@formatter:off
 @Conjunction({

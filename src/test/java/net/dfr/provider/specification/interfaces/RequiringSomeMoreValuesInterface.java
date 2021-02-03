@@ -3,14 +3,14 @@ package net.dfr.provider.specification.interfaces;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import net.dfr.annotation.Conjunction;
-import net.dfr.annotation.Filter;
-import net.dfr.annotation.Or;
-import net.dfr.operator.type.Equals;
-import net.dfr.operator.type.Greater;
-import net.dfr.operator.type.GreaterOrEquals;
-import net.dfr.operator.type.LessOrEquals;
-import net.dfr.operator.type.NotEquals;
+import net.dfr.core.annotation.Conjunction;
+import net.dfr.core.annotation.Filter;
+import net.dfr.core.annotation.Or;
+import net.dfr.core.operator.type.Equals;
+import net.dfr.core.operator.type.Greater;
+import net.dfr.core.operator.type.GreaterOrEquals;
+import net.dfr.core.operator.type.LessOrEquals;
+import net.dfr.core.operator.type.NotEquals;
 
 //@formatter:off
 @Conjunction(
