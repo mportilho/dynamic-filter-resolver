@@ -1,7 +1,5 @@
 package net.dfr.core.converter;
 
-import org.springframework.lang.Nullable;
-
 public interface FormattedConverter<S, T, F> {
 
 	/**
@@ -15,7 +13,6 @@ public interface FormattedConverter<S, T, F> {
 	 * @throws IllegalArgumentException if the source cannot be converted to the
 	 *                                  desired target type
 	 */
-	@Nullable
 	T convert(S source, F format);
 
 }

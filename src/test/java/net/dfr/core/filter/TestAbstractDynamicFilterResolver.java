@@ -8,8 +8,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import net.dfr.core.filter.DynamicFilterResolver;
-import net.dfr.core.filter.FilterParameter;
 import net.dfr.core.operator.type.NotEquals;
 import net.dfr.core.statement.ConditionalStatement;
 import net.dfr.core.statement.LogicType;

@@ -13,8 +13,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.springframework.util.StringValueResolver;
-
 import net.dfr.core.Pair;
 import net.dfr.core.annotation.Conjunction;
 import net.dfr.core.annotation.Disjunction;
@@ -36,10 +34,10 @@ public abstract class AbstractConditionalStatementProvider implements Conditiona
 
 	private static final List<Class<?>> IGNORED_ANNOTATIONS = Arrays.asList(Documented.class, Retention.class, Target.class);
 
-	private StringValueResolver stringValueResolver;
+	private ValueExpressionResolver valueExpressionResolver;
 
-	public AbstractConditionalStatementProvider(StringValueResolver stringValueResolver) {
-		this.stringValueResolver = stringValueResolver;
+	public AbstractConditionalStatementProvider(ValueExpressionResolver valueExpressionResolver) {
+		this.valueExpressionResolver = valueExpressionResolver;
 	}
 
 	/**
@@ -286,7 +284,7 @@ public abstract class AbstractConditionalStatementProvider implements Conditiona
 	 */
 	@SuppressWarnings("unchecked")
 	private <P> P[] computeSpringExpressionLanguage(String[] expressions) {
-		if (stringValueResolver != null && expressions != null && expressions.length != 0) {
+		if (valueExpressionResolver != null && expressions != null && expressions.length != 0) {
 			Object[] computed = new String[expressions.length];
 			for (int i = 0; i < expressions.length; i++) {
 				computed[i] = computeSpringExpressionLanguage(expressions[i]);
@@ -304,8 +302,8 @@ public abstract class AbstractConditionalStatementProvider implements Conditiona
 	 */
 	@SuppressWarnings("unchecked")
 	private final <P> P computeSpringExpressionLanguage(String expression) {
-		if (stringValueResolver != null && expression != null && !expression.isEmpty()) {
-			return (P) stringValueResolver.resolveStringValue(expression);
+		if (valueExpressionResolver != null && expression != null && !expression.isEmpty()) {
+			return (P) valueExpressionResolver.resolveStringValue(expression);
 		}
 		return (P) expression;
 	}

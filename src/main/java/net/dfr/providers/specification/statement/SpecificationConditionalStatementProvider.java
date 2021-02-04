@@ -3,17 +3,16 @@ package net.dfr.providers.specification.statement;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.util.StringValueResolver;
-
 import net.dfr.core.filter.FilterParameter;
 import net.dfr.core.statement.AbstractConditionalStatementProvider;
+import net.dfr.core.statement.ValueExpressionResolver;
 import net.dfr.providers.specification.annotation.Fetch;
 import net.dfr.providers.specification.annotation.Fetches;
 
 public class SpecificationConditionalStatementProvider extends AbstractConditionalStatementProvider {
 
-	public SpecificationConditionalStatementProvider(StringValueResolver stringValueResolver) {
-		super(stringValueResolver);
+	public SpecificationConditionalStatementProvider(ValueExpressionResolver valueExpressionResolver) {
+		super(valueExpressionResolver);
 	}
 
 	@Override
