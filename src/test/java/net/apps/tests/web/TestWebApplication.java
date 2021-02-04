@@ -55,4 +55,11 @@ public class TestWebApplication {
 		assertThat(mvcResult.getResponse().getContentType()).isEqualTo(CONTENT_TYPE);
 	}
 
+	@Test
+	public void givenGreetURI_whenMockMVC_thenVerifyResponse2() throws Exception {
+		final MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/department/{id}", 2).param("name", "Bl")).andDo(print())
+				.andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Blanka")).andReturn();
+		assertThat(mvcResult.getResponse().getContentType()).isEqualTo(CONTENT_TYPE);
+	}
+
 }

@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.util.StringValueResolver;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -22,21 +21,18 @@ import org.springframework.web.servlet.HandlerMapping;
 import net.dfr.core.annotation.Conjunction;
 import net.dfr.core.annotation.Disjunction;
 import net.dfr.core.statement.ConditionalStatement;
-import net.dfr.core.statement.DefaultConditionalStatementProvider;
-import net.dfr.core.statement.ValueExpressionResolver;
+import net.dfr.core.statement.ConditionalStatementProvider;
 import net.dfr.providers.specification.annotation.Fetching;
 import net.dfr.providers.specification.filter.SpecificationDynamicFilterResolver;
 
 public class SpecificationDynamicFilterArgumentResolver implements HandlerMethodArgumentResolver {
 
-	private DefaultConditionalStatementProvider conditionalStatementProvider;
+	private ConditionalStatementProvider conditionalStatementProvider;
 	private SpecificationDynamicFilterResolver<?> dynamicFilterResolver;
 
-	public SpecificationDynamicFilterArgumentResolver(StringValueResolver stringValueResolver,
+	public SpecificationDynamicFilterArgumentResolver(ConditionalStatementProvider conditionalStatementProvider,
 			SpecificationDynamicFilterResolver<?> dynamicFilterResolver) {
-		ValueExpressionResolver valueExpressionResolver = stringValueResolver != null ? (value -> stringValueResolver.resolveStringValue(value))
-				: null;
-		this.conditionalStatementProvider = new DefaultConditionalStatementProvider(valueExpressionResolver);
+		this.conditionalStatementProvider = conditionalStatementProvider;
 		this.dynamicFilterResolver = dynamicFilterResolver;
 	}
 
@@ -60,11 +56,31 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest,
 			WebDataBinderFactory binderFactory) throws Exception {
 		Map<Object, Object[]> providedParameterValuesMap = createProvidedValuesMap(parameter, webRequest);
+		Map<Object, Object> contextMap = createContextMap(parameter);
 
 		ConditionalStatement statement = conditionalStatementProvider.createConditionalStatements(
 				(Class<Specification<?>>) parameter.getParameterType(), parameter.getParameterAnnotations(), providedParameterValuesMap);
 
-		return (statement != null && statement.hasAnyCondition()) ? dynamicFilterResolver.convertTo(statement) : Specification.where(null);
+		return (statement != null && statement.hasAnyCondition()) ? dynamicFilterResolver.convertTo(statement, contextMap)
+				: Specification.where(null);
+	}
+
+	/**
+	 * 
+	 * @param parameter
+	 * @return
+	 */
+	private Map<Object, Object> createContextMap(MethodParameter parameter) {
+		Map<Object, Object> contextMap = new HashMap<>();
+		Annotation[] anns = parameter.getParameterAnnotations();
+		if (anns != null && anns.length > 0) {
+			Annotation[] filteredAnnos = Stream.of(anns).filter(ann -> Fetching.class.isInstance(ann))
+					.collect(collectingAndThen(toList(), l -> l.toArray(new Annotation[l.size()])));
+			if (filteredAnnos != null && filteredAnnos.length > 0) {
+				contextMap.put(Fetching.class, filteredAnnos);
+			}
+		}
+		return contextMap;
 	}
 
 	/**
@@ -79,17 +95,16 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 
 		HttpServletRequest httpServletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
 		providedParameterValuesMap.putAll(webRequest.getParameterMap());
-		providedParameterValuesMap.putAll((Map<String, String[]>) httpServletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE));
 
-		Annotation[] anns = parameter.getParameterAnnotations();
-		if (anns != null && anns.length > 0) {
-			Annotation[] filteredAnnos = Stream.of(anns).filter(ann -> Fetching.class.isInstance(ann))
-					.collect(collectingAndThen(toList(), l -> l.toArray(new Annotation[l.size()])));
-			if (filteredAnnos != null && filteredAnnos.length > 0) {
-				providedParameterValuesMap.put(Fetching.class, filteredAnnos);
-			}
+		Map<Object, Object> pathVariables = (Map<Object, Object>) httpServletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+		if (pathVariables != null && !pathVariables.isEmpty()) {
+			pathVariables.forEach((key, value) -> {
+				boolean isArray = value != null ? value.getClass().isArray() : false;
+				providedParameterValuesMap.put(key, isArray ? (Object[]) value : new Object[] { value });
+			});
 		}
 
+		providedParameterValuesMap.putAll((Map<String, String[]>) httpServletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE));
 		return providedParameterValuesMap;
 	}
 
