@@ -14,7 +14,7 @@ class SpecStartsWithIgnoreCase<T> implements StartsWithIgnoreCase<Specification<
 	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		return (root, query, criteriaBuilder) -> {
 			Path<String> path = PredicateUtils.computeAttributePath(filterParameter, root);
-			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.findFormat());
+			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.getFormat());
 			return criteriaBuilder.like(criteriaBuilder.upper(path), transformNonNull(value, v -> v.toString().toUpperCase() + "%"));
 		};
 	}

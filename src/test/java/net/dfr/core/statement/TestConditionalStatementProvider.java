@@ -40,7 +40,7 @@ public class TestConditionalStatementProvider {
 		assertThat(statement.getClauses()).isNotEmpty().hasSize(1);
 
 		FilterParameter filterParameter = statement.getClauses().get(0);
-		assertThat(filterParameter.getFormats()).isEmpty();
+		assertThat(filterParameter.getFormat()).isEmpty();
 		assertThat(filterParameter.getOperator()).isNotNull().isEqualTo(Equals.class);
 		assertThat(filterParameter.isNegate()).isFalse();
 		assertThat(filterParameter.getParameters()).isNotEmpty().hasSize(1).contains("delete");
@@ -61,7 +61,7 @@ public class TestConditionalStatementProvider {
 		assertThat(statement.getClauses()).isNotEmpty().hasSize(1);
 
 		FilterParameter filterParameter = statement.getClauses().get(0);
-		assertThat(filterParameter.getFormats()).isEmpty();
+		assertThat(filterParameter.getFormat()).isEmpty();
 		assertThat(filterParameter.getOperator()).isNotNull().isEqualTo(Equals.class);
 		assertThat(filterParameter.isNegate()).isTrue();
 		assertThat(filterParameter.getParameters()).isNotEmpty().hasSize(1).contains("delete");
@@ -82,7 +82,7 @@ public class TestConditionalStatementProvider {
 		assertThat(statement.getClauses()).isNotEmpty().hasSize(1);
 
 		FilterParameter filterParameter = statement.getClauses().get(0);
-		assertThat(filterParameter.getFormats()).isEmpty();
+		assertThat(filterParameter.getFormat()).isEmpty();
 		assertThat(filterParameter.getOperator()).isNotNull().isEqualTo(Equals.class);
 		assertThat(filterParameter.isNegate()).isFalse();
 		assertThat(filterParameter.getParameters()).isNotEmpty().hasSize(1).contains("delete");
@@ -104,7 +104,7 @@ public class TestConditionalStatementProvider {
 		assertThat(statement.getClauses()).isNotEmpty().hasSize(2);
 
 		filterParameter = statement.getClauses().get(0);
-		assertThat(filterParameter.getFormats()).isEmpty();
+		assertThat(filterParameter.getFormat()).isEmpty();
 		assertThat(filterParameter.getOperator()).isNotNull().isEqualTo(Equals.class);
 		assertThat(filterParameter.isNegate()).isFalse();
 		assertThat(filterParameter.getParameters()).isNotEmpty().hasSize(1).contains("delete");
@@ -113,7 +113,7 @@ public class TestConditionalStatementProvider {
 		assertThat(filterParameter.getValues()).isNotEmpty().containsOnly("false");
 
 		filterParameter = statement.getClauses().get(1);
-		assertThat(filterParameter.getFormats()).isEmpty();
+		assertThat(filterParameter.getFormat()).isEmpty();
 		assertThat(filterParameter.getOperator()).isNotNull().isEqualTo(Equals.class);
 		assertThat(filterParameter.isNegate()).isFalse();
 		assertThat(filterParameter.getParameters()).isNotEmpty().hasSize(1).contains("status");
@@ -149,7 +149,7 @@ public class TestConditionalStatementProvider {
 		assertThat(stmt1.getClauses()).isNotEmpty().hasSize(1);
 
 		filterParameter = stmt1.getClauses().get(0);
-		assertThat(filterParameter.getFormats()).isEmpty();
+		assertThat(filterParameter.getFormat()).isEmpty();
 		assertThat(filterParameter.getOperator()).isNotNull().isEqualTo(Equals.class);
 		assertThat(filterParameter.isNegate()).isFalse();
 		assertThat(filterParameter.getParameters()).isNotEmpty().hasSize(1).contains("delete");
@@ -158,7 +158,7 @@ public class TestConditionalStatementProvider {
 		assertThat(filterParameter.getValues()).isNotEmpty().containsOnly("false");
 
 		filterParameter = stmt2.getClauses().get(0);
-		assertThat(filterParameter.getFormats()).isEmpty();
+		assertThat(filterParameter.getFormat()).isEmpty();
 		assertThat(filterParameter.getOperator()).isNotNull().isEqualTo(Equals.class);
 		assertThat(filterParameter.isNegate()).isFalse();
 		assertThat(filterParameter.getParameters()).isNotEmpty().hasSize(1).contains("status");

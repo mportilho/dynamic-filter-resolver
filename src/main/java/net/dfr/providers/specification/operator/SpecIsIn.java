@@ -25,7 +25,7 @@ class SpecIsIn<T> implements IsIn<Specification<T>> {
 			if (rawValues != null) {
 				Object[] value = new Object[rawValues.length];
 				for (int i = 0; i < value.length; i++) {
-					value[i] = filterValueConverter.convert(rawValues[i], path.getJavaType(), filterParameter.findFormat());
+					value[i] = filterValueConverter.convert(rawValues[i], path.getJavaType(), filterParameter.getFormat());
 				}
 				predicate = path.in(value);
 			}

@@ -16,7 +16,7 @@ class SpecLess<T> implements Less<Specification<T>>, SpecComparablePredicate {
 	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		return (root, query, criteriaBuilder) -> {
 			Path<?> path = computeAttributePath(filterParameter, root);
-			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.findFormat());
+			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.getFormat());
 			return toComparablePredicate(criteriaBuilder, path, value, criteriaBuilder::lessThan, criteriaBuilder::lt);
 		};
 	}

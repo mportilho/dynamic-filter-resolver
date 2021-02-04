@@ -34,7 +34,6 @@ public class TestConditionalStatementProviderOnAllOperations {
 		assertThat(param.getParameters()).isNotEmpty().hasSize(2).containsExactlyInAnyOrder("startDate", "endDate");
 		assertThat(param.getValues()).isNotEmpty().hasSize(2).containsExactlyInAnyOrder("01/01/1980", "01/01/2000");
 		assertThatThrownBy(() -> param.findValue()).isInstanceOf(IllegalStateException.class);
-//		assertThatThrownBy(() -> param.findFormat()).isInstanceOf(IllegalStateException.class);
 	}
 
 	@Test

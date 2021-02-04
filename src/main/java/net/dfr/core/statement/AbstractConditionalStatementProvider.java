@@ -208,10 +208,10 @@ public abstract class AbstractConditionalStatementProvider implements Conditiona
 				}
 
 				boolean negate = Boolean.parseBoolean(computeSpringExpressionLanguage(filter.negate()));
-				String[] formats = computeSpringExpressionLanguage(filter.formats());
+				String format = computeSpringExpressionLanguage(filter.format());
 
 				FilterParameter parameter = new FilterParameter(filter.attributePath(), filter.path(), filter.parameters(), filter.targetType(),
-						filter.operator(), negate, values, formats);
+						filter.operator(), negate, values, format);
 				parameter = decorateFilterParameter(parameter, parametersMap);
 				filterParameters.add(parameter);
 			}

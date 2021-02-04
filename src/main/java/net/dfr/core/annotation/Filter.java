@@ -88,13 +88,12 @@ public @interface Filter {
 	String[] constantValues() default {};
 
 	/**
-	 * Optional format pattern to assist data conversion for each parameter. It's
-	 * recommended that each parameter has its own provided format for configuration
-	 * clarity
+	 * Optional format pattern to assist data conversion for the corresponding path
+	 * type.
 	 * 
 	 * <p>
 	 * Can be parsed by the Spring Expression Language
 	 */
-	String[] formats() default {};
+	String format() default "";
 
 }

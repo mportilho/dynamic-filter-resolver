@@ -59,7 +59,7 @@ public class FilterParameter {
 	 * recommended that each parameter has its own provided format for configuration
 	 * clarity
 	 */
-	private final String[] formats;
+	private final String format;
 
 	/**
 	 * The parameter's mutable state during filter resolution
@@ -68,7 +68,7 @@ public class FilterParameter {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public FilterParameter(String attributePath, String path, String[] parameters, Class<?> targetType, Class<? extends FilterOperator> operator,
-			boolean negate, Object[] value, String[] formats) {
+			boolean negate, Object[] value, String formats) {
 		this.attributePath = attributePath;
 		this.path = path;
 		this.parameters = parameters;
@@ -76,7 +76,7 @@ public class FilterParameter {
 		this.operator = (Class<? extends FilterOperator<?>>) operator;
 		this.negate = negate;
 		this.values = value;
-		this.formats = formats;
+		this.format = formats;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -89,7 +89,7 @@ public class FilterParameter {
 		this.operator = (Class<? extends FilterOperator<?>>) operator;
 		this.negate = negate;
 		this.values = value != null ? new Object[] { value } : null;
-		this.formats = format != null ? new String[] { format } : null;
+		this.format = format != null && !format.isEmpty() ? format : null;
 	}
 
 	public String getAttributePath() {
@@ -120,8 +120,8 @@ public class FilterParameter {
 		return operator;
 	}
 
-	public String[] getFormats() {
-		return formats;
+	public String getFormat() {
+		return format;
 	}
 
 	public void addState(Object key, Object value) {
@@ -148,20 +148,11 @@ public class FilterParameter {
 		return values[0];
 	}
 
-	public String findFormat() {
-		if (formats == null || formats.length == 0) {
-			return null;
-		} else if (formats.length > 1) {
-			throw new IllegalStateException("Cannot get single value because multiple values are present");
-		}
-		return formats[0];
-	}
-
 	@Override
 	public String toString() {
 		return "FilterParameter [attributePath=" + attributePath + ", path=" + path + ", parameters=" + Arrays.toString(parameters) + ", targetType="
 				+ targetType.getSimpleName() + ", operator=" + operator.getSimpleName() + ", negate=" + negate + ", values=" + Arrays.toString(values)
-				+ ", formats=" + Arrays.toString(formats) + "]";
+				+ ", format=" + format + "]";
 	}
 
 }

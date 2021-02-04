@@ -17,7 +17,7 @@ class SpecEqualsIgnoreCase<T> implements EqualsIgnoreCase<Specification<T>> {
 	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		return (root, query, criteriaBuilder) -> {
 			Path<?> path = computeAttributePath(filterParameter, root);
-			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.findFormat());
+			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.getFormat());
 			if (String.class.equals(path.getJavaType())) {
 				return criteriaBuilder.equal(criteriaBuilder.upper((Path<String>) path), transformNonNull(value, v -> v.toString().toUpperCase()));
 			}
