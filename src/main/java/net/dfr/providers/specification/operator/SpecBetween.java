@@ -20,7 +20,7 @@ class SpecBetween<T> implements Between<Specification<T>> {
 
 			String lowerValueFormat = null;
 			String upperValueFormat = null;
-			if (filterParameter.getFormats() != null || filterParameter.getFormats().length > 0) {
+			if (filterParameter.getFormats() != null && filterParameter.getFormats().length > 0) {
 				lowerValueFormat = filterParameter.getFormats()[0];
 				upperValueFormat = filterParameter.getFormats().length == 2 ? filterParameter.getFormats()[1] : upperValueFormat;
 			}

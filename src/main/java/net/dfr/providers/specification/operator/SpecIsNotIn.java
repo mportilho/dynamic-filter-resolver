@@ -4,12 +4,12 @@ import org.springframework.data.jpa.domain.Specification;
 
 import net.dfr.core.converter.FilterValueConverter;
 import net.dfr.core.filter.FilterParameter;
-import net.dfr.core.operator.type.NotIn;
+import net.dfr.core.operator.type.IsNotIn;
 
-class SpecNotIn<T> implements NotIn<Specification<T>> {
+class SpecIsNotIn<T> implements IsNotIn<Specification<T>> {
 
 	@SuppressWarnings("rawtypes")
-	private static final SpecIn IN_STATIC = new SpecIn<>();
+	private static final SpecIsIn IN_STATIC = new SpecIsIn<>();
 
 	@Override
 	@SuppressWarnings("unchecked")
