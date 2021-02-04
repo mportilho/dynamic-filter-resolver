@@ -1,4 +1,4 @@
-package net.dfr.provider.specification.interfaces;
+package net.dfr.core.statement.interfaces;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,6 +33,6 @@ import net.dfr.core.operator.type.NotEquals;
 	}
 )
 //@formatter:on
-public interface RequiringSomeMoreValuesInterface {
+public interface RequiringSomeMoreValues {
 
 }

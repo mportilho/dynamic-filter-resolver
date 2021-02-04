@@ -1,4 +1,4 @@
-package net.dfr.provider.specification.annotation;
+package net.dfr.core.statement.annotation;
 
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE;
@@ -8,19 +8,18 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import net.dfr.core.annotation.Disjunction;
+import net.dfr.core.annotation.Conjunction;
 import net.dfr.core.annotation.Filter;
 import net.dfr.core.operator.type.Equals;
-import net.dfr.provider.specification.interfaces.StatusEnum;
+import net.dfr.core.statement.interfaces.StatusEnum;
 
 @Documented
 @Retention(RUNTIME)
 @Target({ PARAMETER, TYPE })
 //@formatter:off
-@Disjunction({
-	@Filter(path = "deleted", parameters = "delete", operator = Equals.class, constantValues = "true", targetType = Boolean.class),
-	@Filter(path = "status", parameters = "status", operator = Equals.class, constantValues = "ERROR", targetType = StatusEnum.class)
+@Conjunction({
+	@Filter(path = "status", parameters = "status", operator = Equals.class, constantValues = "OK", targetType = StatusEnum.class)
 })//@formatter:on
-public @interface DeletedAndError {
+public @interface StatusOk {
 
 }

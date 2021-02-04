@@ -1,4 +1,4 @@
-package net.dfr.provider.specification.interfaces;
+package net.dfr.core.statement.interfaces;
 
 import java.time.LocalDate;
 
@@ -27,6 +27,6 @@ import net.dfr.core.operator.type.NotEquals;
 	}
 )
 //@formatter:on
-public interface RequiringSomeValuesInterface {
+public interface RequiringSomeValues {
 
 }

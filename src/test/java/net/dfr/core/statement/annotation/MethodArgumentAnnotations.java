@@ -1,4 +1,4 @@
-package net.dfr.provider.specification.annotation;
+package net.dfr.core.statement.annotation;
 
 import java.time.LocalDate;
 
@@ -6,7 +6,7 @@ import net.dfr.core.annotation.Disjunction;
 import net.dfr.core.annotation.Filter;
 import net.dfr.core.operator.type.Greater;
 import net.dfr.core.operator.type.GreaterOrEquals;
-import net.dfr.provider.specification.interfaces.StatusEnum;
+import net.dfr.core.statement.interfaces.StatusEnum;
 
 /**
  * Simulates parameter annotations
