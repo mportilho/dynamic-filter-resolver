@@ -26,7 +26,7 @@ import net.dfr.providers.specification.statement.SpecificationConditionalStateme
 
 @DataJpaTest
 @ContextConfiguration(classes = TestingApplication.class)
-public class TestComparisonQueries {
+public class TestAllSpecificationOperators {
 
 	@Autowired
 	private PersonRepository personRepo;
