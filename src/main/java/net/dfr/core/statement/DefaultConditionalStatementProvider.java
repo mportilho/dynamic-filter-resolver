@@ -24,7 +24,7 @@ import net.dfr.core.operator.type.IsNotIn;
 import net.dfr.core.operator.type.IsNotNull;
 import net.dfr.core.operator.type.IsNull;
 
-public abstract class AbstractConditionalStatementProvider implements ConditionalStatementProvider {
+public class DefaultConditionalStatementProvider implements ConditionalStatementProvider {
 
 	@SuppressWarnings("rawtypes")
 	private static final List<Class<? extends FilterOperator>> NULL_VALUE_OPERATORS = Arrays.asList(IsNull.class, IsNotNull.class);
@@ -36,7 +36,7 @@ public abstract class AbstractConditionalStatementProvider implements Conditiona
 
 	private ValueExpressionResolver valueExpressionResolver;
 
-	public AbstractConditionalStatementProvider(ValueExpressionResolver valueExpressionResolver) {
+	public DefaultConditionalStatementProvider(ValueExpressionResolver valueExpressionResolver) {
 		this.valueExpressionResolver = valueExpressionResolver;
 	}
 

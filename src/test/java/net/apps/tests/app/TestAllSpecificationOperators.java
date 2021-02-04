@@ -23,10 +23,11 @@ import net.dfr.core.converter.DefaultFilterValueConverter;
 import net.dfr.core.filter.DynamicFilterResolver;
 import net.dfr.core.operator.FilterOperatorService;
 import net.dfr.core.statement.ConditionalStatement;
+import net.dfr.core.statement.ConditionalStatementProvider;
+import net.dfr.core.statement.DefaultConditionalStatementProvider;
 import net.dfr.providers.specification.annotation.Fetching;
 import net.dfr.providers.specification.filter.SpecificationDynamicFilterResolver;
 import net.dfr.providers.specification.operator.SpecificationFilterOperatorService;
-import net.dfr.providers.specification.statement.SpecificationConditionalStatementProvider;
 
 @DataJpaTest
 @ContextConfiguration(classes = TestingApplication.class)
@@ -37,7 +38,7 @@ public class TestAllSpecificationOperators {
 
 	@Test
 	public void testComparisons() {
-		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
+		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(ComparisonOperationsQueryInterface.class, null, null);
 		FilterOperatorService<Specification<Person>> operatorService = new SpecificationFilterOperatorService<>();
 		DefaultFilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
@@ -51,7 +52,7 @@ public class TestAllSpecificationOperators {
 
 	@Test
 	public void testStringComparisons() {
-		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
+		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(StringOperationsQueryInterface.class, null, null);
 		FilterOperatorService<Specification<Person>> operatorService = new SpecificationFilterOperatorService<>();
 		DefaultFilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
@@ -65,7 +66,7 @@ public class TestAllSpecificationOperators {
 
 	@Test
 	public void testOtherComparisons() {
-		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
+		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(OtherOperationsQueryInterface.class, null, null);
 		FilterOperatorService<Specification<Person>> operatorService = new SpecificationFilterOperatorService<>();
 		DefaultFilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
@@ -81,7 +82,7 @@ public class TestAllSpecificationOperators {
 	public void testSimpleFetch() {
 		FilterOperatorService<Specification<Person>> operatorService = new SpecificationFilterOperatorService<>();
 		DefaultFilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
-		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
+		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
 		DynamicFilterResolver<Specification<Person>> resolver = new SpecificationDynamicFilterResolver<>(operatorService, filterValueConverter);
 
 		ConditionalStatement statement = provider.createConditionalStatements(FetchingSimplePath.class, null, null);
@@ -92,12 +93,12 @@ public class TestAllSpecificationOperators {
 
 		assertThat(list).isEmpty();
 	}
-	
+
 	@Test
 	public void testComposedFetch() {
 		FilterOperatorService<Specification<Person>> operatorService = new SpecificationFilterOperatorService<>();
 		DefaultFilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
-		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
+		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
 		DynamicFilterResolver<Specification<Person>> resolver = new SpecificationDynamicFilterResolver<>(operatorService, filterValueConverter);
 
 		ConditionalStatement statement = provider.createConditionalStatements(FetchingComposedPath.class, null, null);
