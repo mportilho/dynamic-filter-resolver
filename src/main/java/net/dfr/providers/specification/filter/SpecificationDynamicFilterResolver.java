@@ -12,6 +12,7 @@ import net.dfr.core.operator.FilterOperator;
 import net.dfr.core.operator.FilterOperatorService;
 import net.dfr.core.statement.ConditionalStatement;
 import net.dfr.core.statement.LogicType;
+import net.dfr.providers.specification.annotation.Fetch;
 
 public class SpecificationDynamicFilterResolver<T> extends AbstractDynamicFilterResolver<Specification<T>> {
 
@@ -51,6 +52,29 @@ public class SpecificationDynamicFilterResolver<T> extends AbstractDynamicFilter
 			currentPredicate = logicType.isConjunction() ? currentPredicate.and(subPredicate) : currentPredicate.or(subPredicate);
 		}
 		return currentPredicate;
+	}
+
+	@Override
+	public <K, V> Specification<T> responseDecorator(Specification<T> response, Map<K, V> context) {
+		if (context == null || context.isEmpty()) {
+			return response;
+		}
+		Fetch[] fetches = (Fetch[]) context.get(Fetch.class);
+		if (fetches == null || fetches.length == 0) {
+			return response;
+		}
+
+		Specification<T> decoratedSpec = (root, query, criteriaBuilder) -> {
+			query.distinct(true);
+			for (Fetch fetch : fetches) {
+				for (String fetchPath : fetch.value()) {
+					root.fetch(fetchPath, fetch.joinType());
+				}
+			}
+			return null;
+		};
+
+		return decoratedSpec.and(response);
 	}
 
 }
