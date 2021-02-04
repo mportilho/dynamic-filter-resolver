@@ -13,6 +13,6 @@ import java.lang.annotation.Target;
 @Target({ PARAMETER, TYPE })
 @interface Fetches {
 
-	Fetch[] value() default {};
+	Fetching[] value() default {};
 
 }

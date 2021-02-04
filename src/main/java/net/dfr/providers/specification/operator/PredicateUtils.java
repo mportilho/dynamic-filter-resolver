@@ -1,8 +1,5 @@
 package net.dfr.providers.specification.operator;
 
-import java.util.Map;
-
-import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.From;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
@@ -13,7 +10,6 @@ import javax.persistence.metamodel.Attribute;
 import org.springframework.data.mapping.PropertyPath;
 
 import net.dfr.core.filter.FilterParameter;
-import net.dfr.providers.specification.annotation.FetchingMode;
 
 class PredicateUtils {
 
@@ -26,21 +22,10 @@ class PredicateUtils {
 	public static final <T> Path<T> computeAttributePath(FilterParameter filterParameter, Root<?> root) {
 		PropertyPath propertyPath = PropertyPath.from(filterParameter.getPath(), root.getJavaType());
 		From<?, ?> from = root;
-		boolean graphFromFetch = false;
-
-		Map<String, FetchingMode> fetchingMap = filterParameter.findState(Fetch.class);
 
 		if (propertyPath.isCollection()) {
 			do {
-				Fetch<?, ?> fetchAttribute = getFetchAttribute(from, propertyPath.getSegment());
-				if (fetchAttribute != null) {
-					from = (From<?, ?>) fetchAttribute;
-					graphFromFetch = true;
-				} else if (graphFromFetch) {
-					from = (From<?, ?>) from.fetch(propertyPath.getSegment(), filterParameter.findStateOrDefault(JoinType.class, JoinType.LEFT));
-				} else {
-					from = getOrCreateJoin(from, propertyPath.getSegment(), filterParameter.findStateOrDefault(JoinType.class, JoinType.INNER));
-				}
+				from = getOrCreateJoin(from, propertyPath.getSegment(), filterParameter.findStateOrDefault(JoinType.class, JoinType.INNER));
 				propertyPath = propertyPath.next();
 			} while (propertyPath.hasNext());
 		}
@@ -55,7 +40,7 @@ class PredicateUtils {
 	 * @param attribute the {@link Attribute} to look for in the current joins.
 	 * @return will never be {@literal null}.
 	 */
-	public static final Join<?, ?> getOrCreateJoin(From<?, ?> from, String attribute, JoinType joinType) {
+	private static final Join<?, ?> getOrCreateJoin(From<?, ?> from, String attribute, JoinType joinType) {
 		for (Join<?, ?> join : from.getJoins()) {
 			boolean sameName = join.getAttribute().getName().equals(attribute);
 			if (sameName && join.getJoinType().equals(joinType)) {
@@ -63,41 +48,6 @@ class PredicateUtils {
 			}
 		}
 		return from.join(attribute, joinType);
-	}
-
-	/**
-	 * Return whether the given {@link From} contains a fetch declaration for the
-	 * attribute with the given name.
-	 *
-	 * @param from      the {@link From} to check for fetches.
-	 * @param attribute the attribute name to check.
-	 * @return
-	 */
-	private static Fetch<?, ?> getFetchAttribute(From<?, ?> from, String attribute) {
-		for (Fetch<?, ?> fetch : from.getFetches()) {
-			boolean sameName = fetch.getAttribute().getName().equals(attribute);
-			if (sameName && fetch.getJoinType().equals(JoinType.LEFT)) {
-				return fetch;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * 
-	 * @param from
-	 * @param attribute
-	 * @param joinType
-	 * @return
-	 */
-	public static final Join<?, ?> getJoinByAttribute(From<?, ?> from, String attribute, JoinType joinType) {
-		for (Join<?, ?> join : from.getJoins()) {
-			boolean sameName = join.getAttribute().getName().equals(attribute);
-			if (sameName && join.getJoinType().equals(joinType)) {
-				return join;
-			}
-		}
-		return null;
 	}
 
 }

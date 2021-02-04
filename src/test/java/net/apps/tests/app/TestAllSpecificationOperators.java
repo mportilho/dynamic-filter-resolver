@@ -22,7 +22,7 @@ import net.dfr.core.converter.DefaultFilterValueConverter;
 import net.dfr.core.filter.DynamicFilterResolver;
 import net.dfr.core.operator.FilterOperatorService;
 import net.dfr.core.statement.ConditionalStatement;
-import net.dfr.providers.specification.annotation.Fetch;
+import net.dfr.providers.specification.annotation.Fetching;
 import net.dfr.providers.specification.filter.SpecificationDynamicFilterResolver;
 import net.dfr.providers.specification.operator.SpecificationFilterOperatorService;
 import net.dfr.providers.specification.statement.SpecificationConditionalStatementProvider;
@@ -85,8 +85,8 @@ public class TestAllSpecificationOperators {
 
 		ConditionalStatement statement = provider.createConditionalStatements(FetchingSimpleRelation.class, null, null);
 
-		Fetch[] anns = FetchingSimpleRelation.class.getAnnotationsByType(Fetch.class);
-		Specification<Person> specification = resolver.convertTo(statement, Collections.singletonMap(Fetch.class, anns));
+		Fetching[] anns = FetchingSimpleRelation.class.getAnnotationsByType(Fetching.class);
+		Specification<Person> specification = resolver.convertTo(statement, Collections.singletonMap(Fetching.class, anns));
 		List<Person> list = personRepo.findAll(specification);
 
 		assertThat(list).isEmpty();

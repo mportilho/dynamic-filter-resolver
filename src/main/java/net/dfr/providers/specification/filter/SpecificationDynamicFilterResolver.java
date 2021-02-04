@@ -12,7 +12,7 @@ import net.dfr.core.operator.FilterOperator;
 import net.dfr.core.operator.FilterOperatorService;
 import net.dfr.core.statement.ConditionalStatement;
 import net.dfr.core.statement.LogicType;
-import net.dfr.providers.specification.annotation.Fetch;
+import net.dfr.providers.specification.annotation.Fetching;
 
 public class SpecificationDynamicFilterResolver<T> extends AbstractDynamicFilterResolver<Specification<T>> {
 
@@ -59,16 +59,16 @@ public class SpecificationDynamicFilterResolver<T> extends AbstractDynamicFilter
 		if (context == null || context.isEmpty()) {
 			return response;
 		}
-		Fetch[] fetches = (Fetch[]) context.get(Fetch.class);
+		Fetching[] fetches = (Fetching[]) context.get(Fetching.class);
 		if (fetches == null || fetches.length == 0) {
 			return response;
 		}
 
 		Specification<T> decoratedSpec = (root, query, criteriaBuilder) -> {
 			query.distinct(true);
-			for (Fetch fetch : fetches) {
-				for (String fetchPath : fetch.value()) {
-					root.fetch(fetchPath, fetch.joinType());
+			for (Fetching fetching : fetches) {
+				for (String fetchPath : fetching.value()) {
+					root.fetch(fetchPath, fetching.joinType());
 				}
 			}
 			return null;

@@ -23,7 +23,7 @@ import net.dfr.core.annotation.Conjunction;
 import net.dfr.core.annotation.Disjunction;
 import net.dfr.core.statement.ConditionalStatement;
 import net.dfr.core.statement.ValueExpressionResolver;
-import net.dfr.providers.specification.annotation.Fetch;
+import net.dfr.providers.specification.annotation.Fetching;
 import net.dfr.providers.specification.filter.SpecificationDynamicFilterResolver;
 import net.dfr.providers.specification.statement.SpecificationConditionalStatementProvider;
 
@@ -83,10 +83,10 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 
 		Annotation[] anns = parameter.getParameterAnnotations();
 		if (anns != null && anns.length > 0) {
-			Annotation[] filteredAnnos = Stream.of(anns).filter(ann -> Fetch.class.isInstance(ann))
+			Annotation[] filteredAnnos = Stream.of(anns).filter(ann -> Fetching.class.isInstance(ann))
 					.collect(collectingAndThen(toList(), l -> l.toArray(new Annotation[l.size()])));
 			if (filteredAnnos != null && filteredAnnos.length > 0) {
-				providedParameterValuesMap.put(Fetch.class, filteredAnnos);
+				providedParameterValuesMap.put(Fetching.class, filteredAnnos);
 			}
 		}
 

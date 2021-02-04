@@ -15,11 +15,9 @@ import javax.persistence.criteria.JoinType;
 @Retention(RUNTIME)
 @Target({ PARAMETER, TYPE })
 @Repeatable(Fetches.class)
-public @interface Fetch {
+public @interface Fetching {
 
 	String[] value();
-
-	FetchingMode fetchingMode() default FetchingMode.EXTRA_JOINS;
 
 	JoinType joinType() default JoinType.LEFT;
 
