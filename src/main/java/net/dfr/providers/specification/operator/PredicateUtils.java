@@ -22,12 +22,13 @@ class PredicateUtils {
 	public static final <T> Path<T> computeAttributePath(FilterParameter filterParameter, Root<?> root) {
 		PropertyPath propertyPath = PropertyPath.from(filterParameter.getPath(), root.getJavaType());
 		From<?, ?> from = root;
-
-		if (propertyPath.isCollection()) {
-			do {
-				from = getOrCreateJoin(from, propertyPath.getSegment(), filterParameter.findStateOrDefault(JoinType.class, JoinType.INNER));
-				propertyPath = propertyPath.next();
-			} while (propertyPath.hasNext());
+		if (propertyPath == null) {
+			throw new IllegalArgumentException(
+					String.format("No path '%s' found for type '%s'", filterParameter.getPath(), from.getJavaType().getSimpleName()));
+		}
+		while (propertyPath.hasNext()) {
+			from = getOrCreateJoin(from, propertyPath.getSegment(), filterParameter.findStateOrDefault(JoinType.class, JoinType.INNER));
+			propertyPath = propertyPath.next();
 		}
 		return from.get(propertyPath.getSegment());
 	}

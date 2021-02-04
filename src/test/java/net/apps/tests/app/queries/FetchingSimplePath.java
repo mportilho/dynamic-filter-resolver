@@ -11,6 +11,6 @@ import net.dfr.providers.specification.annotation.Fetching;
 		@Filter(path = "addresses.number", parameters = "houseNumber", operator = GreaterOrEquals.class, defaultValues = "1010") 
 	}
 )
-public interface FetchingSimpleRelation {
+public interface FetchingSimplePath {
 
 }

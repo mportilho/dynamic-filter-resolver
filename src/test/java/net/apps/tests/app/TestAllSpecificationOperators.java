@@ -15,7 +15,8 @@ import net.apps.apptest.TestingApplication;
 import net.apps.apptest.domain.model.Person;
 import net.apps.apptest.repository.PersonRepository;
 import net.apps.tests.app.queries.ComparisonOperationsQueryInterface;
-import net.apps.tests.app.queries.FetchingSimpleRelation;
+import net.apps.tests.app.queries.FetchingComposedPath;
+import net.apps.tests.app.queries.FetchingSimplePath;
 import net.apps.tests.app.queries.OtherOperationsQueryInterface;
 import net.apps.tests.app.queries.StringOperationsQueryInterface;
 import net.dfr.core.converter.DefaultFilterValueConverter;
@@ -83,9 +84,25 @@ public class TestAllSpecificationOperators {
 		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
 		DynamicFilterResolver<Specification<Person>> resolver = new SpecificationDynamicFilterResolver<>(operatorService, filterValueConverter);
 
-		ConditionalStatement statement = provider.createConditionalStatements(FetchingSimpleRelation.class, null, null);
+		ConditionalStatement statement = provider.createConditionalStatements(FetchingSimplePath.class, null, null);
 
-		Fetching[] anns = FetchingSimpleRelation.class.getAnnotationsByType(Fetching.class);
+		Fetching[] anns = FetchingSimplePath.class.getAnnotationsByType(Fetching.class);
+		Specification<Person> specification = resolver.convertTo(statement, Collections.singletonMap(Fetching.class, anns));
+		List<Person> list = personRepo.findAll(specification);
+
+		assertThat(list).isEmpty();
+	}
+	
+	@Test
+	public void testComposedFetch() {
+		FilterOperatorService<Specification<Person>> operatorService = new SpecificationFilterOperatorService<>();
+		DefaultFilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
+		DynamicFilterResolver<Specification<Person>> resolver = new SpecificationDynamicFilterResolver<>(operatorService, filterValueConverter);
+
+		ConditionalStatement statement = provider.createConditionalStatements(FetchingComposedPath.class, null, null);
+
+		Fetching[] anns = FetchingSimplePath.class.getAnnotationsByType(Fetching.class);
 		Specification<Person> specification = resolver.convertTo(statement, Collections.singletonMap(Fetching.class, anns));
 		List<Person> list = personRepo.findAll(specification);
 

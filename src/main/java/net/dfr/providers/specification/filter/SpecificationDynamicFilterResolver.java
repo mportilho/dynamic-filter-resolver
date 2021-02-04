@@ -3,7 +3,10 @@ package net.dfr.providers.specification.filter;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.criteria.From;
+
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.mapping.PropertyPath;
 
 import net.dfr.core.converter.FilterValueConverter;
 import net.dfr.core.filter.AbstractDynamicFilterResolver;
@@ -67,8 +70,18 @@ public class SpecificationDynamicFilterResolver<T> extends AbstractDynamicFilter
 		Specification<T> decoratedSpec = (root, query, criteriaBuilder) -> {
 			query.distinct(true);
 			for (Fetching fetching : fetches) {
-				for (String fetchPath : fetching.value()) {
-					root.fetch(fetchPath, fetching.joinType());
+				for (String attributePath : fetching.value()) {
+					From<?, ?> from = root;
+					PropertyPath propertyPath = PropertyPath.from(attributePath, root.getJavaType());
+					if (propertyPath == null) {
+						throw new IllegalArgumentException(
+								String.format("No path '%s' found for type '%s'", attributePath, from.getJavaType().getSimpleName()));
+					}
+					while (propertyPath.hasNext()) {
+						from = (From<?, ?>) root.fetch(propertyPath.getSegment(), fetching.joinType());
+						propertyPath = propertyPath.next();
+					}
+					from.fetch(propertyPath.getSegment(), fetching.joinType());
 				}
 			}
 			return null;
