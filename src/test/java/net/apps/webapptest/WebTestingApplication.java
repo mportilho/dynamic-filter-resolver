@@ -11,7 +11,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import net.dfr.core.converter.DefaultFilterValueConverter;
 import net.dfr.core.converter.FilterValueConverter;
-import net.dfr.core.filter.DynamicFilterResolver;
 import net.dfr.providers.specification.filter.SpecificationDynamicFilterResolver;
 import net.dfr.providers.specification.operator.SpecificationFilterOperatorService;
 import net.dfr.providers.specification.web.SpecificationFilterParameterArgumentResolver;
@@ -28,7 +27,8 @@ public class WebTestingApplication implements WebMvcRegistrations, WebMvcConfigu
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
 		SpecificationFilterOperatorService<?> filterOperatorService = new SpecificationFilterOperatorService<>();
 		FilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
-		DynamicFilterResolver<?> dynamicFilterResolver = new SpecificationDynamicFilterResolver<>(filterOperatorService, filterValueConverter);
+		SpecificationDynamicFilterResolver<?> dynamicFilterResolver = new SpecificationDynamicFilterResolver<>(filterOperatorService,
+				filterValueConverter);
 
 		resolvers.add(new SpecificationFilterParameterArgumentResolver(null, dynamicFilterResolver));
 	}
