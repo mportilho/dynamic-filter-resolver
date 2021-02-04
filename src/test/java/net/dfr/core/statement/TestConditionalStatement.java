@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import net.dfr.core.filter.FilterParameter;
 import net.dfr.core.operator.type.NotEquals;
-import net.dfr.core.statement.ConditionalStatement;
-import net.dfr.core.statement.LogicType;
 
 public class TestConditionalStatement {
 

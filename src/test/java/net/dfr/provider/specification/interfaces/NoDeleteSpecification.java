@@ -10,6 +10,6 @@ import net.dfr.core.operator.type.Equals;
 @Conjunction({
 	@Filter(path = "deleted", parameters = "delete", operator = Equals.class, constantValues = "false", targetType = Boolean.class)
 })//@formatter:on
-public interface NoDeleteSpecification<T> extends Specification<T> {
+public interface NoDeleteSpecification {
 
 }

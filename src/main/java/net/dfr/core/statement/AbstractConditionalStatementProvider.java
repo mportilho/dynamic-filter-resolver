@@ -20,8 +20,19 @@ import net.dfr.core.annotation.Conjunction;
 import net.dfr.core.annotation.Disjunction;
 import net.dfr.core.annotation.Filter;
 import net.dfr.core.filter.FilterParameter;
+import net.dfr.core.operator.FilterOperator;
+import net.dfr.core.operator.type.IsIn;
+import net.dfr.core.operator.type.IsNotIn;
+import net.dfr.core.operator.type.IsNotNull;
+import net.dfr.core.operator.type.IsNull;
 
 public abstract class AbstractConditionalStatementProvider implements ConditionalStatementProvider {
+
+	@SuppressWarnings("rawtypes")
+	private static final List<Class<? extends FilterOperator>> NULL_VALUE_OPERATORS = Arrays.asList(IsNull.class, IsNotNull.class);
+
+	@SuppressWarnings("rawtypes")
+	private static final List<Class<? extends FilterOperator>> MULTIPLE_VALUES_OPERATORS = Arrays.asList(IsIn.class, IsNotIn.class);
 
 	private static final List<Class<?>> IGNORED_ANNOTATIONS = Arrays.asList(Documented.class, Retention.class, Target.class);
 
@@ -188,7 +199,7 @@ public abstract class AbstractConditionalStatementProvider implements Conditiona
 
 		List<FilterParameter> filterParameters = new ArrayList<>();
 		for (Filter filter : filters) {
-			if (hasAnyParameterProvidedOrConstants(parametersMap, filter)) {
+			if (operatorAcceptsNullValues(filter.operator()) || hasAnyParameterProvidedOrConstants(parametersMap, filter)) {
 				Object[] values = null;
 				if (hasAnyConstantValue(filter)) {
 					values = generateValuesFromConstants(filter);
@@ -219,9 +230,13 @@ public abstract class AbstractConditionalStatementProvider implements Conditiona
 		Object[] values = computeProvidedValues(filter, parametersMap);
 		if (values.length > 0) {
 			String[] defaultValues = filter.defaultValues();
-			for (int i = 0; i < values.length; i++) {
-				if (values[i] == null && defaultValues.length > i) {
-					values[i] = computeSpringExpressionLanguage(defaultValues[i]);
+			if (operatorAcceptsMultipleValues(filter.operator())) {
+				values[0] = defaultValues;
+			} else {
+				for (int i = 0; i < values.length; i++) {
+					if (values[i] == null && defaultValues.length > i) {
+						values[i] = computeSpringExpressionLanguage(defaultValues[i]);
+					}
 				}
 			}
 		}
@@ -304,6 +319,8 @@ public abstract class AbstractConditionalStatementProvider implements Conditiona
 	private <K, V> boolean hasAnyParameterProvidedOrConstants(Map<K, V[]> parametersMap, Filter filter) {
 		if (hasAnyConstantValue(filter) || hasAnyDefaultValue(filter)) {
 			return true;
+		} else if (parametersMap == null) {
+			return false;
 		}
 		for (String filterParams : filter.parameters()) {
 			if (parametersMap.keySet().contains(filterParams)) {
@@ -335,6 +352,17 @@ public abstract class AbstractConditionalStatementProvider implements Conditiona
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	@SuppressWarnings("rawtypes")
+	public boolean operatorAcceptsNullValues(Class<? extends FilterOperator> clazz) {
+		return NULL_VALUE_OPERATORS.contains(clazz);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public boolean operatorAcceptsMultipleValues(Class<? extends FilterOperator> clazz) {
+		return MULTIPLE_VALUES_OPERATORS.contains(clazz);
 	}
 
 }

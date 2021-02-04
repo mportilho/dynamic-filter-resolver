@@ -22,12 +22,12 @@ import net.dfr.providers.specification.annotation.Fetches;
 import net.dfr.providers.specification.filter.SpecificationDynamicFilterResolver;
 import net.dfr.providers.specification.statement.SpecificationConditionalStatementProvider;
 
-public class SpecificationFilterParameterArgumentResolver implements HandlerMethodArgumentResolver {
+public class SpecificationDynamicFilterArgumentResolver implements HandlerMethodArgumentResolver {
 
 	private SpecificationConditionalStatementProvider conditionalStatementProvider;
 	private SpecificationDynamicFilterResolver<?> dynamicFilterResolver;
 
-	public SpecificationFilterParameterArgumentResolver(StringValueResolver stringValueResolver,
+	public SpecificationDynamicFilterArgumentResolver(StringValueResolver stringValueResolver,
 			SpecificationDynamicFilterResolver<?> dynamicFilterResolver) {
 		this.conditionalStatementProvider = new SpecificationConditionalStatementProvider(stringValueResolver);
 		this.dynamicFilterResolver = dynamicFilterResolver;

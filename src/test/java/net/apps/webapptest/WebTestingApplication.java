@@ -13,7 +13,7 @@ import net.dfr.core.converter.DefaultFilterValueConverter;
 import net.dfr.core.converter.FilterValueConverter;
 import net.dfr.providers.specification.filter.SpecificationDynamicFilterResolver;
 import net.dfr.providers.specification.operator.SpecificationFilterOperatorService;
-import net.dfr.providers.specification.web.SpecificationFilterParameterArgumentResolver;
+import net.dfr.providers.specification.web.SpecificationDynamicFilterArgumentResolver;
 
 @EnableWebMvc
 @SpringBootApplication
@@ -30,7 +30,7 @@ public class WebTestingApplication implements WebMvcRegistrations, WebMvcConfigu
 		SpecificationDynamicFilterResolver<?> dynamicFilterResolver = new SpecificationDynamicFilterResolver<>(filterOperatorService,
 				filterValueConverter);
 
-		resolvers.add(new SpecificationFilterParameterArgumentResolver(null, dynamicFilterResolver));
+		resolvers.add(new SpecificationDynamicFilterArgumentResolver(null, dynamicFilterResolver));
 	}
 
 }

@@ -21,7 +21,7 @@ public @interface Filter {
 	 * JPA entity's attribute with <code>path</code>.
 	 */
 	String attributePath() default "";
-	
+
 	/**
 	 * Name or path to the required attribute
 	 * 

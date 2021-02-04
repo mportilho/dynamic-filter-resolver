@@ -2,6 +2,7 @@ package net.apps.apptest.domain.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,7 +26,11 @@ public class Person {
 
 	private BigDecimal height;
 
+	private BigDecimal weight;
+
 	private LocalDate birthday;
+
+	private LocalDateTime registerDate;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
 	private List<Address> addresses;
@@ -48,8 +53,16 @@ public class Person {
 		return height;
 	}
 
+	public BigDecimal getWeight() {
+		return weight;
+	}
+
 	public LocalDate getBirthday() {
 		return birthday;
+	}
+
+	public LocalDateTime getRegisterDate() {
+		return registerDate;
 	}
 
 	public List<Address> getAddresses() {

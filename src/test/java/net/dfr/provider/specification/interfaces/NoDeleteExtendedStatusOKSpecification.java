@@ -10,6 +10,6 @@ import net.dfr.core.operator.type.Equals;
 @Conjunction({
 	@Filter(path = "status", parameters = "status", operator = Equals.class, constantValues = "OK", targetType = StatusEnum.class)
 })//@formatter:on
-public interface NoDeleteExtendedStatusOKSpecification<T> extends NoDeleteSpecification<T>, Serializable {
+public interface NoDeleteExtendedStatusOKSpecification<T> extends NoDeleteSpecification, Serializable {
 
 }

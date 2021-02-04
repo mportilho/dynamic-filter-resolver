@@ -18,6 +18,9 @@ public class SpecificationConditionalStatementProvider extends AbstractCondition
 
 	@Override
 	public <K, V> FilterParameter decorateFilterParameter(FilterParameter filterParameter, Map<K, V[]> parametersMap) {
+		if (parametersMap == null) {
+			return filterParameter;
+		}
 		Fetches[] fetchesArray = (Fetches[]) parametersMap.get(Fetches.class);
 		if (fetchesArray == null || fetchesArray.length == 0 || parametersMap.isEmpty()) {
 			return filterParameter;
