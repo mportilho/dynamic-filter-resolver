@@ -1,8 +1,12 @@
 package net.dfr.providers.specification.web;
 
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
+
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,7 +23,7 @@ import net.dfr.core.annotation.Conjunction;
 import net.dfr.core.annotation.Disjunction;
 import net.dfr.core.statement.ConditionalStatement;
 import net.dfr.core.statement.ValueExpressionResolver;
-import net.dfr.providers.specification.annotation.Fetches;
+import net.dfr.providers.specification.annotation.Fetch;
 import net.dfr.providers.specification.filter.SpecificationDynamicFilterResolver;
 import net.dfr.providers.specification.statement.SpecificationConditionalStatementProvider;
 
@@ -55,19 +59,38 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 	@SuppressWarnings("unchecked")
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest,
 			WebDataBinderFactory binderFactory) throws Exception {
+		Map<Object, Object[]> providedParameterValuesMap = createProvidedValuesMap(parameter, webRequest);
+
+		ConditionalStatement statement = conditionalStatementProvider.createConditionalStatements(
+				(Class<Specification<?>>) parameter.getParameterType(), parameter.getParameterAnnotations(), providedParameterValuesMap);
+
+		return (statement != null && statement.hasAnyCondition()) ? dynamicFilterResolver.convertTo(statement) : Specification.where(null);
+	}
+
+	/**
+	 * 
+	 * @param parameter
+	 * @param webRequest
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	private Map<Object, Object[]> createProvidedValuesMap(MethodParameter parameter, NativeWebRequest webRequest) {
 		Map<Object, Object[]> providedParameterValuesMap = new HashMap<>();
 
 		HttpServletRequest httpServletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
 		providedParameterValuesMap.putAll(webRequest.getParameterMap());
 		providedParameterValuesMap.putAll((Map<String, String[]>) httpServletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE));
-		Fetches fetches = parameter.getParameterAnnotation(Fetches.class);
-		if (fetches != null) {
-			providedParameterValuesMap.put(Fetches.class, new Object[] { fetches });
+
+		Annotation[] anns = parameter.getParameterAnnotations();
+		if (anns != null && anns.length > 0) {
+			Annotation[] filteredAnnos = Stream.of(anns).filter(ann -> Fetch.class.isInstance(ann))
+					.collect(collectingAndThen(toList(), l -> l.toArray(new Annotation[l.size()])));
+			if (filteredAnnos != null && filteredAnnos.length > 0) {
+				providedParameterValuesMap.put(Fetch.class, filteredAnnos);
+			}
 		}
 
-		ConditionalStatement statement = conditionalStatementProvider.createConditionalStatements(
-				(Class<Specification<?>>) parameter.getParameterType(), parameter.getParameterAnnotations(), providedParameterValuesMap);
-		return (statement != null && statement.hasAnyCondition()) ? dynamicFilterResolver.convertTo(statement) : Specification.where(null);
+		return providedParameterValuesMap;
 	}
 
 	/**

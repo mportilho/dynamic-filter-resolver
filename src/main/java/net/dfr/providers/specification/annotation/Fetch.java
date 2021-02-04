@@ -1,6 +1,7 @@
 package net.dfr.providers.specification.annotation;
 
 import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Documented;
@@ -12,7 +13,7 @@ import javax.persistence.criteria.JoinType;
 
 @Documented
 @Retention(RUNTIME)
-@Target(PARAMETER)
+@Target({ PARAMETER, TYPE })
 @Repeatable(Fetches.class)
 public @interface Fetch {
 

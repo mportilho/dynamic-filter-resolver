@@ -13,7 +13,6 @@ import javax.persistence.metamodel.Attribute;
 import org.springframework.data.mapping.PropertyPath;
 
 import net.dfr.core.filter.FilterParameter;
-import net.dfr.providers.specification.annotation.Fetches;
 import net.dfr.providers.specification.annotation.FetchingMode;
 
 class PredicateUtils {
@@ -29,7 +28,7 @@ class PredicateUtils {
 		From<?, ?> from = root;
 		boolean graphFromFetch = false;
 
-		Map<String, FetchingMode> fetchingMap = filterParameter.findState(Fetches.class);
+		Map<String, FetchingMode> fetchingMap = filterParameter.findState(Fetch.class);
 
 		if (propertyPath.isCollection()) {
 			do {

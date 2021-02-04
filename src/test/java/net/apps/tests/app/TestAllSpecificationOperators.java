@@ -2,7 +2,9 @@ package net.apps.tests.app;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +16,14 @@ import net.apps.apptest.TestingApplication;
 import net.apps.apptest.domain.model.Person;
 import net.apps.apptest.repository.PersonRepository;
 import net.apps.tests.app.queries.ComparisonOperationsQueryInterface;
+import net.apps.tests.app.queries.FetchingSimpleRelation;
 import net.apps.tests.app.queries.OtherOperationsQueryInterface;
 import net.apps.tests.app.queries.StringOperationsQueryInterface;
 import net.dfr.core.converter.DefaultFilterValueConverter;
 import net.dfr.core.filter.DynamicFilterResolver;
 import net.dfr.core.operator.FilterOperatorService;
 import net.dfr.core.statement.ConditionalStatement;
+import net.dfr.providers.specification.annotation.Fetch;
 import net.dfr.providers.specification.filter.SpecificationDynamicFilterResolver;
 import net.dfr.providers.specification.operator.SpecificationFilterOperatorService;
 import net.dfr.providers.specification.statement.SpecificationConditionalStatementProvider;
@@ -58,7 +62,7 @@ public class TestAllSpecificationOperators {
 
 		assertThat(list).isEmpty();
 	}
-	
+
 	@Test
 	public void testOtherComparisons() {
 		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
@@ -66,6 +70,26 @@ public class TestAllSpecificationOperators {
 		FilterOperatorService<Specification<Person>> operatorService = new SpecificationFilterOperatorService<>();
 		DefaultFilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
 		DynamicFilterResolver<Specification<Person>> resolver = new SpecificationDynamicFilterResolver<>(operatorService, filterValueConverter);
+
+		Specification<Person> specification = resolver.convertTo(statement);
+		List<Person> list = personRepo.findAll(specification);
+
+		assertThat(list).isEmpty();
+	}
+
+	@Test
+	public void testSimpleFetch() {
+		FilterOperatorService<Specification<Person>> operatorService = new SpecificationFilterOperatorService<>();
+		DefaultFilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
+		DynamicFilterResolver<Specification<Person>> resolver = new SpecificationDynamicFilterResolver<>(operatorService, filterValueConverter);
+
+		SpecificationConditionalStatementProvider provider = new SpecificationConditionalStatementProvider(null);
+
+		Fetch[] anns = FetchingSimpleRelation.class.getAnnotationsByType(Fetch.class);
+		Map<Object, Object[]> valueMap = new HashMap<>();
+		valueMap.put(Fetch.class, anns);
+
+		ConditionalStatement statement = provider.createConditionalStatements(FetchingSimpleRelation.class, null, null);
 
 		Specification<Person> specification = resolver.convertTo(statement);
 		List<Person> list = personRepo.findAll(specification);

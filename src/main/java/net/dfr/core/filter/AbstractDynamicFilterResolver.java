@@ -2,6 +2,7 @@ package net.dfr.core.filter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.dfr.core.converter.FilterValueConverter;
 import net.dfr.core.operator.FilterOperatorService;
@@ -22,14 +23,14 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 	 * 
 	 * @return
 	 */
-	public abstract T emptyPredicate();
+	public abstract <K, V> T emptyPredicate(Map<K, V> context);
 
 	/**
 	 * 
 	 * @param conditionalStatement
 	 * @return
 	 */
-	public abstract T createPredicate(ConditionalStatement conditionalStatement);
+	public abstract <K, V> T createPredicate(ConditionalStatement conditionalStatement, Map<K, V> context);
 
 	/**
 	 * 
@@ -38,17 +39,17 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 	 * @param statementPredicates
 	 * @return
 	 */
-	public abstract T postCondicionalStatementResolving(LogicType logicType, T predicate, List<T> statementPredicates);
+	public abstract <K, V> T postCondicionalStatementResolving(LogicType logicType, T predicate, List<T> subStatementPredicates, Map<K, V> context);
 
 	@Override
-	public final T convertTo(ConditionalStatement conditionalStatement) {
+	public <K, V> T convertTo(ConditionalStatement conditionalStatement, Map<K, V> context) {
 		T result;
 		if (conditionalStatement != null && conditionalStatement.hasAnyCondition()) {
-			result = convertRecursively(conditionalStatement);
+			result = convertRecursively(conditionalStatement, context);
 		} else {
-			result = emptyPredicate();
+			result = emptyPredicate(context);
 		}
-		return responseDecorator(result);
+		return responseDecorator(result, context);
 	}
 
 	/**
@@ -56,19 +57,19 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 	 * @param conditionalStatement
 	 * @return
 	 */
-	private final T convertRecursively(ConditionalStatement conditionalStatement) {
+	private final <K, V> T convertRecursively(ConditionalStatement conditionalStatement, Map<K, V> context) {
 		if (conditionalStatement == null || !conditionalStatement.hasAnyCondition()) {
 			return null;
 		}
-		T predicate = createPredicate(conditionalStatement);
+		T predicate = createPredicate(conditionalStatement, context);
 
 		List<T> subStatementPredicates = new ArrayList<>();
 		if (conditionalStatement.hasSubStatements()) {
 			for (ConditionalStatement additionalStatement : conditionalStatement.getSubStatements()) {
-				subStatementPredicates.add(convertRecursively(additionalStatement));
+				subStatementPredicates.add(convertRecursively(additionalStatement, context));
 			}
 		}
-		return postCondicionalStatementResolving(conditionalStatement.getLogicType(), predicate, subStatementPredicates);
+		return postCondicionalStatementResolving(conditionalStatement.getLogicType(), predicate, subStatementPredicates, context);
 	}
 
 	protected FilterOperatorService<T> getFilterOperatorService() {

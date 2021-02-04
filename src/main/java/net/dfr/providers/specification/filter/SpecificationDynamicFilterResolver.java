@@ -1,6 +1,7 @@
 package net.dfr.providers.specification.filter;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -20,12 +21,12 @@ public class SpecificationDynamicFilterResolver<T> extends AbstractDynamicFilter
 	}
 
 	@Override
-	public Specification<T> emptyPredicate() {
+	public <K, V> Specification<T> emptyPredicate(Map<K, V> context) {
 		return Specification.where(null);
 	}
 
 	@Override
-	public Specification<T> createPredicate(ConditionalStatement conditionalStatement) {
+	public <K, V> Specification<T> createPredicate(ConditionalStatement conditionalStatement, Map<K, V> context) {
 		Specification<T> rootSpec = null;
 		for (FilterParameter clause : conditionalStatement.getClauses()) {
 			FilterOperator<Specification<T>> operator = getFilterOperatorService().getOperatorFor(clause.getOperator());
@@ -43,8 +44,8 @@ public class SpecificationDynamicFilterResolver<T> extends AbstractDynamicFilter
 	}
 
 	@Override
-	public Specification<T> postCondicionalStatementResolving(LogicType logicType, Specification<T> predicate,
-			List<Specification<T>> subStatementPredicates) {
+	public <K, V> Specification<T> postCondicionalStatementResolving(LogicType logicType, Specification<T> predicate,
+			List<Specification<T>> subStatementPredicates, Map<K, V> context) {
 		Specification<T> currentPredicate = predicate;
 		for (Specification<T> subPredicate : subStatementPredicates) {
 			currentPredicate = logicType.isConjunction() ? currentPredicate.and(subPredicate) : currentPredicate.or(subPredicate);
