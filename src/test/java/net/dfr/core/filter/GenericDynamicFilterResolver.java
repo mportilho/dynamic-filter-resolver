@@ -1,6 +1,7 @@
 package net.dfr.core.filter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -9,34 +10,39 @@ import java.util.stream.Collectors;
 import net.dfr.core.statement.ConditionalStatement;
 import net.dfr.core.statement.LogicType;
 
-public class GenericDynamicFilterResolver extends AbstractDynamicFilterResolver<List<String>> {
+public class GenericDynamicFilterResolver extends AbstractDynamicFilterResolver<List<?>> {
 
 	public GenericDynamicFilterResolver() {
 		super(null, null);
 	}
 
 	@Override
-	public <K, V> List<String> emptyPredicate(Map<K, V> context) {
-		return Collections.emptyList();
+	@SuppressWarnings("unchecked")
+	public <R extends List<?>, K, V> R emptyPredicate(Map<K, V> context) {
+		return (R) Collections.emptyList();
 	}
 
 	@Override
-	public <K, V> List<String> createPredicate(ConditionalStatement conditionalStatement, Map<K, V> context) {
-		return conditionalStatement.getClauses().stream().map(p -> p.getValues()).filter(v -> v != null && v.length > 0).map(v -> v[0].toString())
+	@SuppressWarnings("unchecked")
+	public <R extends List<?>, K, V> R createPredicate(ConditionalStatement conditionalStatement, Map<K, V> context) {
+		return (R) conditionalStatement.getClauses().stream().map(p -> p.getValues()).filter(v -> v != null && v.length > 0).map(v -> v[0].toString())
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public <K, V> List<String> postCondicionalStatementResolving(LogicType logicType, List<String> predicate, List<List<String>> statementPredicates,
+	@SuppressWarnings("unchecked")
+	public <R extends List<?>, K, V> R postCondicionalStatementResolving(LogicType logicType, R predicate, List<R> subStatementPredicates,
 			Map<K, V> context) {
-		List<String> list = new ArrayList<>();
+		List<R> list = new ArrayList<>();
 		if (predicate != null) {
-			list.addAll(predicate);
-			if (statementPredicates != null) {
-				statementPredicates.stream().filter(p -> p != null && !p.isEmpty()).forEach(list::addAll);
+			list.addAll((Collection<? extends R>) predicate);
+			if (subStatementPredicates != null) {
+				subStatementPredicates.stream().filter(p -> p != null && !p.isEmpty()).forEach(p -> {
+					list.addAll((Collection<? extends R>) p);
+				});
 			}
 		}
-		return list;
+		return (R) list;
 	}
 
 }

@@ -17,48 +17,58 @@ import net.dfr.core.statement.ConditionalStatement;
 import net.dfr.core.statement.LogicType;
 import net.dfr.providers.specification.annotation.Fetching;
 
-public class SpecificationDynamicFilterResolver<T> extends AbstractDynamicFilterResolver<Specification<T>> {
+public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterResolver<Specification<?>> {
 
-	public SpecificationDynamicFilterResolver(FilterOperatorService<Specification<T>> filterOperatorService,
+	public SpecificationDynamicFilterResolver(FilterOperatorService<Specification<?>> filterOperatorService,
 			FilterValueConverter filterValueConverter) {
 		super(filterOperatorService, filterValueConverter);
 	}
 
 	@Override
-	public <K, V> Specification<T> emptyPredicate(Map<K, V> context) {
-		return Specification.where(null);
+	@SuppressWarnings("unchecked")
+	public <R extends Specification<?>, K, V> R emptyPredicate(Map<K, V> context) {
+		return (R) Specification.where(null);
 	}
 
 	@Override
-	public <K, V> Specification<T> createPredicate(ConditionalStatement conditionalStatement, Map<K, V> context) {
-		Specification<T> rootSpec = null;
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public <R extends Specification<?>, K, V> R createPredicate(ConditionalStatement conditionalStatement, Map<K, V> context) {
+		Specification<?> rootSpec = null;
 		for (FilterParameter clause : conditionalStatement.getClauses()) {
-			FilterOperator<Specification<T>> operator = getFilterOperatorService().getOperatorFor(clause.getOperator());
-			Specification<T> spec = operator.createFilter(clause, getFilterValueConverter());
+			FilterOperatorService<R> operatorService = getFilterOperatorService();
+			FilterOperator<R> operator = operatorService.getOperatorFor(clause.getOperator());
+			R spec = operator.createFilter(clause, getFilterValueConverter());
 			if (spec != null) {
-				spec = clause.isNegate() ? Specification.not(spec) : spec;
+				spec = clause.isNegate() ? (R) Specification.not(spec) : spec;
 				if (rootSpec == null) {
-					rootSpec = spec;
+					rootSpec = (R) spec;
 				} else {
-					rootSpec = conditionalStatement.isConjunction() ? rootSpec.and(spec) : rootSpec.or(spec);
+					if (conditionalStatement.isConjunction()) {
+						rootSpec = ((Specification) rootSpec).and(spec);
+					} else {
+						rootSpec = ((Specification) rootSpec).or(spec);
+					}
 				}
 			}
 		}
-		return conditionalStatement.isNegate() ? Specification.not(rootSpec) : rootSpec;
+		return conditionalStatement.isNegate() ? (R) Specification.not(rootSpec) : (R) rootSpec;
 	}
 
 	@Override
-	public <K, V> Specification<T> postCondicionalStatementResolving(LogicType logicType, Specification<T> predicate,
-			List<Specification<T>> subStatementPredicates, Map<K, V> context) {
-		Specification<T> currentPredicate = predicate;
-		for (Specification<T> subPredicate : subStatementPredicates) {
-			currentPredicate = logicType.isConjunction() ? currentPredicate.and(subPredicate) : currentPredicate.or(subPredicate);
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public <R extends Specification<?>, K, V> R postCondicionalStatementResolving(LogicType logicType, R predicate, List<R> subStatementPredicates,
+			Map<K, V> context) {
+		Specification<?> currentPredicate = predicate;
+		for (Specification<?> subPredicate : subStatementPredicates) {
+			currentPredicate = logicType.isConjunction() ? ((Specification) currentPredicate).and(subPredicate)
+					: ((Specification) currentPredicate).or(subPredicate);
 		}
-		return currentPredicate;
+		return (R) currentPredicate;
 	}
 
 	@Override
-	public <K, V> Specification<T> responseDecorator(Specification<T> response, Map<K, V> context) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public <R extends Specification<?>, K, V> R responseDecorator(R response, Map<K, V> context) {
 		if (context == null || context.isEmpty()) {
 			return response;
 		}
@@ -67,7 +77,7 @@ public class SpecificationDynamicFilterResolver<T> extends AbstractDynamicFilter
 			return response;
 		}
 
-		Specification<T> decoratedSpec = (root, query, criteriaBuilder) -> {
+		Specification<?> decoratedSpec = (root, query, criteriaBuilder) -> {
 			query.distinct(true);
 			for (Fetching fetching : fetches) {
 				for (String attributePath : fetching.value()) {
@@ -87,7 +97,7 @@ public class SpecificationDynamicFilterResolver<T> extends AbstractDynamicFilter
 			return null;
 		};
 
-		return decoratedSpec.and(response);
+		return (R) ((Specification) decoratedSpec).and(response);
 	}
 
 }

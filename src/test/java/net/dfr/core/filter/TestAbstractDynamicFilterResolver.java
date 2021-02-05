@@ -16,7 +16,7 @@ public class TestAbstractDynamicFilterResolver {
 
 	@Test
 	public void testNullParameters() {
-		DynamicFilterResolver<List<String>> resolver = new GenericDynamicFilterResolver();
+		DynamicFilterResolver<List<?>> resolver = new GenericDynamicFilterResolver();
 		ConditionalStatement condition = new ConditionalStatement(LogicType.CONJUNCTION, false, null, null);
 
 		assertThat(condition.getLogicType()).isEqualByComparingTo(LogicType.CONJUNCTION);
@@ -29,7 +29,7 @@ public class TestAbstractDynamicFilterResolver {
 
 	@Test
 	public void testNoClause() {
-		DynamicFilterResolver<List<String>> resolver = new GenericDynamicFilterResolver();
+		DynamicFilterResolver<List<?>> resolver = new GenericDynamicFilterResolver();
 		List<FilterParameter> clauses = new ArrayList<>();
 		ConditionalStatement condition = new ConditionalStatement(LogicType.CONJUNCTION, false, clauses, null);
 
@@ -43,7 +43,7 @@ public class TestAbstractDynamicFilterResolver {
 
 	@Test
 	public void testOneClause() {
-		DynamicFilterResolver<List<String>> resolver = new GenericDynamicFilterResolver();
+		DynamicFilterResolver<List<?>> resolver = new GenericDynamicFilterResolver();
 		List<FilterParameter> clauses = new ArrayList<>();
 		clauses.add(
 				new FilterParameter("name", "name", new String[] { "name" }, String.class, NotEquals.class, false, new String[] { "Blanka" }, null));
@@ -59,7 +59,7 @@ public class TestAbstractDynamicFilterResolver {
 
 	@Test
 	public void testTwoClauses() {
-		DynamicFilterResolver<List<String>> resolver = new GenericDynamicFilterResolver();
+		DynamicFilterResolver<List<?>> resolver = new GenericDynamicFilterResolver();
 		List<FilterParameter> clauses = new ArrayList<>();
 		clauses.add(
 				new FilterParameter("name", "name", new String[] { "name" }, String.class, NotEquals.class, false, new String[] { "Blanka" }, null));
@@ -77,7 +77,7 @@ public class TestAbstractDynamicFilterResolver {
 
 	@Test
 	public void testTwoClausesAndTwoSubConditions() {
-		DynamicFilterResolver<List<String>> resolver = new GenericDynamicFilterResolver();
+		DynamicFilterResolver<List<?>> resolver = new GenericDynamicFilterResolver();
 
 		List<FilterParameter> subClauses1 = new ArrayList<>();
 		subClauses1.add(

@@ -20,18 +20,18 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import net.dfr.core.annotation.Conjunction;
 import net.dfr.core.annotation.Disjunction;
+import net.dfr.core.filter.DynamicFilterResolver;
 import net.dfr.core.statement.ConditionalStatement;
 import net.dfr.core.statement.ConditionalStatementProvider;
 import net.dfr.providers.specification.annotation.Fetching;
-import net.dfr.providers.specification.filter.SpecificationDynamicFilterResolver;
 
 public class SpecificationDynamicFilterArgumentResolver implements HandlerMethodArgumentResolver {
 
 	private ConditionalStatementProvider conditionalStatementProvider;
-	private SpecificationDynamicFilterResolver<?> dynamicFilterResolver;
+	private DynamicFilterResolver<Specification<?>> dynamicFilterResolver;
 
 	public SpecificationDynamicFilterArgumentResolver(ConditionalStatementProvider conditionalStatementProvider,
-			SpecificationDynamicFilterResolver<?> dynamicFilterResolver) {
+			DynamicFilterResolver<Specification<?>> dynamicFilterResolver) {
 		this.conditionalStatementProvider = conditionalStatementProvider;
 		this.dynamicFilterResolver = dynamicFilterResolver;
 	}

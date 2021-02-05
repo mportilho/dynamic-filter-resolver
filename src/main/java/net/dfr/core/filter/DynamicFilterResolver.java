@@ -6,13 +6,13 @@ import net.dfr.core.statement.ConditionalStatement;
 
 public interface DynamicFilterResolver<T> {
 
-	<K, V> T convertTo(ConditionalStatement conditionalStatement, Map<K, V> context);
+	<R extends T, K, V> R convertTo(ConditionalStatement conditionalStatement, Map<K, V> context);
 
-	default T convertTo(ConditionalStatement conditionalStatement) {
+	default <R extends T> R convertTo(ConditionalStatement conditionalStatement) {
 		return convertTo(conditionalStatement, null);
 	}
 
-	default <K, V> T responseDecorator(T response, Map<K, V> context) {
+	default <R extends T, K, V> R responseDecorator(R response, Map<K, V> context) {
 		return response;
 	}
 

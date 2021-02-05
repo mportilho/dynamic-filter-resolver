@@ -40,9 +40,9 @@ public class TestAllSpecificationOperators {
 	public void testComparisons() {
 		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(ComparisonOperationsQueryInterface.class, null, null);
-		FilterOperatorService<Specification<Person>> operatorService = new SpecificationFilterOperatorService<>();
+		FilterOperatorService<Specification<?>> operatorService = new SpecificationFilterOperatorService();
 		DefaultFilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
-		DynamicFilterResolver<Specification<Person>> resolver = new SpecificationDynamicFilterResolver<>(operatorService, filterValueConverter);
+		DynamicFilterResolver<Specification<?>> resolver = new SpecificationDynamicFilterResolver(operatorService, filterValueConverter);
 
 		Specification<Person> specification = resolver.convertTo(statement);
 		List<Person> list = personRepo.findAll(specification);
@@ -54,9 +54,9 @@ public class TestAllSpecificationOperators {
 	public void testStringComparisons() {
 		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(StringOperationsQueryInterface.class, null, null);
-		FilterOperatorService<Specification<Person>> operatorService = new SpecificationFilterOperatorService<>();
+		FilterOperatorService<Specification<?>> operatorService = new SpecificationFilterOperatorService();
 		DefaultFilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
-		DynamicFilterResolver<Specification<Person>> resolver = new SpecificationDynamicFilterResolver<>(operatorService, filterValueConverter);
+		DynamicFilterResolver<Specification<?>> resolver = new SpecificationDynamicFilterResolver(operatorService, filterValueConverter);
 
 		Specification<Person> specification = resolver.convertTo(statement);
 		List<Person> list = personRepo.findAll(specification);
@@ -68,9 +68,9 @@ public class TestAllSpecificationOperators {
 	public void testOtherComparisons() {
 		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(OtherOperationsQueryInterface.class, null, null);
-		FilterOperatorService<Specification<Person>> operatorService = new SpecificationFilterOperatorService<>();
+		FilterOperatorService<Specification<?>> operatorService = new SpecificationFilterOperatorService();
 		DefaultFilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
-		DynamicFilterResolver<Specification<Person>> resolver = new SpecificationDynamicFilterResolver<>(operatorService, filterValueConverter);
+		DynamicFilterResolver<Specification<?>> resolver = new SpecificationDynamicFilterResolver(operatorService, filterValueConverter);
 
 		Specification<Person> specification = resolver.convertTo(statement);
 		List<Person> list = personRepo.findAll(specification);
@@ -80,10 +80,10 @@ public class TestAllSpecificationOperators {
 
 	@Test
 	public void testSimpleFetch() {
-		FilterOperatorService<Specification<Person>> operatorService = new SpecificationFilterOperatorService<>();
+		FilterOperatorService<Specification<?>> operatorService = new SpecificationFilterOperatorService();
 		DefaultFilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
 		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
-		DynamicFilterResolver<Specification<Person>> resolver = new SpecificationDynamicFilterResolver<>(operatorService, filterValueConverter);
+		DynamicFilterResolver<Specification<?>> resolver = new SpecificationDynamicFilterResolver(operatorService, filterValueConverter);
 
 		ConditionalStatement statement = provider.createConditionalStatements(FetchingSimplePath.class, null, null);
 
@@ -96,10 +96,10 @@ public class TestAllSpecificationOperators {
 
 	@Test
 	public void testComposedFetch() {
-		FilterOperatorService<Specification<Person>> operatorService = new SpecificationFilterOperatorService<>();
+		FilterOperatorService<Specification<?>> operatorService = new SpecificationFilterOperatorService();
 		DefaultFilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
 		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
-		DynamicFilterResolver<Specification<Person>> resolver = new SpecificationDynamicFilterResolver<>(operatorService, filterValueConverter);
+		DynamicFilterResolver<Specification<?>> resolver = new SpecificationDynamicFilterResolver(operatorService, filterValueConverter);
 
 		ConditionalStatement statement = provider.createConditionalStatements(FetchingComposedPath.class, null, null);
 

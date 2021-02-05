@@ -35,7 +35,7 @@ public class TestProgramEntries {
 
 	@Test
 	public void test() {
-		FilterOperatorService<Specification<Person>> operatorService = new SpecificationFilterOperatorService<>();
+		FilterOperatorService<Specification<?>> operatorService = new SpecificationFilterOperatorService();
 		FilterValueConverter filterValueConverter = new DefaultFilterValueConverter();
 
 		List<FilterParameter> parameters = new ArrayList<>();
@@ -48,8 +48,7 @@ public class TestProgramEntries {
 
 		ConditionalStatement statement = new ConditionalStatement(LogicType.CONJUNCTION, false, parameters);
 
-		DynamicFilterResolver<Specification<Person>> parameterFilter = new SpecificationDynamicFilterResolver<>(operatorService,
-				filterValueConverter);
+		DynamicFilterResolver<Specification<?>> parameterFilter = new SpecificationDynamicFilterResolver(operatorService, filterValueConverter);
 		Specification<Person> specification = parameterFilter.convertTo(statement);
 
 		List<Person> list = personRepo.findAll(specification);

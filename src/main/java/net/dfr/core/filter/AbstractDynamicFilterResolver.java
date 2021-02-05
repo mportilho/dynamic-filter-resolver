@@ -23,14 +23,14 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 	 * 
 	 * @return
 	 */
-	public abstract <K, V> T emptyPredicate(Map<K, V> context);
+	public abstract <R extends T, K, V> R emptyPredicate(Map<K, V> context);
 
 	/**
 	 * 
 	 * @param conditionalStatement
 	 * @return
 	 */
-	public abstract <K, V> T createPredicate(ConditionalStatement conditionalStatement, Map<K, V> context);
+	public abstract <R extends T, K, V> R createPredicate(ConditionalStatement conditionalStatement, Map<K, V> context);
 
 	/**
 	 * 
@@ -39,11 +39,12 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 	 * @param statementPredicates
 	 * @return
 	 */
-	public abstract <K, V> T postCondicionalStatementResolving(LogicType logicType, T predicate, List<T> subStatementPredicates, Map<K, V> context);
+	public abstract <R extends T, K, V> R postCondicionalStatementResolving(LogicType logicType, R predicate, List<R> subStatementPredicates,
+			Map<K, V> context);
 
 	@Override
-	public <K, V> T convertTo(ConditionalStatement conditionalStatement, Map<K, V> context) {
-		T result;
+	public <R extends T, K, V> R convertTo(ConditionalStatement conditionalStatement, Map<K, V> context) {
+		R result;
 		if (conditionalStatement != null && conditionalStatement.hasAnyCondition()) {
 			result = convertRecursively(conditionalStatement, context);
 		} else {
@@ -57,13 +58,13 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 	 * @param conditionalStatement
 	 * @return
 	 */
-	private final <K, V> T convertRecursively(ConditionalStatement conditionalStatement, Map<K, V> context) {
+	private final <R extends T, K, V> R convertRecursively(ConditionalStatement conditionalStatement, Map<K, V> context) {
 		if (conditionalStatement == null || !conditionalStatement.hasAnyCondition()) {
 			return null;
 		}
-		T predicate = createPredicate(conditionalStatement, context);
+		R predicate = createPredicate(conditionalStatement, context);
 
-		List<T> subStatementPredicates = new ArrayList<>();
+		List<R> subStatementPredicates = new ArrayList<>();
 		if (conditionalStatement.hasSubStatements()) {
 			for (ConditionalStatement additionalStatement : conditionalStatement.getSubStatements()) {
 				subStatementPredicates.add(convertRecursively(additionalStatement, context));
@@ -72,8 +73,9 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 		return postCondicionalStatementResolving(conditionalStatement.getLogicType(), predicate, subStatementPredicates, context);
 	}
 
-	protected FilterOperatorService<T> getFilterOperatorService() {
-		return filterOperatorService;
+	@SuppressWarnings("unchecked")
+	protected <R extends T> FilterOperatorService<R> getFilterOperatorService() {
+		return (FilterOperatorService<R>) filterOperatorService;
 	}
 
 	protected FilterValueConverter getFilterValueConverter() {

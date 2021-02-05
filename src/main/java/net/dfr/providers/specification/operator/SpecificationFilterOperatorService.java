@@ -15,6 +15,7 @@ import net.dfr.core.operator.type.EqualsIgnoreCase;
 import net.dfr.core.operator.type.Greater;
 import net.dfr.core.operator.type.GreaterOrEquals;
 import net.dfr.core.operator.type.IsIn;
+import net.dfr.core.operator.type.IsNotIn;
 import net.dfr.core.operator.type.IsNotNull;
 import net.dfr.core.operator.type.IsNull;
 import net.dfr.core.operator.type.Less;
@@ -23,45 +24,46 @@ import net.dfr.core.operator.type.Like;
 import net.dfr.core.operator.type.LikeIgnoreCase;
 import net.dfr.core.operator.type.NotEquals;
 import net.dfr.core.operator.type.NotEqualsIgnoreCase;
-import net.dfr.core.operator.type.IsNotIn;
 import net.dfr.core.operator.type.NotLike;
 import net.dfr.core.operator.type.NotLikeIgnoreCase;
 import net.dfr.core.operator.type.StartsWith;
 import net.dfr.core.operator.type.StartsWithIgnoreCase;
 
-public class SpecificationFilterOperatorService<T> implements FilterOperatorService<Specification<T>> {
+public class SpecificationFilterOperatorService implements FilterOperatorService<Specification<?>> {
 
 	@SuppressWarnings("rawtypes")
-	private Map<Class<? extends FilterOperator>, FilterOperator<Specification<T>>> operators;
+	private Map<Class<? extends FilterOperator>, FilterOperator> operators;
 
+	@SuppressWarnings("rawtypes")
 	public SpecificationFilterOperatorService() {
 		operators = new HashMap<>();
-		operators.put(Between.class, new SpecBetween<T>());
-		operators.put(EndsWith.class, new SpecEndsWith<T>());
-		operators.put(EndsWithIgnoreCase.class, new SpecEndsWithIgnoreCase<T>());
-		operators.put(Equals.class, new SpecEquals<T>());
-		operators.put(EqualsIgnoreCase.class, new SpecEqualsIgnoreCase<T>());
-		operators.put(Greater.class, new SpecGreater<T>());
-		operators.put(GreaterOrEquals.class, new SpecGreaterOrEquals<T>());
-		operators.put(IsIn.class, new SpecIsIn<T>());
-		operators.put(IsNotNull.class, new SpecIsNotNull<T>());
-		operators.put(IsNull.class, new SpecIsNull<T>());
-		operators.put(Less.class, new SpecLess<T>());
-		operators.put(LessOrEquals.class, new SpecLessOrEquals<T>());
-		operators.put(Like.class, new SpecLike<T>());
-		operators.put(LikeIgnoreCase.class, new SpecLikeIgnoreCase<T>());
-		operators.put(NotEquals.class, new SpecNotEquals<T>());
-		operators.put(NotEqualsIgnoreCase.class, new SpecNotEqualsIgnoreCase<T>());
-		operators.put(IsNotIn.class, new SpecIsNotIn<T>());
-		operators.put(NotLike.class, new SpecNotLike<T>());
-		operators.put(NotLikeIgnoreCase.class, new SpecNotLikeIgnoreCase<T>());
-		operators.put(StartsWith.class, new SpecStartsWith<T>());
-		operators.put(StartsWithIgnoreCase.class, new SpecStartsWithIgnoreCase<T>());
+		operators.put(Between.class, new SpecBetween());
+		operators.put(EndsWith.class, new SpecEndsWith());
+		operators.put(EndsWithIgnoreCase.class, new SpecEndsWithIgnoreCase());
+		operators.put(Equals.class, new SpecEquals());
+		operators.put(EqualsIgnoreCase.class, new SpecEqualsIgnoreCase());
+		operators.put(Greater.class, new SpecGreater());
+		operators.put(GreaterOrEquals.class, new SpecGreaterOrEquals());
+		operators.put(IsIn.class, new SpecIsIn());
+		operators.put(IsNotNull.class, new SpecIsNotNull());
+		operators.put(IsNull.class, new SpecIsNull());
+		operators.put(Less.class, new SpecLess());
+		operators.put(LessOrEquals.class, new SpecLessOrEquals());
+		operators.put(Like.class, new SpecLike());
+		operators.put(LikeIgnoreCase.class, new SpecLikeIgnoreCase());
+		operators.put(NotEquals.class, new SpecNotEquals());
+		operators.put(NotEqualsIgnoreCase.class, new SpecNotEqualsIgnoreCase());
+		operators.put(IsNotIn.class, new SpecIsNotIn());
+		operators.put(NotLike.class, new SpecNotLike());
+		operators.put(NotLikeIgnoreCase.class, new SpecNotLikeIgnoreCase());
+		operators.put(StartsWith.class, new SpecStartsWith());
+		operators.put(StartsWithIgnoreCase.class, new SpecStartsWithIgnoreCase());
 	}
 
 	@Override
-	public FilterOperator<Specification<T>> getOperatorFor(Class<? extends FilterOperator<?>> operator) {
-		return operators.get(operator);
+	@SuppressWarnings("unchecked")
+	public <R extends FilterOperator<Specification<?>>> R getOperatorFor(Class<?> operator) {
+		return (R) operators.get(operator);
 	}
 
 }
