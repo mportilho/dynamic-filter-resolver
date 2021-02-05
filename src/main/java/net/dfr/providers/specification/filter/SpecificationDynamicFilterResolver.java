@@ -60,8 +60,12 @@ public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterRes
 			Map<K, V> context) {
 		Specification<?> currentPredicate = predicate;
 		for (Specification<?> subPredicate : subStatementPredicates) {
-			currentPredicate = logicType.isConjunction() ? ((Specification) currentPredicate).and(subPredicate)
-					: ((Specification) currentPredicate).or(subPredicate);
+			if (currentPredicate == null) {
+				currentPredicate = subPredicate;
+			} else {
+				currentPredicate = logicType.isConjunction() ? ((Specification) currentPredicate).and(subPredicate)
+						: ((Specification) currentPredicate).or(subPredicate);
+			}
 		}
 		return (R) currentPredicate;
 	}

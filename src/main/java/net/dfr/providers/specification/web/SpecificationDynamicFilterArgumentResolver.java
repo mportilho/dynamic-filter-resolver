@@ -4,12 +4,16 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
+import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -61,8 +65,22 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 		ConditionalStatement statement = conditionalStatementProvider.createConditionalStatements(
 				(Class<Specification<?>>) parameter.getParameterType(), parameter.getParameterAnnotations(), providedParameterValuesMap);
 
-		return (statement != null && statement.hasAnyCondition()) ? dynamicFilterResolver.convertTo(statement, contextMap)
+		Specification<?> specification = (statement != null && statement.hasAnyCondition()) ? dynamicFilterResolver.convertTo(statement, contextMap)
 				: Specification.where(null);
+
+		Enhancer enhancer = new Enhancer();
+		enhancer.setInterfaces(new Class[] { parameter.getParameterType() });
+		enhancer.setCallback(new MethodInterceptor() {
+			@Override
+			public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+				if ("toString".equals(method.getName())) {
+					return parameter.getParameterType().getSimpleName() + "[" + proxy.invoke(specification, args) + "]";
+				}
+				return proxy.invoke(specification, args);
+			}
+		});
+		return enhancer.create();
+
 	}
 
 	/**

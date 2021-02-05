@@ -2,6 +2,7 @@ package net.apps.tests.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import javax.servlet.ServletContext;
 
@@ -16,6 +17,7 @@ import org.springframework.test.context.NestedTestConfiguration.EnclosingConfigu
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -57,8 +59,11 @@ public class TestWebApplication {
 
 	@Test
 	public void givenGreetURI_whenMockMVC_thenVerifyResponse2() throws Exception {
-		final MvcResult mvcResult = this.mockMvc.perform(MockMvcRequestBuilders.get("/department/{id}", 2).param("name", "Bl")).andDo(print())
-				.andExpect(MockMvcResultMatchers.status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Blanka")).andReturn();
+		ResultActions resultActions = this.mockMvc.perform(MockMvcRequestBuilders.get("/department/{id}", 2).param("name", "Bl")).andDo(print());
+
+		MvcResult mvcResult = resultActions.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(jsonPath("$.name").value("Blanka")).andExpect(jsonPath("$.foundSpec").value("true")).andReturn();
+		
 		assertThat(mvcResult.getResponse().getContentType()).isEqualTo(CONTENT_TYPE);
 	}
 
