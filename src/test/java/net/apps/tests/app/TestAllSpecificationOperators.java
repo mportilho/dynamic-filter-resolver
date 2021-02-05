@@ -103,7 +103,7 @@ public class TestAllSpecificationOperators {
 
 		ConditionalStatement statement = provider.createConditionalStatements(FetchingComposedPath.class, null, null);
 
-		Fetching[] anns = FetchingSimplePath.class.getAnnotationsByType(Fetching.class);
+		Fetching[] anns = FetchingComposedPath.class.getAnnotationsByType(Fetching.class);
 		Specification<Person> specification = resolver.convertTo(statement, Collections.singletonMap(Fetching.class, anns));
 		List<Person> list = personRepo.findAll(specification);
 
