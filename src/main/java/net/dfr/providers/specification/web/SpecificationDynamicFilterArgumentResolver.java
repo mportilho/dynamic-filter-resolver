@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -61,7 +62,18 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 		ConditionalStatement statement = conditionalStatementProvider.createConditionalStatements(
 				(Class<Specification<?>>) parameter.getParameterType(), parameter.getParameterAnnotations(), providedParameterValuesMap);
 
-		return ProxyUtils.proxy(dynamicFilterResolver.convertTo(statement, contextMap), parameter.getParameterType());
+		return createProxy(dynamicFilterResolver.convertTo(statement, contextMap), parameter.getParameterType());
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> T createProxy(Object target, Class<T> targetInterface) {
+		if (target == null) {
+			return null;
+		} else if (targetInterface.equals(target.getClass())) {
+			return (T) target;
+		}
+		return (T) Proxy.newProxyInstance(target.getClass().getClassLoader(), new Class[] { targetInterface },
+				(proxy, method, args) -> method.invoke(target, args));
 	}
 
 	/**
