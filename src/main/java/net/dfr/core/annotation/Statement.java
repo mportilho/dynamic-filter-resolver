@@ -7,7 +7,7 @@ import java.lang.annotation.Retention;
 
 @Documented
 @Retention(RUNTIME)
-public @interface Or {
+public @interface Statement {
 
 	Filter[] value();
 

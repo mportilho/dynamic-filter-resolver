@@ -23,8 +23,7 @@ public class DepartmentController {
 
 	@GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
 	public String test(
-			@Conjunction(value = {
-					@Filter(path = "name", parameters = "name", operator = StartsWith.class) }) Specification<Department> specification)
+			@Conjunction({ @Filter(path = "name", parameters = "name", operator = StartsWith.class) }) Specification<Department> specification)
 			throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		ObjectNode node = mapper.createObjectNode();
@@ -35,14 +34,13 @@ public class DepartmentController {
 
 	@GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public String test2(@PathVariable Long id,
-			@Conjunction(value = {
+			@Conjunction({
 					@Filter(path = "name", parameters = "name", operator = StartsWith.class) }) NoDeletionSpecification<Department> specification)
 			throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		ObjectNode node = mapper.createObjectNode();
 		node.put("name", "Blanka");
 		node.put("foundSpec", specification != null);
-		specification.toPredicate(null, null, null);
 		return mapper.writeValueAsString(node);
 	}
 

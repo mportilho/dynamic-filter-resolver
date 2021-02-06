@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import net.dfr.core.Pair;
 import net.dfr.core.annotation.Conjunction;
 import net.dfr.core.annotation.Disjunction;
 import net.dfr.core.annotation.Filter;
@@ -131,48 +130,31 @@ public class DefaultConditionalStatementProvider implements ConditionalStatement
 				}
 			}
 		}
+		Conjunction conjunction = Conjunction.class.equals(parameterAnnotation.annotationType()) ? (Conjunction) parameterAnnotation : null;
+		Disjunction disjunction = Disjunction.class.equals(parameterAnnotation.annotationType()) ? (Disjunction) parameterAnnotation : null;
+		if (conjunction != null || disjunction != null) {
+			LogicType logicType = conjunction != null ? LogicType.CONJUNCTION : LogicType.DISJUNCTION;
+			Boolean negate = Boolean.parseBoolean(computeSpringExpressionLanguage(conjunction != null ? conjunction.negate() : disjunction.negate()));
 
-		LogicType logicTypeTemp = null;
-		Filter[] filters = null;
-		List<Pair<Filter[], String>> inversedConditionFilters = null;
-		boolean negate = false;
-		if (Conjunction.class.equals(parameterAnnotation.annotationType())) {
-			logicTypeTemp = LogicType.CONJUNCTION;
-			Conjunction conjunction = (Conjunction) parameterAnnotation;
-			filters = conjunction.value();
-			negate = Boolean.parseBoolean(computeSpringExpressionLanguage(conjunction.negate()));
-			inversedConditionFilters = Stream.of(conjunction.disjunctions()).filter(or -> or.value().length > 0)
-					.map(or -> Pair.of(or.value(), or.negate())).collect(Collectors.toList());
-		} else if (Disjunction.class.equals(parameterAnnotation.annotationType())) {
-			logicTypeTemp = LogicType.DISJUNCTION;
-			Disjunction disjunction = (Disjunction) parameterAnnotation;
-			filters = disjunction.value();
-			negate = Boolean.parseBoolean(computeSpringExpressionLanguage(disjunction.negate()));
-			inversedConditionFilters = Stream.of(disjunction.conjunctions()).filter(and -> and.value().length > 0)
-					.map(and -> Pair.of(and.value(), and.negate())).collect(Collectors.toList());
-		}
-		if (logicTypeTemp != null) {
-			LogicType logicType = logicTypeTemp;
-			List<FilterParameter> clauses = createFilterParameters(filters, parametersMap);
-			List<ConditionalStatement> invertedStatements = (inversedConditionFilters == null) ? Collections.emptyList() : //@formatter:off
-				inversedConditionFilters
-					.stream()
-					.filter(Objects::nonNull)
-					.map(pair -> {
-						List<FilterParameter> parameters = createFilterParameters(pair.getLeft(), parametersMap);
-						if(parameters != null && !parameters.isEmpty()) {
-							return new ConditionalStatement(logicType.opposite(), Boolean.parseBoolean(computeSpringExpressionLanguage(pair.getRight())), parameters);
+			List<FilterParameter> clauses = createFilterParameters(conjunction != null ? conjunction.value() : disjunction.value(), parametersMap);
+			List<ConditionalStatement> composedConditionals = Stream //
+					.of(conjunction != null ? conjunction.disjunctions() : disjunction.conjunctions()) //
+					.filter(Objects::nonNull) //
+					.flatMap(stmts -> Stream.of(stmts)) //
+					.map(stmt -> {
+						List<FilterParameter> params = createFilterParameters(stmt.value(), parametersMap);
+						if (params != null && !params.isEmpty()) {
+							return new ConditionalStatement(logicType.opposite(),
+									Boolean.parseBoolean(computeSpringExpressionLanguage(stmt.negate())), params);
 						}
 						return null;
-					})
-					.filter(Objects::nonNull)
-					.collect(Collectors.toList())
-			;//@formatter:on
-
-			if (clauses.isEmpty() && !invertedStatements.isEmpty() && invertedStatements.size() == 1) {
-				statements.add(invertedStatements.get(0));
-			} else if (!clauses.isEmpty() || !invertedStatements.isEmpty()) {
-				statements.add(new ConditionalStatement(logicType, negate, clauses, invertedStatements));
+					}) //
+					.filter(Objects::nonNull) //
+					.collect(Collectors.toList());
+			if (clauses.isEmpty() && !composedConditionals.isEmpty() && composedConditionals.size() == 1) {
+				statements.add(composedConditionals.get(0));
+			} else if (!clauses.isEmpty() || !composedConditionals.isEmpty()) {
+				statements.add(new ConditionalStatement(logicType, negate, clauses, composedConditionals));
 			}
 		}
 

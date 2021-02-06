@@ -15,7 +15,7 @@ public @interface Conjunction {
 
 	Filter[] value() default {};
 
-	Or[] disjunctions() default {};
+	Statement[] disjunctions() default {};
 
 	String negate() default "false";
 

@@ -17,7 +17,6 @@ import java.util.Map;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 
-import net.dfr.core.Pair;
 import net.dfr.core.converter.impl.StringToInstantConverter;
 import net.dfr.core.converter.impl.StringToJavaSqlDateConverter;
 import net.dfr.core.converter.impl.StringToJavaUtilDateConverter;

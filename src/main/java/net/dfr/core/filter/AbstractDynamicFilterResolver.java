@@ -44,13 +44,10 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 
 	@Override
 	public <R extends T, K, V> R convertTo(ConditionalStatement conditionalStatement, Map<K, V> context) {
-		R result;
-		if (conditionalStatement != null && conditionalStatement.hasAnyCondition()) {
-			result = convertRecursively(conditionalStatement, context);
-		} else {
-			result = emptyPredicate(context);
+		if (conditionalStatement == null || !conditionalStatement.hasAnyCondition()) {
+			return responseDecorator(emptyPredicate(context), context);
 		}
-		return responseDecorator(result, context);
+		return responseDecorator(convertRecursively(conditionalStatement, context), context);
 	}
 
 	/**

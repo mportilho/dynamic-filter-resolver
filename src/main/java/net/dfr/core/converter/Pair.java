@@ -1,8 +1,8 @@
-package net.dfr.core;
+package net.dfr.core.converter;
 
 import java.util.Objects;
 
-public class Pair<L, R> {
+class Pair<L, R> {
 
 	private final L left;
 	private final R right;
