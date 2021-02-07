@@ -32,7 +32,7 @@ public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterRes
 
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public <R extends Specification<?>, K, V> R createPredicate(ConditionalStatement conditionalStatement, Map<K, V> context) {
+	public <R extends Specification<?>, K, V> R createPredicateFromStatement(ConditionalStatement conditionalStatement, Map<K, V> context) {
 		Specification<?> rootSpec = null;
 		for (FilterParameter clause : conditionalStatement.getClauses()) {
 			FilterOperatorService<R> operatorService = getFilterOperatorService();
@@ -56,7 +56,7 @@ public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterRes
 
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public <R extends Specification<?>, K, V> R postCondicionalStatementResolving(LogicType logicType, R predicate, List<R> subStatementPredicates,
+	public <R extends Specification<?>, K, V> R composePredicatesFromSubStatements(LogicType logicType, R predicate, List<R> subStatementPredicates,
 			Map<K, V> context) {
 		Specification<?> currentPredicate = predicate;
 		for (Specification<?> subPredicate : subStatementPredicates) {

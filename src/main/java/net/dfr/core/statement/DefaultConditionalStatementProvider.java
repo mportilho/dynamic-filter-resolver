@@ -7,15 +7,15 @@ import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Set;
 
 import net.dfr.core.annotation.Conjunction;
 import net.dfr.core.annotation.Disjunction;
 import net.dfr.core.annotation.Filter;
+import net.dfr.core.annotation.Statement;
 import net.dfr.core.filter.FilterParameter;
 import net.dfr.core.operator.FilterOperator;
 import net.dfr.core.operator.type.IsIn;
@@ -26,12 +26,12 @@ import net.dfr.core.operator.type.IsNull;
 public class DefaultConditionalStatementProvider implements ConditionalStatementProvider {
 
 	@SuppressWarnings("rawtypes")
-	private static final List<Class<? extends FilterOperator>> NULL_VALUE_OPERATORS = Arrays.asList(IsNull.class, IsNotNull.class);
+	private static final Set<Class<? extends FilterOperator>> NULL_VALUE_OPERATORS = new HashSet<>(Arrays.asList(IsNull.class, IsNotNull.class));
 
 	@SuppressWarnings("rawtypes")
-	private static final List<Class<? extends FilterOperator>> MULTIPLE_VALUES_OPERATORS = Arrays.asList(IsIn.class, IsNotIn.class);
+	private static final Set<Class<? extends FilterOperator>> MULTIPLE_VALUES_OPERATORS = new HashSet<>(Arrays.asList(IsIn.class, IsNotIn.class));
 
-	private static final List<Class<?>> IGNORED_ANNOTATIONS = Arrays.asList(Documented.class, Retention.class, Target.class);
+	private static final Set<Class<?>> IGNORED_ANNOTATIONS = new HashSet<>(Arrays.asList(Documented.class, Retention.class, Target.class));
 
 	private ValueExpressionResolver valueExpressionResolver;
 
@@ -57,7 +57,7 @@ public class DefaultConditionalStatementProvider implements ConditionalStatement
 			statements.add(interfaceStatement);
 		}
 
-		if (parameterAnnotations != null && parameterAnnotations.length != 0) {
+		if (parameterAnnotations != null) {
 			for (Annotation annotation : parameterAnnotations) {
 				ConditionalStatement annotationStatement = createConditionalStatementsFromAnnotations(annotation, parametersMap);
 				if (annotationStatement != null && annotationStatement.hasAnyCondition()) {
@@ -83,6 +83,7 @@ public class DefaultConditionalStatementProvider implements ConditionalStatement
 	 */
 	private <K, V> ConditionalStatement createConditionalStatementsFromParameterInterface(Class<?> parameterInterface, Map<K, V[]> parametersMap) {
 		List<ConditionalStatement> statements = new ArrayList<>();
+
 		for (Class<?> subInterfaces : parameterInterface.getInterfaces()) {
 			ConditionalStatement stmt = createConditionalStatementsFromParameterInterface(subInterfaces, parametersMap);
 			if (stmt != null && stmt.hasAnyCondition()) {
@@ -90,13 +91,10 @@ public class DefaultConditionalStatementProvider implements ConditionalStatement
 			}
 		}
 
-		Annotation[] parameterAnnotations = parameterInterface.getAnnotations();
-		if (parameterAnnotations != null && parameterAnnotations.length != 0) {
-			for (Annotation annotation : parameterAnnotations) {
-				ConditionalStatement annotationStatement = createConditionalStatementsFromAnnotations(annotation, parametersMap);
-				if (annotationStatement != null && annotationStatement.hasAnyCondition()) {
-					statements.add(annotationStatement);
-				}
+		for (Annotation annotation : parameterInterface.getAnnotations()) {
+			ConditionalStatement annotationStatement = createConditionalStatementsFromAnnotations(annotation, parametersMap);
+			if (annotationStatement != null && annotationStatement.hasAnyCondition()) {
+				statements.add(annotationStatement);
 			}
 		}
 
@@ -137,20 +135,16 @@ public class DefaultConditionalStatementProvider implements ConditionalStatement
 			Boolean negate = Boolean.parseBoolean(computeSpringExpressionLanguage(conjunction != null ? conjunction.negate() : disjunction.negate()));
 
 			List<FilterParameter> clauses = createFilterParameters(conjunction != null ? conjunction.value() : disjunction.value(), parametersMap);
-			List<ConditionalStatement> composedConditionals = Stream //
-					.of(conjunction != null ? conjunction.disjunctions() : disjunction.conjunctions()) //
-					.filter(Objects::nonNull) //
-					.flatMap(stmts -> Stream.of(stmts)) //
-					.map(stmt -> {
-						List<FilterParameter> params = createFilterParameters(stmt.value(), parametersMap);
-						if (params != null && !params.isEmpty()) {
-							return new ConditionalStatement(logicType.opposite(),
-									Boolean.parseBoolean(computeSpringExpressionLanguage(stmt.negate())), params);
-						}
-						return null;
-					}) //
-					.filter(Objects::nonNull) //
-					.collect(Collectors.toList());
+
+			List<ConditionalStatement> composedConditionals = new ArrayList<>();
+			for (Statement stmt : (conjunction != null ? conjunction.disjunctions() : disjunction.conjunctions())) {
+				List<FilterParameter> params = createFilterParameters(stmt.value(), parametersMap);
+				if (!params.isEmpty()) {
+					composedConditionals.add(new ConditionalStatement(logicType.opposite(),
+							Boolean.parseBoolean(computeSpringExpressionLanguage(stmt.negate())), params));
+				}
+			}
+
 			if (clauses.isEmpty() && !composedConditionals.isEmpty() && composedConditionals.size() == 1) {
 				statements.add(composedConditionals.get(0));
 			} else if (!clauses.isEmpty() || !composedConditionals.isEmpty()) {
@@ -213,7 +207,8 @@ public class DefaultConditionalStatementProvider implements ConditionalStatement
 			if (operatorAcceptsMultipleValues(filter.operator())) {
 				values[0] = defaultValues;
 			} else {
-				for (int i = 0; i < values.length; i++) {
+				int size = values.length;
+				for (int i = 0; i < size; i++) {
 					if (values[i] == null && defaultValues.length > i) {
 						values[i] = computeSpringExpressionLanguage(defaultValues[i]);
 					}
@@ -302,8 +297,11 @@ public class DefaultConditionalStatementProvider implements ConditionalStatement
 		} else if (parametersMap == null) {
 			return false;
 		}
-		for (String filterParams : filter.parameters()) {
-			if (parametersMap.keySet().contains(filterParams)) {
+
+		String[] parameters = filter.parameters();
+		Set<K> keySet = parametersMap.keySet();
+		for (String param : parameters) {
+			if (keySet.contains(param)) {
 				return true;
 			}
 		}

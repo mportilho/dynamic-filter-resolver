@@ -24,14 +24,14 @@ public class GenericDynamicFilterResolver extends AbstractDynamicFilterResolver<
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <R extends List<?>, K, V> R createPredicate(ConditionalStatement conditionalStatement, Map<K, V> context) {
+	public <R extends List<?>, K, V> R createPredicateFromStatement(ConditionalStatement conditionalStatement, Map<K, V> context) {
 		return (R) conditionalStatement.getClauses().stream().map(p -> p.getValues()).filter(v -> v != null && v.length > 0).map(v -> v[0].toString())
 				.collect(Collectors.toList());
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <R extends List<?>, K, V> R postCondicionalStatementResolving(LogicType logicType, R predicate, List<R> subStatementPredicates,
+	public <R extends List<?>, K, V> R composePredicatesFromSubStatements(LogicType logicType, R predicate, List<R> subStatementPredicates,
 			Map<K, V> context) {
 		List<R> list = new ArrayList<>();
 		if (predicate != null) {

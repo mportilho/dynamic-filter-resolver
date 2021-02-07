@@ -30,7 +30,7 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 	 * @param conditionalStatement
 	 * @return
 	 */
-	public abstract <R extends T, K, V> R createPredicate(ConditionalStatement conditionalStatement, Map<K, V> context);
+	public abstract <R extends T, K, V> R createPredicateFromStatement(ConditionalStatement conditionalStatement, Map<K, V> context);
 
 	/**
 	 * 
@@ -39,7 +39,7 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 	 * @param statementPredicates
 	 * @return
 	 */
-	public abstract <R extends T, K, V> R postCondicionalStatementResolving(LogicType logicType, R predicate, List<R> subStatementPredicates,
+	public abstract <R extends T, K, V> R composePredicatesFromSubStatements(LogicType logicType, R predicate, List<R> subStatementPredicates,
 			Map<K, V> context);
 
 	@Override
@@ -59,15 +59,13 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 		if (conditionalStatement == null || !conditionalStatement.hasAnyCondition()) {
 			return null;
 		}
-		R predicate = createPredicate(conditionalStatement, context);
+		R predicate = createPredicateFromStatement(conditionalStatement, context);
 
 		List<R> subStatementPredicates = new ArrayList<>();
-		if (conditionalStatement.hasSubStatements()) {
-			for (ConditionalStatement additionalStatement : conditionalStatement.getSubStatements()) {
-				subStatementPredicates.add(convertRecursively(additionalStatement, context));
-			}
+		for (ConditionalStatement subStatement : conditionalStatement.getSubStatements()) {
+			subStatementPredicates.add(convertRecursively(subStatement, context));
 		}
-		return postCondicionalStatementResolving(conditionalStatement.getLogicType(), predicate, subStatementPredicates, context);
+		return composePredicatesFromSubStatements(conditionalStatement.getLogicType(), predicate, subStatementPredicates, context);
 	}
 
 	@SuppressWarnings("unchecked")
