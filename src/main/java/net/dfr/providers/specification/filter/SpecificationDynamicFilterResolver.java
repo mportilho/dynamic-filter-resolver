@@ -33,21 +33,18 @@ public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterRes
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <R extends Specification<?>, K, V> R createPredicateFromStatement(ConditionalStatement conditionalStatement, Map<K, V> context) {
-		Specification<?> rootSpec = null;
+		Specification rootSpec = null;
+		FilterOperatorService<Specification> operatorService = getFilterOperatorService();
+
 		for (FilterParameter clause : conditionalStatement.getClauses()) {
-			FilterOperatorService<R> operatorService = getFilterOperatorService();
-			FilterOperator<R> operator = operatorService.getOperatorFor(clause.getOperator());
-			R spec = operator.createFilter(clause, getFilterValueConverter());
+			FilterOperator<Specification> operator = operatorService.getOperatorFor(clause.getOperator());
+			Specification spec = operator.createFilter(clause, getFilterValueConverter());
 			if (spec != null) {
-				spec = clause.isNegate() ? (R) Specification.not(spec) : spec;
+				spec = clause.isNegate() ? Specification.not(spec) : spec;
 				if (rootSpec == null) {
-					rootSpec = (R) spec;
+					rootSpec = spec;
 				} else {
-					if (conditionalStatement.isConjunction()) {
-						rootSpec = ((Specification) rootSpec).and(spec);
-					} else {
-						rootSpec = ((Specification) rootSpec).or(spec);
-					}
+					rootSpec = conditionalStatement.isConjunction() ? rootSpec.and(spec) : rootSpec.or(spec);
 				}
 			}
 		}
@@ -58,13 +55,12 @@ public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterRes
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public <R extends Specification<?>, K, V> R composePredicatesFromSubStatements(LogicType logicType, R predicate, List<R> subStatementPredicates,
 			Map<K, V> context) {
-		Specification<?> currentPredicate = predicate;
-		for (Specification<?> subPredicate : subStatementPredicates) {
+		Specification currentPredicate = predicate;
+		for (Specification subPredicate : subStatementPredicates) {
 			if (currentPredicate == null) {
 				currentPredicate = subPredicate;
 			} else {
-				currentPredicate = logicType.isConjunction() ? ((Specification) currentPredicate).and(subPredicate)
-						: ((Specification) currentPredicate).or(subPredicate);
+				currentPredicate = logicType.isConjunction() ? currentPredicate.and(subPredicate) : currentPredicate.or(subPredicate);
 			}
 		}
 		return (R) currentPredicate;

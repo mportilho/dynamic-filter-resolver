@@ -1,4 +1,4 @@
-package net.dfr.spring.autoconfigure;
+package net.dfr.providers.specification.autoconfiguration;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;

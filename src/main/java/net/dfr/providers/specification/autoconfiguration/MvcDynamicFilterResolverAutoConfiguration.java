@@ -1,4 +1,4 @@
-package net.dfr.spring.autoconfigure;
+package net.dfr.providers.specification.autoconfiguration;
 
 import java.util.List;
 
