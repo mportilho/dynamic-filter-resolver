@@ -1,4 +1,4 @@
-package net.dfr.core.modules.springdocs;
+package net.dfr.modules.spring.springdocs;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

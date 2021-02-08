@@ -14,57 +14,34 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.support.DefaultConversionService;
-
-import net.dfr.core.converter.impl.StringToInstantConverter;
-import net.dfr.core.converter.impl.StringToJavaSqlDateConverter;
-import net.dfr.core.converter.impl.StringToJavaUtilDateConverter;
-import net.dfr.core.converter.impl.StringToLocalDateConverter;
-import net.dfr.core.converter.impl.StringToLocalDateTimeConverter;
-import net.dfr.core.converter.impl.StringToLocalTimeConverter;
-import net.dfr.core.converter.impl.StringToOffsetDateTimeConverter;
-import net.dfr.core.converter.impl.StringToOffsetTimeConverter;
-import net.dfr.core.converter.impl.StringToTimestampConverter;
-import net.dfr.core.converter.impl.StringToYearConverter;
-import net.dfr.core.converter.impl.StringToYearMonthConverter;
-import net.dfr.core.converter.impl.StringToZonedDateTimeConverter;
+import net.dfr.core.converter.converters.StringToInstantConverter;
+import net.dfr.core.converter.converters.StringToJavaSqlDateConverter;
+import net.dfr.core.converter.converters.StringToJavaUtilDateConverter;
+import net.dfr.core.converter.converters.StringToLocalDateConverter;
+import net.dfr.core.converter.converters.StringToLocalDateTimeConverter;
+import net.dfr.core.converter.converters.StringToLocalTimeConverter;
+import net.dfr.core.converter.converters.StringToOffsetDateTimeConverter;
+import net.dfr.core.converter.converters.StringToOffsetTimeConverter;
+import net.dfr.core.converter.converters.StringToTimestampConverter;
+import net.dfr.core.converter.converters.StringToYearConverter;
+import net.dfr.core.converter.converters.StringToYearMonthConverter;
+import net.dfr.core.converter.converters.StringToZonedDateTimeConverter;
 
 public class DefaultFilterValueConverter implements FilterValueConverter {
 
+	private static final FormattedConversionService DEFAULT_FORMATTED_CONVERSION_SERVICE = createDefaultFormmatedConversionService();
+
 	private Map<Pair<Class<?>, Class<?>>, FormattedConverter<?, ?, String>> formattedConverters;
-	private final ConversionService conversionService;
+	private final FormattedConversionService conversionService;
 
 	public DefaultFilterValueConverter() {
 		this.formattedConverters = loadFormattedValueConverters();
-		this.conversionService = DefaultConversionService.getSharedInstance();
+		this.conversionService = DEFAULT_FORMATTED_CONVERSION_SERVICE;
 	}
 
-	public DefaultFilterValueConverter(ConversionService conversionService) {
+	public DefaultFilterValueConverter(FormattedConversionService conversionService) {
 		this.formattedConverters = loadFormattedValueConverters();
 		this.conversionService = conversionService;
-	}
-
-	/**
-	 * 
-	 * @param valueResolver
-	 * @return
-	 */
-	private Map<Pair<Class<?>, Class<?>>, FormattedConverter<?, ?, String>> loadFormattedValueConverters() {
-		formattedConverters = new HashMap<>();
-		formattedConverters.put(Pair.of(String.class, Instant.class), new StringToInstantConverter());
-		formattedConverters.put(Pair.of(String.class, LocalDate.class), new StringToLocalDateConverter());
-		formattedConverters.put(Pair.of(String.class, LocalDateTime.class), new StringToLocalDateTimeConverter());
-		formattedConverters.put(Pair.of(String.class, LocalTime.class), new StringToLocalTimeConverter());
-		formattedConverters.put(Pair.of(String.class, YearMonth.class), new StringToYearMonthConverter());
-		formattedConverters.put(Pair.of(String.class, OffsetDateTime.class), new StringToOffsetDateTimeConverter());
-		formattedConverters.put(Pair.of(String.class, OffsetTime.class), new StringToOffsetTimeConverter());
-		formattedConverters.put(Pair.of(String.class, Year.class), new StringToYearConverter());
-		formattedConverters.put(Pair.of(String.class, ZonedDateTime.class), new StringToZonedDateTimeConverter());
-		formattedConverters.put(Pair.of(String.class, Date.class), new StringToJavaUtilDateConverter());
-		formattedConverters.put(Pair.of(String.class, java.sql.Date.class), new StringToJavaSqlDateConverter());
-		formattedConverters.put(Pair.of(String.class, Timestamp.class), new StringToTimestampConverter());
-		return formattedConverters;
 	}
 
 	/**
@@ -102,6 +79,43 @@ public class DefaultFilterValueConverter implements FilterValueConverter {
 			return conversionService.convert(value, targetClass);
 		}
 		return value;
+	}
+
+	/**
+	 * 
+	 * @param valueResolver
+	 * @return
+	 */
+	private Map<Pair<Class<?>, Class<?>>, FormattedConverter<?, ?, String>> loadFormattedValueConverters() {
+		formattedConverters = new HashMap<>();
+		formattedConverters.put(Pair.of(String.class, Instant.class), new StringToInstantConverter());
+		formattedConverters.put(Pair.of(String.class, LocalDate.class), new StringToLocalDateConverter());
+		formattedConverters.put(Pair.of(String.class, LocalDateTime.class), new StringToLocalDateTimeConverter());
+		formattedConverters.put(Pair.of(String.class, LocalTime.class), new StringToLocalTimeConverter());
+		formattedConverters.put(Pair.of(String.class, YearMonth.class), new StringToYearMonthConverter());
+		formattedConverters.put(Pair.of(String.class, OffsetDateTime.class), new StringToOffsetDateTimeConverter());
+		formattedConverters.put(Pair.of(String.class, OffsetTime.class), new StringToOffsetTimeConverter());
+		formattedConverters.put(Pair.of(String.class, Year.class), new StringToYearConverter());
+		formattedConverters.put(Pair.of(String.class, ZonedDateTime.class), new StringToZonedDateTimeConverter());
+		formattedConverters.put(Pair.of(String.class, Date.class), new StringToJavaUtilDateConverter());
+		formattedConverters.put(Pair.of(String.class, java.sql.Date.class), new StringToJavaSqlDateConverter());
+		formattedConverters.put(Pair.of(String.class, Timestamp.class), new StringToTimestampConverter());
+		return formattedConverters;
+	}
+
+	private static final FormattedConversionService createDefaultFormmatedConversionService() {
+		return new FormattedConversionService() {
+			@Override
+			@SuppressWarnings("unchecked")
+			public <T> T convert(Object source, Class<T> targetType) {
+				return (T) source;
+			}
+
+			@Override
+			public boolean canConvert(Class<?> sourceType, Class<?> targetType) {
+				return false;
+			}
+		};
 	}
 
 }

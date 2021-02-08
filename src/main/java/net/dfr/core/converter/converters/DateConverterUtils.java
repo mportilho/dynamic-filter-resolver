@@ -1,4 +1,4 @@
-package net.dfr.core.converter.impl;
+package net.dfr.core.converter.converters;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;

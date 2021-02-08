@@ -16,18 +16,18 @@ import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.Test;
 
-import net.dfr.core.converter.impl.StringToInstantConverter;
-import net.dfr.core.converter.impl.StringToJavaSqlDateConverter;
-import net.dfr.core.converter.impl.StringToJavaUtilDateConverter;
-import net.dfr.core.converter.impl.StringToLocalDateConverter;
-import net.dfr.core.converter.impl.StringToLocalDateTimeConverter;
-import net.dfr.core.converter.impl.StringToLocalTimeConverter;
-import net.dfr.core.converter.impl.StringToOffsetDateTimeConverter;
-import net.dfr.core.converter.impl.StringToOffsetTimeConverter;
-import net.dfr.core.converter.impl.StringToTimestampConverter;
-import net.dfr.core.converter.impl.StringToYearConverter;
-import net.dfr.core.converter.impl.StringToYearMonthConverter;
-import net.dfr.core.converter.impl.StringToZonedDateTimeConverter;
+import net.dfr.core.converter.converters.StringToInstantConverter;
+import net.dfr.core.converter.converters.StringToJavaSqlDateConverter;
+import net.dfr.core.converter.converters.StringToJavaUtilDateConverter;
+import net.dfr.core.converter.converters.StringToLocalDateConverter;
+import net.dfr.core.converter.converters.StringToLocalDateTimeConverter;
+import net.dfr.core.converter.converters.StringToLocalTimeConverter;
+import net.dfr.core.converter.converters.StringToOffsetDateTimeConverter;
+import net.dfr.core.converter.converters.StringToOffsetTimeConverter;
+import net.dfr.core.converter.converters.StringToTimestampConverter;
+import net.dfr.core.converter.converters.StringToYearConverter;
+import net.dfr.core.converter.converters.StringToYearMonthConverter;
+import net.dfr.core.converter.converters.StringToZonedDateTimeConverter;
 
 public class TestFormattedConverters {
 
