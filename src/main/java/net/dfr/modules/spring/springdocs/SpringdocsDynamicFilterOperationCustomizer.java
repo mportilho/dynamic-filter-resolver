@@ -44,12 +44,9 @@ import net.dfr.core.annotation.Disjunction;
 import net.dfr.core.annotation.Filter;
 import net.dfr.core.annotation.Statement;
 
-public class DynamicFilterOperationCustomizer implements OperationCustomizer {
+public class SpringdocsDynamicFilterOperationCustomizer implements OperationCustomizer {
 
 	protected static Set<String> NOT_NULL_ANNOTATIONS = new HashSet<>(Arrays.asList("NotNull", "NonNull", "NotBlank", "NotEmpty"));
-
-	private DynamicFilterOperationCustomizer() {
-	}
 
 	@Override
 	public Operation customize(Operation operation, HandlerMethod handlerMethod) {
