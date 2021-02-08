@@ -63,6 +63,12 @@
 			<artifactId>jakarta.servlet-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.5.3</version>
+			<scope>provided</scope>
+		</dependency>
 
 		<!-- Spring Framework Dev -->
 		<dependency>
