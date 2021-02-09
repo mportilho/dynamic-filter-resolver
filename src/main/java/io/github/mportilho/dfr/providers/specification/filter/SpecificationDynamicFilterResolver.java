@@ -1,3 +1,25 @@
+/*MIT License
+
+Copyright (c) 2021 Marcelo Portilho
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.*/
+
 package io.github.mportilho.dfr.providers.specification.filter;
 
 import java.util.List;
@@ -10,6 +32,7 @@ import org.springframework.data.mapping.PropertyPath;
 
 import io.github.mportilho.dfr.core.converter.FilterValueConverter;
 import io.github.mportilho.dfr.core.filter.AbstractDynamicFilterResolver;
+import io.github.mportilho.dfr.core.filter.DynamicFilterResolver;
 import io.github.mportilho.dfr.core.filter.FilterParameter;
 import io.github.mportilho.dfr.core.operator.FilterOperator;
 import io.github.mportilho.dfr.core.operator.FilterOperatorService;
@@ -17,6 +40,13 @@ import io.github.mportilho.dfr.core.statement.ConditionalStatement;
 import io.github.mportilho.dfr.core.statement.LogicType;
 import io.github.mportilho.dfr.providers.specification.annotation.Fetching;
 
+/**
+ * A {@link DynamicFilterResolver} that converts {@link ConditionalStatement}
+ * into {@link Specification} instances
+ * 
+ * @author Marcelo Portilho
+ *
+ */
 public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterResolver<Specification<?>> {
 
 	public SpecificationDynamicFilterResolver(FilterOperatorService<Specification<?>> filterOperatorService,
@@ -24,12 +54,18 @@ public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterRes
 		super(filterOperatorService, filterValueConverter);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public <R extends Specification<?>, K, V> R emptyPredicate(Map<K, V> context) {
 		return (R) Specification.where(null);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <R extends Specification<?>, K, V> R createPredicateFromStatement(ConditionalStatement conditionalStatement, Map<K, V> context) {
@@ -51,6 +87,9 @@ public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterRes
 		return conditionalStatement.isNegate() ? (R) Specification.not(rootSpec) : (R) rootSpec;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public <R extends Specification<?>, K, V> R composePredicatesFromSubStatements(LogicType logicType, R predicate, List<R> subStatementPredicates,
@@ -66,6 +105,9 @@ public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterRes
 		return (R) currentPredicate;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public <R extends Specification<?>, K, V> R responseDecorator(R response, Map<K, V> context) {

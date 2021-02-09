@@ -1,9 +1,32 @@
+/*MIT License
+
+Copyright (c) 2021 Marcelo Portilho
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.*/
+
 package io.github.mportilho.dfr.providers.specification.web;
 
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.Inherited;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +49,14 @@ import io.github.mportilho.dfr.core.statement.ConditionalStatement;
 import io.github.mportilho.dfr.core.statement.ConditionalStatementProvider;
 import io.github.mportilho.dfr.providers.specification.annotation.Fetching;
 
+/**
+ * Resolves interfaces assignable from {@link Specification} into valid queries.
+ * These structures must be annotated with {@link Conjunction} or
+ * {@link Disjunction} types.
+ * 
+ * @author Marcelo Portilho
+ *
+ */
 public class SpecificationDynamicFilterArgumentResolver implements HandlerMethodArgumentResolver {
 
 	private ConditionalStatementProvider conditionalStatementProvider;
@@ -37,6 +68,9 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 		this.dynamicFilterResolver = dynamicFilterResolver;
 	}
 
+	/**
+	 * {@link Inherited}
+	 */
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		Class<?> parameterType = parameter.getParameterType();
@@ -52,6 +86,9 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 		return countAnnotations == 1;
 	}
 
+	/**
+	 * {@link Inherited}
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest,
@@ -62,13 +99,25 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 		ConditionalStatement statement = conditionalStatementProvider.createConditionalStatements(
 				(Class<Specification<?>>) parameter.getParameterType(), parameter.getParameterAnnotations(), providedParameterValuesMap);
 
-		return createProxy(dynamicFilterResolver.convertTo(statement, contextMap), parameter.getParameterType());
+		return createProxy(parameter, dynamicFilterResolver.convertTo(statement, contextMap), parameter.getParameterType());
 	}
 
+	/**
+	 * Creates a new proxy object for interfaces that extends {@link Specification}
+	 * 
+	 * @param <T>
+	 * @param parameter
+	 * @param target
+	 * @param targetInterface
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
-	private <T> T createProxy(Object target, Class<T> targetInterface) {
+	private <T> T createProxy(MethodParameter parameter, Object target, Class<T> targetInterface) {
 		if (target == null) {
 			return null;
+		} else if (!Specification.class.isAssignableFrom(targetInterface)) {
+			throw new IllegalStateException(String.format("The '%s' parameter must be of a interface assignable from %s",
+					parameter.getParameterName(), Specification.class.getCanonicalName()));
 		} else if (targetInterface.equals(target.getClass())) {
 			return (T) target;
 		}
@@ -77,6 +126,7 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 	}
 
 	/**
+	 * Creates a context map for the {@link ConditionalStatementProvider}
 	 * 
 	 * @param parameter
 	 * @return
@@ -95,6 +145,7 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 	}
 
 	/**
+	 * Creates a new value provider map from the request parameters
 	 * 
 	 * @param parameter
 	 * @param webRequest
@@ -120,8 +171,11 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 	}
 
 	/**
+	 * Counts the quantity of {@link Conjunction} and {@link Disjunction}
+	 * annotations on a {@link MethodParameter}
 	 * 
 	 * @param parameter
+	 * @return
 	 */
 	private int countAnnotationsUntilTwo(MethodParameter parameter) {
 		int count = 0;
