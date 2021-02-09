@@ -14,7 +14,7 @@ import io.github.mportilho.dfr.core.statement.interfaces.StatusEnum;
  * @author Marcelo Portilho
  *
  */
-@Disjunction({
+@Disjunction(value = {
 		@Filter(path = "birthday", parameters = "birthday", operator = GreaterOrEquals.class, constantValues = "12/12/2012", targetType = LocalDate.class),
 		@Filter(path = "height", parameters = "height", operator = Greater.class, constantValues = "170", targetType = StatusEnum.class) })
 public interface MethodArgumentAnnotations {

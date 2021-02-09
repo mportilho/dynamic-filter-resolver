@@ -1,3 +1,25 @@
+/*MIT License
+
+Copyright (c) 2021 Marcelo Portilho
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.*/
+
 package io.github.mportilho.dfr.modules.spring.springdocs;
 
 import java.lang.annotation.Annotation;
@@ -44,6 +66,14 @@ import io.swagger.v3.oas.models.media.NumberSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.StringSchema;
 
+/**
+ * An {@link OperationCustomizer} implementation for Springdocs library that
+ * adds, to a OpenAPI 3 specification, additional request parameters related to
+ * the defined {@link Filter}'s configuration on Spring Framework's controllers
+ * 
+ * @author Marcelo Portilho
+ *
+ */
 public class SpringdocsDynamicFilterOperationCustomizer implements OperationCustomizer {
 
 	protected static Set<String> NOT_NULL_ANNOTATIONS = new HashSet<>(Arrays.asList("NotNull", "NonNull", "NotBlank", "NotEmpty"));
@@ -52,7 +82,7 @@ public class SpringdocsDynamicFilterOperationCustomizer implements OperationCust
 	public Operation customize(Operation operation, HandlerMethod handlerMethod) {
 		for (MethodParameter methodParameter : handlerMethod.getMethodParameters()) {
 			String parameterName = getParameterName(methodParameter);
-			List<Filter> parameterAnnotations = retrieveSpecificationParameterAnnotations(methodParameter);
+			List<Filter> parameterAnnotations = retrieveFilterParameterAnnotations(methodParameter);
 			if (!parameterAnnotations.isEmpty()) {
 				operation.getParameters().removeIf(p -> p.getName().equals(parameterName));
 				for (Filter spec : parameterAnnotations) {
@@ -67,6 +97,15 @@ public class SpringdocsDynamicFilterOperationCustomizer implements OperationCust
 		return operation;
 	}
 
+	/**
+	 * Applies necessary customization on the OpenAPI 3 {@link Operation}
+	 * representation
+	 * 
+	 * @param operation
+	 * @param methodParameter
+	 * @param spec
+	 * @throws Exception
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private static void customizeParameter(Operation operation, MethodParameter methodParameter, Filter spec) throws Exception {
 		ParameterizedType parameterizedType = (ParameterizedType) methodParameter.getParameter().getParameterizedType();
@@ -111,6 +150,13 @@ public class SpringdocsDynamicFilterOperationCustomizer implements OperationCust
 		}
 	}
 
+	/**
+	 * Extracts a {@link JsonView} configuration from a {@link MethodParameter} for
+	 * additional customization
+	 * 
+	 * @param methodParameter
+	 * @return
+	 */
 	private static JsonView getJsonViewFromMethod(MethodParameter methodParameter) {
 		JsonView[] jsonViews = methodParameter.getMethod().getAnnotationsByType(JsonView.class);
 		JsonView jsonView = null;
@@ -120,6 +166,12 @@ public class SpringdocsDynamicFilterOperationCustomizer implements OperationCust
 		return jsonView;
 	}
 
+	/**
+	 * Defines the request parameter's name
+	 * 
+	 * @param methodParameter
+	 * @return
+	 */
 	private static final String getParameterName(MethodParameter methodParameter) {
 		String name = null;
 		Parameter parameter = methodParameter.getParameter();
@@ -132,7 +184,13 @@ public class SpringdocsDynamicFilterOperationCustomizer implements OperationCust
 		return name;
 	}
 
-	private static final List<Filter> retrieveSpecificationParameterAnnotations(MethodParameter methodParameter) {
+	/**
+	 * Extract {@link Filter} annotation from the {@link MethodParameter}'s instance
+	 * 
+	 * @param methodParameter
+	 * @return
+	 */
+	private static final List<Filter> retrieveFilterParameterAnnotations(MethodParameter methodParameter) {
 		if (!Specification.class.isAssignableFrom(methodParameter.getParameterType())) {
 			return Collections.emptyList();
 		}
@@ -146,6 +204,12 @@ public class SpringdocsDynamicFilterOperationCustomizer implements OperationCust
 		return specs;
 	}
 
+	/**
+	 * Creates a list of parameter's filters from the annotation
+	 * 
+	 * @param annotation
+	 * @return
+	 */
 	private static final List<Filter> composeSpecsFromParameterConfiguration(Annotation annotation) {
 		List<Filter> specsList = new ArrayList<>();
 		if (Conjunction.class.isAssignableFrom(annotation.getClass())) {
@@ -163,6 +227,14 @@ public class SpringdocsDynamicFilterOperationCustomizer implements OperationCust
 		return specsList;
 	}
 
+	/**
+	 * Applies Bean Validation's requirements on the request parameter based on the
+	 * annotated attribute located on the {@link Filter#path()}
+	 * 
+	 * @param property
+	 * @param annotations
+	 * @param parent
+	 */
 	private static void applyBeanValidatorAnnotations(Schema<?> property, Annotation[] annotations, Schema<?> parent) {
 		Map<String, Annotation> annos = new HashMap<>();
 		for (Annotation anno : annotations) {
@@ -226,6 +298,12 @@ public class SpringdocsDynamicFilterOperationCustomizer implements OperationCust
 		}
 	}
 
+	/**
+	 * Sets the request parameter as required on OpenAPI 3 specification
+	 * 
+	 * @param model
+	 * @param propName
+	 */
 	private static void setAsRequiredItem(Schema<?> model, String propName) {
 		if (model == null || propName == null || StringUtils.isBlank(propName)) {
 			return;
@@ -238,6 +316,13 @@ public class SpringdocsDynamicFilterOperationCustomizer implements OperationCust
 		}
 	}
 
+	/**
+	 * Gets the {@link Field}'s representation on the specific type
+	 * 
+	 * @param clazz
+	 * @param fieldName
+	 * @return
+	 */
 	private static Field getPropertyField(Class<?> clazz, String fieldName) {
 		final String[] fieldNames = fieldName.split("\\.", -1);
 		// if using dot notation to navigate for classes

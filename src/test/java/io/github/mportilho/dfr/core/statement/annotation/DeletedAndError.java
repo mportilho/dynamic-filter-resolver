@@ -17,7 +17,7 @@ import io.github.mportilho.dfr.core.statement.interfaces.StatusEnum;
 @Retention(RUNTIME)
 @Target({ PARAMETER, TYPE })
 //@formatter:off
-@Disjunction({
+@Disjunction(value = {
 	@Filter(path = "deleted", parameters = "delete", operator = Equals.class, constantValues = "true", targetType = Boolean.class),
 	@Filter(path = "status", parameters = "status", operator = Equals.class, constantValues = "ERROR", targetType = StatusEnum.class)
 })//@formatter:on

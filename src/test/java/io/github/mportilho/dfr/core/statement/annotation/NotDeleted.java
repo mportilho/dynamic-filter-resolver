@@ -16,7 +16,7 @@ import io.github.mportilho.dfr.core.operator.type.Equals;
 @Retention(RUNTIME)
 @Target({ PARAMETER, TYPE })
 //@formatter:off
-@Conjunction({
+@Conjunction(value = {
 	@Filter(path = "deleted", parameters = "delete", operator = Equals.class, constantValues = "false", targetType = Boolean.class)
 })//@formatter:on
 public @interface NotDeleted {

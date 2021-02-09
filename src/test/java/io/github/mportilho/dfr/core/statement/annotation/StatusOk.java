@@ -17,7 +17,7 @@ import io.github.mportilho.dfr.core.statement.interfaces.StatusEnum;
 @Retention(RUNTIME)
 @Target({ PARAMETER, TYPE })
 //@formatter:off
-@Conjunction({
+@Conjunction(value = {
 	@Filter(path = "status", parameters = "status", operator = Equals.class, constantValues = "OK", targetType = StatusEnum.class)
 })//@formatter:on
 public @interface StatusOk {

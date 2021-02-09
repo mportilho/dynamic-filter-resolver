@@ -20,17 +20,37 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.operator.type;
+package io.github.mportilho.dfr.core.converter;
 
-import io.github.mportilho.dfr.core.operator.FilterOperator;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.function.Function;
 
 /**
- * Represents a StartsWith operation
+ * An abstract implementation of a {@link FormattedConverter} that caches the
+ * instance responsible for the formatting with it's pattern format as it's key
  * 
  * @author Marcelo Portilho
  *
+ * @param <S>
  * @param <T>
+ * @param <F>
  */
-public interface StartsWith<T> extends FilterOperator<T> {
+public abstract class AbstractCachedFormattedConverter<S, T, F> implements FormattedConverter<S, T, F> {
+
+	private Map<F, Object> cache = new WeakHashMap<>();
+
+	/**
+	 * Caches the instance responsible for formatting an specific pattern
+	 * 
+	 * @param <U>
+	 * @param format
+	 * @param supplier
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	protected <U> U cache(F format, Function<F, U> supplier) {
+		return (U) cache.computeIfAbsent(format, supplier);
+	}
 
 }
