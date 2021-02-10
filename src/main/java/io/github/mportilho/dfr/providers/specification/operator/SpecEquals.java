@@ -22,9 +22,7 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.providers.specification.operator;
 
-import static io.github.mportilho.dfr.providers.specification.operator.PredicateUtils.computeAttributePath;
-
-import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Expression;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -48,9 +46,15 @@ class SpecEquals<T> implements Equals<Specification<T>> {
 	@Override
 	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		return (root, query, criteriaBuilder) -> {
-			Path<?> path = computeAttributePath(filterParameter, root);
-			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.getFormat());
-			return criteriaBuilder.equal(path, value);
+			Expression<String> expression = PredicateUtils.computeAttributePath(filterParameter, root);
+			Object value = filterValueConverter.convert(filterParameter.findValue(), expression.getJavaType(), filterParameter.getFormat());
+
+			if (filterParameter.isIgnoreCase() && expression.getJavaType().equals(String.class)) {
+				expression = criteriaBuilder.upper(expression);
+				value = transformNonNull(value, v -> v.toString().toUpperCase());
+			}
+
+			return criteriaBuilder.equal(expression, value);
 		};
 	}
 

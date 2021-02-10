@@ -22,6 +22,7 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.providers.specification.operator;
 
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -47,8 +48,18 @@ class SpecStartsWith<T> implements StartsWith<Specification<T>> {
 	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		return (root, query, criteriaBuilder) -> {
 			Path<String> path = PredicateUtils.computeAttributePath(filterParameter, root);
-			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.getFormat());
-			return criteriaBuilder.like(path, transformNonNull(value, v -> v + "%"));
+			String value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.getFormat());
+
+			Expression<String> expression;
+			if (filterParameter.isIgnoreCase()) {
+				expression = criteriaBuilder.upper(path);
+				value = transformNonNull(value, v -> v.toString().toUpperCase() + "%");
+			} else {
+				expression = path;
+				value = transformNonNull(value, v -> v.toString() + "%");
+			}
+
+			return criteriaBuilder.like(expression, value);
 		};
 	}
 
