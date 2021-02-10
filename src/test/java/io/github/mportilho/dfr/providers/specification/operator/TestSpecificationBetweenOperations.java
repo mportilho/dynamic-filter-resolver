@@ -77,7 +77,7 @@ public class TestSpecificationBetweenOperations {
 		when(root.get(anyString())).thenReturn(path);
 		when(path.getJavaType()).thenReturn(String.class);
 
-		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, StartsWith.class, false,
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, StartsWith.class, false, false,
 				new String[] { "TestValue" }, null);
 
 		Specification<Person> specification = specStartsWith.createFilter(filterParameter, new DefaultFilterValueConverter());
@@ -96,7 +96,7 @@ public class TestSpecificationBetweenOperations {
 		when(root.get(anyString())).thenReturn(path);
 		when(path.getJavaType()).thenReturn(String.class);
 
-		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, StartsWith.class, false,
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, StartsWith.class, false, false,
 				new String[] { "1", "2", "3" }, null);
 
 		Specification<Person> specification = specStartsWith.createFilter(filterParameter, new DefaultFilterValueConverter());
@@ -115,7 +115,7 @@ public class TestSpecificationBetweenOperations {
 		when(root.get(anyString())).thenReturn(path);
 		when(path.getJavaType()).thenReturn(String.class);
 
-		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, StartsWith.class, false,
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, StartsWith.class, false, false,
 				new String[] { null, null }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());

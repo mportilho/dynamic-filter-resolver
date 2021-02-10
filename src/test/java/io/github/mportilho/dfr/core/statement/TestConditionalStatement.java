@@ -56,8 +56,8 @@ public class TestConditionalStatement {
 	@Test
 	public void testOneClause() {
 		List<FilterParameter> clauses = new ArrayList<>();
-		clauses.add(
-				new FilterParameter("name", "name", new String[] { "name" }, String.class, NotEquals.class, false, new String[] { "Blanka" }, null));
+		clauses.add(new FilterParameter("name", "name", new String[] { "name" }, String.class, NotEquals.class, false, false,
+				new String[] { "Blanka" }, null));
 		ConditionalStatement condition = new ConditionalStatement(LogicType.CONJUNCTION, false, clauses, null);
 
 		assertThat(condition.getLogicType()).isEqualByComparingTo(LogicType.CONJUNCTION);

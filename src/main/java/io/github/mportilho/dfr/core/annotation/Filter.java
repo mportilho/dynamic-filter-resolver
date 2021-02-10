@@ -98,6 +98,12 @@ public @interface Filter {
 	String negate() default "false";
 
 	/**
+	 * If the comparison attribute type is a {@link String}, tries to ignore case
+	 * while processing the dynamic filter
+	 */
+	boolean ignoreCase() default false;
+
+	/**
 	 * Default values for each parameter, each at the same position as
 	 * <code>parameters</code>
 	 * 

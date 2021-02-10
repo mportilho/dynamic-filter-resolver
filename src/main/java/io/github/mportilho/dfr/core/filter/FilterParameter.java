@@ -80,6 +80,12 @@ public class FilterParameter {
 	private final boolean negate;
 
 	/**
+	 * Indicates that the dynamic filter must try to ignore value's case if its type
+	 * is {@link String}
+	 */
+	private final boolean ignoreCase;
+
+	/**
 	 * The provided parameter values from the caller
 	 */
 	private final Object[] values;
@@ -98,26 +104,28 @@ public class FilterParameter {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public FilterParameter(String attributePath, String path, String[] parameters, Class<?> targetType, Class<? extends FilterOperator> operator,
-			boolean negate, Object[] value, String formats) {
+			boolean negate, boolean ignoreCase, Object[] value, String formats) {
 		this.attributePath = attributePath;
 		this.path = path;
 		this.parameters = parameters;
 		this.targetType = targetType;
 		this.operator = (Class<? extends FilterOperator<?>>) operator;
 		this.negate = negate;
+		this.ignoreCase = ignoreCase;
 		this.values = value;
 		this.format = formats;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public FilterParameter(String attributePath, String path, String parameter, Class<?> targetType, Class<? extends FilterOperator> operator,
-			boolean negate, Object value, String format) {
+			boolean negate, boolean ignoreCase, Object value, String format) {
 		this.attributePath = attributePath;
 		this.path = path;
 		this.parameters = new String[] { parameter };
 		this.targetType = targetType;
 		this.operator = (Class<? extends FilterOperator<?>>) operator;
 		this.negate = negate;
+		this.ignoreCase = ignoreCase;
 		this.values = value != null ? new Object[] { value } : null;
 		this.format = format != null && !format.isEmpty() ? format : null;
 	}
@@ -136,6 +144,10 @@ public class FilterParameter {
 
 	public boolean isNegate() {
 		return negate;
+	}
+
+	public boolean isIgnoreCase() {
+		return ignoreCase;
 	}
 
 	public Object[] getValues() {

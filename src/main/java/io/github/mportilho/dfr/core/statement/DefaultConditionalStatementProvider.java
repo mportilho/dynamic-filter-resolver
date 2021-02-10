@@ -214,7 +214,7 @@ public class DefaultConditionalStatementProvider implements ConditionalStatement
 				String format = computeSpringExpressionLanguage(filter.format());
 
 				FilterParameter parameter = new FilterParameter(filter.attributePath(), filter.path(), filter.parameters(), filter.targetType(),
-						filter.operator(), negate, values, format);
+						filter.operator(), negate, filter.ignoreCase(), values, format);
 				parameter = decorateFilterParameter(parameter, parametersMap);
 				filterParameters.add(parameter);
 			}

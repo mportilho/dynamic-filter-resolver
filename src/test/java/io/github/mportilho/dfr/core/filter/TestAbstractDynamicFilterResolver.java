@@ -67,8 +67,8 @@ public class TestAbstractDynamicFilterResolver {
 	public void testOneClause() {
 		DynamicFilterResolver<List<?>> resolver = new GenericDynamicFilterResolver();
 		List<FilterParameter> clauses = new ArrayList<>();
-		clauses.add(
-				new FilterParameter("name", "name", new String[] { "name" }, String.class, NotEquals.class, false, new String[] { "Blanka" }, null));
+		clauses.add(new FilterParameter("name", "name", new String[] { "name" }, String.class, NotEquals.class, false, false,
+				new String[] { "Blanka" }, null));
 		ConditionalStatement condition = new ConditionalStatement(LogicType.CONJUNCTION, false, clauses, null);
 
 		assertThat(condition.getLogicType()).isEqualByComparingTo(LogicType.CONJUNCTION);
@@ -83,10 +83,10 @@ public class TestAbstractDynamicFilterResolver {
 	public void testTwoClauses() {
 		DynamicFilterResolver<List<?>> resolver = new GenericDynamicFilterResolver();
 		List<FilterParameter> clauses = new ArrayList<>();
-		clauses.add(
-				new FilterParameter("name", "name", new String[] { "name" }, String.class, NotEquals.class, false, new String[] { "Blanka" }, null));
-		clauses.add(new FilterParameter("title", "title", new String[] { "title" }, String.class, NotEquals.class, false, new String[] { "fighter" },
-				null));
+		clauses.add(new FilterParameter("name", "name", new String[] { "name" }, String.class, NotEquals.class, false, false,
+				new String[] { "Blanka" }, null));
+		clauses.add(new FilterParameter("title", "title", new String[] { "title" }, String.class, NotEquals.class, false, false,
+				new String[] { "fighter" }, null));
 		ConditionalStatement condition = new ConditionalStatement(LogicType.CONJUNCTION, false, clauses, null);
 
 		assertThat(condition.getLogicType()).isEqualByComparingTo(LogicType.CONJUNCTION);
@@ -102,21 +102,22 @@ public class TestAbstractDynamicFilterResolver {
 		DynamicFilterResolver<List<?>> resolver = new GenericDynamicFilterResolver();
 
 		List<FilterParameter> subClauses1 = new ArrayList<>();
-		subClauses1.add(
-				new FilterParameter("name", "name", new String[] { "name" }, String.class, NotEquals.class, false, new String[] { "foo" }, null));
-		subClauses1.add(
-				new FilterParameter("title", "title", new String[] { "title" }, String.class, NotEquals.class, false, new String[] { "bah" }, null));
+		subClauses1.add(new FilterParameter("name", "name", new String[] { "name" }, String.class, NotEquals.class, false, false,
+				new String[] { "foo" }, null));
+		subClauses1.add(new FilterParameter("title", "title", new String[] { "title" }, String.class, NotEquals.class, false, false,
+				new String[] { "bah" }, null));
 		ConditionalStatement subCondition1 = new ConditionalStatement(LogicType.DISJUNCTION, false, subClauses1, null);
 
 		List<FilterParameter> subClauses2 = new ArrayList<>();
-		subClauses2.add(new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, NotEquals.class, false,
+		subClauses2.add(new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, NotEquals.class, false, false,
 				new String[] { "80" }, null));
 		ConditionalStatement subCondition2 = new ConditionalStatement(LogicType.DISJUNCTION, false, subClauses2, null);
 
 		List<FilterParameter> clauses = new ArrayList<>();
-		clauses.add(new FilterParameter("height", "height", new String[] { "height" }, String.class, NotEquals.class, false, new String[] { "170" },
-				null));
-		clauses.add(new FilterParameter("age", "age", new String[] { "age" }, String.class, NotEquals.class, false, new String[] { "22" }, null));
+		clauses.add(new FilterParameter("height", "height", new String[] { "height" }, String.class, NotEquals.class, false, false,
+				new String[] { "170" }, null));
+		clauses.add(
+				new FilterParameter("age", "age", new String[] { "age" }, String.class, NotEquals.class, false, false, new String[] { "22" }, null));
 		ConditionalStatement condition = new ConditionalStatement(LogicType.CONJUNCTION, false, clauses, Arrays.asList(subCondition1, subCondition2));
 
 		assertThat(condition.getLogicType()).isEqualByComparingTo(LogicType.CONJUNCTION);
