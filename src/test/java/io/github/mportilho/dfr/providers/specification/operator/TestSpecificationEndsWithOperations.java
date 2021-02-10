@@ -46,11 +46,11 @@ import org.springframework.data.jpa.domain.Specification;
 import io.github.mportilho.apps.apptest.domain.model.Person;
 import io.github.mportilho.dfr.core.converter.DefaultFilterValueConverter;
 import io.github.mportilho.dfr.core.filter.FilterParameter;
-import io.github.mportilho.dfr.core.operator.type.StartsWith;
+import io.github.mportilho.dfr.core.operator.type.EndsWith;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class TestSpecificationStartsWithOperations {
+public class TestSpecificationEndsWithOperations {
 
 	@Mock
 	private CriteriaBuilder builder;
@@ -69,40 +69,40 @@ public class TestSpecificationStartsWithOperations {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testStartsWithOperation() {
-		SpecStartsWith<Person> specOp = new SpecStartsWith<>();
+	public void testEndsWithOperation() {
+		SpecEndsWith<Person> specOp = new SpecEndsWith<>();
 
 		when(root.getJavaType()).thenReturn(Person.class);
 		when(root.get(anyString())).thenReturn(path);
 		when(path.getJavaType()).thenReturn(String.class);
 		when(builder.upper(any())).thenReturn(path);
 
-		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, StartsWith.class, false, false,
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, EndsWith.class, false, false,
 				new String[] { "TestValue" }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
 
-		verify(builder, times(1)).like(any(Expression.class), (String) argThat(x -> x.toString().equals("TestValue%")));
+		verify(builder, times(1)).like(any(Expression.class), (String) argThat(x -> x.toString().equals("%TestValue")));
 	}
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testStartsWithOperation_IgnoringCase() {
-		SpecStartsWith<Person> specOp = new SpecStartsWith<>();
+	public void testEndsWithOperation_IgnoringCase() {
+		SpecEndsWith<Person> specOp = new SpecEndsWith<>();
 
 		when(root.getJavaType()).thenReturn(Person.class);
 		when(root.get(anyString())).thenReturn(path);
 		when(path.getJavaType()).thenReturn(String.class);
 		when(builder.upper(any())).thenReturn(path);
 
-		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, StartsWith.class, false, true,
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, EndsWith.class, false, true,
 				new String[] { "TestValue" }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
 
-		verify(builder, times(1)).like(any(Expression.class), (String) argThat(x -> x.toString().equals("TESTVALUE%")));
+		verify(builder, times(1)).like(any(Expression.class), (String) argThat(x -> x.toString().equals("%TESTVALUE")));
 	}
 
 }

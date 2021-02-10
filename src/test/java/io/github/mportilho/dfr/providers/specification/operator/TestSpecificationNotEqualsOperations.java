@@ -25,9 +25,12 @@ package io.github.mportilho.dfr.providers.specification.operator;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -46,11 +49,11 @@ import org.springframework.data.jpa.domain.Specification;
 import io.github.mportilho.apps.apptest.domain.model.Person;
 import io.github.mportilho.dfr.core.converter.DefaultFilterValueConverter;
 import io.github.mportilho.dfr.core.filter.FilterParameter;
-import io.github.mportilho.dfr.core.operator.type.StartsWith;
+import io.github.mportilho.dfr.core.operator.type.NotEquals;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class TestSpecificationStartsWithOperations {
+public class TestSpecificationNotEqualsOperations {
 
 	@Mock
 	private CriteriaBuilder builder;
@@ -69,40 +72,78 @@ public class TestSpecificationStartsWithOperations {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testStartsWithOperation() {
-		SpecStartsWith<Person> specOp = new SpecStartsWith<>();
+	public void test_NotEqualsOperation_OnString() {
+		SpecNotEquals<Person> specOp = new SpecNotEquals<>();
 
 		when(root.getJavaType()).thenReturn(Person.class);
 		when(root.get(anyString())).thenReturn(path);
 		when(path.getJavaType()).thenReturn(String.class);
 		when(builder.upper(any())).thenReturn(path);
 
-		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, StartsWith.class, false, false,
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, NotEquals.class, false, false,
 				new String[] { "TestValue" }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
 
-		verify(builder, times(1)).like(any(Expression.class), (String) argThat(x -> x.toString().equals("TestValue%")));
+		verify(builder, times(1)).notEqual(any(Expression.class), (String) argThat(x -> x.toString().equals("TestValue")));
 	}
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void testStartsWithOperation_IgnoringCase() {
-		SpecStartsWith<Person> specOp = new SpecStartsWith<>();
+	public void test_NotEqualsOperation_OnString_IgnoringCase() {
+		SpecNotEquals<Person> specOp = new SpecNotEquals<>();
 
 		when(root.getJavaType()).thenReturn(Person.class);
 		when(root.get(anyString())).thenReturn(path);
 		when(path.getJavaType()).thenReturn(String.class);
 		when(builder.upper(any())).thenReturn(path);
 
-		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, StartsWith.class, false, true,
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, NotEquals.class, false, true,
 				new String[] { "TestValue" }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
 
-		verify(builder, times(1)).like(any(Expression.class), (String) argThat(x -> x.toString().equals("TESTVALUE%")));
+		verify(builder, times(1)).notEqual(any(Expression.class), (String) argThat(x -> x.toString().equals("TESTVALUE")));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void test_NotEqualsOperation_OnNumber() {
+		SpecNotEquals<Person> specOp = new SpecNotEquals<>();
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(BigDecimal.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, BigDecimal.class, NotEquals.class, false,
+				false, new BigDecimal[] { BigDecimal.ONE }, null);
+
+		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
+		specification.toPredicate(root, query, builder);
+
+		verify(builder, times(1)).notEqual(any(Expression.class), eq(BigDecimal.ONE));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void test_NotEqualsOperation_OnNumber_IngoringCase() {
+		SpecNotEquals<Person> specOp = new SpecNotEquals<>();
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(BigDecimal.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, BigDecimal.class, NotEquals.class, false, true,
+				new BigDecimal[] { BigDecimal.ONE }, null);
+
+		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
+		specification.toPredicate(root, query, builder);
+
+		verify(builder, times(1)).notEqual(any(Expression.class), eq(BigDecimal.ONE));
 	}
 
 }

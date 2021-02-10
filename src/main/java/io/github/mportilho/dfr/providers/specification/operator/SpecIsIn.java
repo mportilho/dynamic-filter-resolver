@@ -24,8 +24,6 @@ package io.github.mportilho.dfr.providers.specification.operator;
 
 import static io.github.mportilho.dfr.providers.specification.operator.PredicateUtils.computeAttributePath;
 
-import java.util.Collection;
-
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
@@ -65,10 +63,11 @@ class SpecIsIn<T> implements IsIn<Specification<T>> {
 				int size = rawValues.length;
 				Object[] value = new Object[size];
 				for (int i = 0; i < size; i++) {
-					value[i] = filterValueConverter.convert(rawValues[i], expression.getJavaType(), filterParameter.getFormat());
+					Object currVal = filterValueConverter.convert(rawValues[i], expression.getJavaType(), filterParameter.getFormat());
 					if (ignoreCase) {
-						value[i] = transformNonNull(value, v -> v.toString().toUpperCase());
+						currVal = transformNonNull(currVal, v -> v.toString().toUpperCase());
 					}
+					value[i] = currVal;
 				}
 				predicate = expression.in(value);
 			}
@@ -85,12 +84,11 @@ class SpecIsIn<T> implements IsIn<Specification<T>> {
 	private Object[] extractArrayFromParameter(Object[] paramValues) {
 		if (paramValues == null || paramValues.length == 0) {
 			return null;
-		} else if (!paramValues[0].getClass().isArray() && !Collection.class.isAssignableFrom(paramValues[0].getClass())) {
-			throw new IllegalArgumentException("Expecting parameter value to be a collection of elements for 'in' operation");
-		} else if (paramValues[0].getClass().isArray()) {
-			return (Object[]) paramValues[0];
+		} else if (paramValues.getClass().isArray()) {
+			return paramValues;
+		} else {
+			throw new IllegalArgumentException("Expecting parameter value to be an array");
 		}
-		return ((Collection<?>) paramValues[0]).toArray();
 	}
 
 }

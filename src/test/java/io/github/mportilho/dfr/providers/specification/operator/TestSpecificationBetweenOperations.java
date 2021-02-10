@@ -30,6 +30,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
+
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
@@ -47,7 +49,7 @@ import org.springframework.data.jpa.domain.Specification;
 import io.github.mportilho.apps.apptest.domain.model.Person;
 import io.github.mportilho.dfr.core.converter.DefaultFilterValueConverter;
 import io.github.mportilho.dfr.core.filter.FilterParameter;
-import io.github.mportilho.dfr.core.operator.type.StartsWith;
+import io.github.mportilho.dfr.core.operator.type.Between;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -71,16 +73,17 @@ public class TestSpecificationBetweenOperations {
 	@Test
 	@SuppressWarnings("unchecked")
 	public void testBetweenOperation_WithOneValue_ThrowingException() {
-		SpecBetween<Person> specStartsWith = new SpecBetween<>();
+		SpecBetween<Person> specOp = new SpecBetween<>();
 
 		when(root.getJavaType()).thenReturn(Person.class);
 		when(root.get(anyString())).thenReturn(path);
 		when(path.getJavaType()).thenReturn(String.class);
+		when(builder.upper(any())).thenReturn(path);
 
-		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, StartsWith.class, false, false,
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, Between.class, false, false,
 				new String[] { "TestValue" }, null);
 
-		Specification<Person> specification = specStartsWith.createFilter(filterParameter, new DefaultFilterValueConverter());
+		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		assertThatThrownBy(() -> specification.toPredicate(root, query, builder)).isInstanceOf(IllegalStateException.class)
 				.hasMessageStartingWith("Wrong number of arguments");
 
@@ -90,16 +93,17 @@ public class TestSpecificationBetweenOperations {
 	@Test
 	@SuppressWarnings("unchecked")
 	public void testBetweenOperation_WithMoreThenTwoValues_ThrowingException() {
-		SpecBetween<Person> specStartsWith = new SpecBetween<>();
+		SpecBetween<Person> specOp = new SpecBetween<>();
 
 		when(root.getJavaType()).thenReturn(Person.class);
 		when(root.get(anyString())).thenReturn(path);
 		when(path.getJavaType()).thenReturn(String.class);
+		when(builder.upper(any())).thenReturn(path);
 
-		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, StartsWith.class, false, false,
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, Between.class, false, false,
 				new String[] { "1", "2", "3" }, null);
 
-		Specification<Person> specification = specStartsWith.createFilter(filterParameter, new DefaultFilterValueConverter());
+		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		assertThatThrownBy(() -> specification.toPredicate(root, query, builder)).isInstanceOf(IllegalStateException.class)
 				.hasMessageStartingWith("Wrong number of arguments");
 
@@ -114,14 +118,72 @@ public class TestSpecificationBetweenOperations {
 		when(root.getJavaType()).thenReturn(Person.class);
 		when(root.get(anyString())).thenReturn(path);
 		when(path.getJavaType()).thenReturn(String.class);
+		when(builder.upper(any())).thenReturn(path);
 
-		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, StartsWith.class, false, false,
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, Between.class, false, false,
 				new String[] { null, null }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
 
 		verify(builder, times(1)).between((Path) any(), (String) eq(null), (String) eq(null));
+	}
+
+	@Test
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void testBetweenOperation_WithTwoString() {
+		SpecBetween<Person> specOp = new SpecBetween<>();
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(String.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, Between.class, false, false,
+				new String[] { "a", "c" }, null);
+
+		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
+		specification.toPredicate(root, query, builder);
+
+		verify(builder, times(1)).between((Expression) any(), eq("a"), eq("c"));
+	}
+
+	@Test
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void testBetweenOperation_WithTwoString_IgnoringCase() {
+		SpecBetween<Person> specOp = new SpecBetween<>();
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(String.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, Between.class, false, true,
+				new String[] { "a", "c" }, null);
+
+		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
+		specification.toPredicate(root, query, builder);
+
+		verify(builder, times(1)).between((Expression) any(), eq("A"), eq("C"));
+	}
+
+	@Test
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void testBetweenOperation_WithTwoNumbers() {
+		SpecBetween<Person> specOp = new SpecBetween<>();
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(BigDecimal.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("height", "height", new String[] { "height" }, BigDecimal.class, Between.class, false,
+				false, new BigDecimal[] { BigDecimal.ZERO, BigDecimal.ONE }, null);
+
+		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
+		specification.toPredicate(root, query, builder);
+
+		verify(builder, times(1)).between((Expression) any(), eq(BigDecimal.ZERO), eq(new BigDecimal("1")));
 	}
 
 }

@@ -41,7 +41,7 @@ public class TestConditionalStatementProviderOnAllOperations {
 
 	@Test
 	public void testComparisonOperations() {
-		ConditionalStatementProvider provider = new GenericConditionalStatementProvider(null);
+		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(ComparisonOperations.class, null, null);
 		FilterParameter param;
 
@@ -60,7 +60,7 @@ public class TestConditionalStatementProviderOnAllOperations {
 
 	@Test
 	public void testStringComparisonOperations() {
-		ConditionalStatementProvider provider = new GenericConditionalStatementProvider(null);
+		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(StringComparisonOperations.class, null, null);
 
 		assertThat(statement).isNotNull();
@@ -72,7 +72,7 @@ public class TestConditionalStatementProviderOnAllOperations {
 
 	@Test
 	public void testOtherComparisonOperations() {
-		ConditionalStatementProvider provider = new GenericConditionalStatementProvider(null);
+		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(OtherComparisonOperations.class, null, null);
 		FilterParameter param;
 
