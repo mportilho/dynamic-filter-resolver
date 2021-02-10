@@ -26,7 +26,7 @@ import static io.github.mportilho.dfr.providers.specification.operator.Predicate
 
 import java.util.Collection;
 
-import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -49,18 +49,28 @@ class SpecIsIn<T> implements IsIn<Specification<T>> {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		return (root, query, criteriaBuilder) -> {
-			Path<?> path = computeAttributePath(filterParameter, root);
+			Expression expression = computeAttributePath(filterParameter, root);
 			Object[] rawValues = extractArrayFromParameter(filterParameter.getValues());
 			Predicate predicate = null;
+			boolean ignoreCase = filterParameter.isIgnoreCase() && expression.getJavaType().equals(String.class);
 
 			if (rawValues != null) {
-				Object[] value = new Object[rawValues.length];
-				for (int i = 0; i < value.length; i++) {
-					value[i] = filterValueConverter.convert(rawValues[i], path.getJavaType(), filterParameter.getFormat());
+				if (ignoreCase) {
+					expression = criteriaBuilder.upper(expression);
 				}
-				predicate = path.in(value);
+
+				int size = rawValues.length;
+				Object[] value = new Object[size];
+				for (int i = 0; i < size; i++) {
+					value[i] = filterValueConverter.convert(rawValues[i], expression.getJavaType(), filterParameter.getFormat());
+					if (ignoreCase) {
+						value[i] = transformNonNull(value, v -> v.toString().toUpperCase());
+					}
+				}
+				predicate = expression.in(value);
 			}
 			return predicate;
 		};

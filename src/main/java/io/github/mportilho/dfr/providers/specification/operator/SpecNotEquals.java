@@ -44,9 +44,10 @@ class SpecNotEquals<T> implements NotEquals<Specification<T>> {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		return (root, query, criteriaBuilder) -> {
-			Expression<String> expression = PredicateUtils.computeAttributePath(filterParameter, root);
+			Expression expression = PredicateUtils.computeAttributePath(filterParameter, root);
 			Object value = filterValueConverter.convert(filterParameter.findValue(), expression.getJavaType(), filterParameter.getFormat());
 
 			if (filterParameter.isIgnoreCase() && expression.getJavaType().equals(String.class)) {

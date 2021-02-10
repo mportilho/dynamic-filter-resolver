@@ -22,9 +22,7 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.providers.specification.operator;
 
-import static io.github.mportilho.dfr.providers.specification.operator.PredicateUtils.computeAttributePath;
-
-import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Expression;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -46,11 +44,16 @@ class SpecGreaterOrEquals<T> implements GreaterOrEquals<Specification<T>> {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		return (root, query, criteriaBuilder) -> {
-			Path<?> path = computeAttributePath(filterParameter, root);
-			Object value = filterValueConverter.convert(filterParameter.findValue(), path.getJavaType(), filterParameter.getFormat());
-			return PredicateUtils.toComparablePredicate(path, value, criteriaBuilder::greaterThanOrEqualTo, criteriaBuilder::ge);
+			Expression<? extends Comparable<?>> expression = PredicateUtils.computeAttributePath(filterParameter, root);
+			Object value = filterValueConverter.convert(filterParameter.findValue(), expression.getJavaType(), filterParameter.getFormat());
+			if (filterParameter.isIgnoreCase() && expression.getJavaType().equals(String.class)) {
+				expression = criteriaBuilder.upper((Expression<String>) expression);
+				value = transformNonNull(value, v -> v.toString().toUpperCase());
+			}
+			return PredicateUtils.toComparablePredicate(expression, value, criteriaBuilder::greaterThanOrEqualTo, criteriaBuilder::ge);
 		};
 	}
 

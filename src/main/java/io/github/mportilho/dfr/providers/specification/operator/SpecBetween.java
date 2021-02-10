@@ -22,7 +22,7 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.providers.specification.operator;
 
-import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Expression;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -44,12 +44,12 @@ class SpecBetween<T> implements Between<Specification<T>> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		return (root, query, criteriaBuilder) -> {
-			Path<Comparable<Object>> path = PredicateUtils.computeAttributePath(filterParameter, root);
-			Comparable<Object> lowerValue;
-			Comparable<Object> upperValue;
+			Expression<Comparable> expression = PredicateUtils.computeAttributePath(filterParameter, root);
+			Comparable lowerValue;
+			Comparable upperValue;
 
 			if (filterParameter.getValues() == null) {
 				lowerValue = null;
@@ -57,14 +57,21 @@ class SpecBetween<T> implements Between<Specification<T>> {
 			} else if (filterParameter.getValues().length == 1 || filterParameter.getValues().length > 2) {
 				throw new IllegalStateException(
 						"Wrong number of arguments for between operation. Needs 2 arguments, have " + filterParameter.getValues().length);
+			} else {
+				lowerValue = (Comparable) filterParameter.getValues()[0];
+				lowerValue = filterValueConverter.convert(lowerValue, expression.getJavaType(), filterParameter.getFormat());
+
+				upperValue = (Comparable) filterParameter.getValues()[1];
+				upperValue = filterValueConverter.convert(upperValue, expression.getJavaType(), filterParameter.getFormat());
+
+				if (filterParameter.isIgnoreCase() && expression.getJavaType().equals(String.class)) {
+					expression = criteriaBuilder.upper((Expression) expression);
+					lowerValue = transformNonNull(lowerValue, v -> (Comparable<String>) v.toString().toUpperCase());
+					upperValue = transformNonNull(upperValue, v -> (Comparable<String>) v.toString().toUpperCase());
+				}
 			}
 
-			lowerValue = (Comparable<Object>) filterParameter.getValues()[0];
-			upperValue = (Comparable<Object>) filterParameter.getValues()[1];
-
-			lowerValue = filterValueConverter.convert(lowerValue, path.getJavaType(), filterParameter.getFormat());
-			upperValue = filterValueConverter.convert(upperValue, path.getJavaType(), filterParameter.getFormat());
-			return criteriaBuilder.between(path, lowerValue, upperValue);
+			return criteriaBuilder.between(expression, lowerValue, upperValue);
 		};
 	}
 

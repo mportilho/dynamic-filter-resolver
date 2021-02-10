@@ -57,7 +57,7 @@ class PredicateUtils {
 	 * @return
 	 */
 	@SuppressWarnings({ "unchecked" })
-	public static final Predicate toComparablePredicate(Path<?> path, Object value,
+	public static final Predicate toComparablePredicate(Expression<?> path, Object value,
 			BiFunction<Expression<? extends Comparable<Object>>, Comparable<Object>, Predicate> comparablePredicateFunction,
 			BiFunction<Expression<Number>, Number, Predicate> numberPredicateFunction) {
 		if (value != null && Number.class.isAssignableFrom(value.getClass())) {
