@@ -85,6 +85,9 @@ class SpecIsIn<T> implements IsIn<Specification<T>> {
 		if (paramValues == null || paramValues.length == 0) {
 			return null;
 		} else if (paramValues.getClass().isArray()) {
+			if (paramValues.length == 1 && paramValues[0].getClass().isArray()) {
+				return (Object[]) paramValues[0];
+			}
 			return paramValues;
 		} else {
 			throw new IllegalArgumentException("Expecting parameter value to be an array");

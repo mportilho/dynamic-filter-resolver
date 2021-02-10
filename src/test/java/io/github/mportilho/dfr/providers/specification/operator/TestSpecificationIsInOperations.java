@@ -126,6 +126,25 @@ public class TestSpecificationIsInOperations {
 
 	@Test
 	@SuppressWarnings("unchecked")
+	public void test_InOperation_ArrayOfArray_OnNumber() {
+		SpecIsIn<Person> specOp = new SpecIsIn<>();
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(BigDecimal.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, BigDecimal.class, IsIn.class, false, false,
+				new Object[] { new BigDecimal[] { BigDecimal.ZERO, BigDecimal.ONE } }, null);
+
+		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
+		specification.toPredicate(root, query, builder);
+
+		verify(path, times(1)).in(new BigDecimal[] { BigDecimal.ZERO, BigDecimal.ONE });
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
 	public void test_InOperation_OnNumber_IngoringCase() {
 		SpecIsIn<Person> specOp = new SpecIsIn<>();
 
