@@ -48,8 +48,19 @@ class SpecBetween<T> implements Between<Specification<T>> {
 	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		return (root, query, criteriaBuilder) -> {
 			Path<Comparable<Object>> path = PredicateUtils.computeAttributePath(filterParameter, root);
-			Comparable<Object> lowerValue = (Comparable<Object>) filterParameter.getValues()[0];
-			Comparable<Object> upperValue = (Comparable<Object>) filterParameter.getValues()[1];
+			Comparable<Object> lowerValue;
+			Comparable<Object> upperValue;
+
+			if (filterParameter.getValues() == null) {
+				lowerValue = null;
+				upperValue = null;
+			} else if (filterParameter.getValues().length == 1 || filterParameter.getValues().length > 2) {
+				throw new IllegalStateException(
+						"Wrong number of arguments for between operation. Needs 2 arguments, have " + filterParameter.getValues().length);
+			}
+
+			lowerValue = (Comparable<Object>) filterParameter.getValues()[0];
+			upperValue = (Comparable<Object>) filterParameter.getValues()[1];
 
 			lowerValue = filterValueConverter.convert(lowerValue, path.getJavaType(), filterParameter.getFormat());
 			upperValue = filterValueConverter.convert(upperValue, path.getJavaType(), filterParameter.getFormat());
