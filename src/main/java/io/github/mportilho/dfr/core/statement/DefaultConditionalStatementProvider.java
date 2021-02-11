@@ -42,8 +42,6 @@ import io.github.mportilho.dfr.core.filter.FilterParameter;
 import io.github.mportilho.dfr.core.operator.FilterOperator;
 import io.github.mportilho.dfr.core.operator.type.IsIn;
 import io.github.mportilho.dfr.core.operator.type.IsNotIn;
-import io.github.mportilho.dfr.core.operator.type.IsNotNull;
-import io.github.mportilho.dfr.core.operator.type.IsNull;
 
 /**
  * Provides a default and generic implementation of a
@@ -53,9 +51,6 @@ import io.github.mportilho.dfr.core.operator.type.IsNull;
  *
  */
 public class DefaultConditionalStatementProvider implements ConditionalStatementProvider {
-
-	@SuppressWarnings("rawtypes")
-	private static final Set<Class<? extends FilterOperator>> NULL_VALUE_OPERATORS = new HashSet<>(Arrays.asList(IsNull.class, IsNotNull.class));
 
 	@SuppressWarnings("rawtypes")
 	private static final Set<Class<? extends FilterOperator>> MULTIPLE_VALUES_OPERATORS = new HashSet<>(Arrays.asList(IsIn.class, IsNotIn.class));
@@ -359,12 +354,6 @@ public class DefaultConditionalStatementProvider implements ConditionalStatement
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	@SuppressWarnings("rawtypes")
-	public boolean operatorAcceptsNullValues(Class<? extends FilterOperator> clazz) {
-		return NULL_VALUE_OPERATORS.contains(clazz);
 	}
 
 	@SuppressWarnings("rawtypes")

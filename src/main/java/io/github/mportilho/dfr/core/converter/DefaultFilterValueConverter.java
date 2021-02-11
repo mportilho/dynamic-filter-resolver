@@ -36,6 +36,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.github.mportilho.dfr.core.converter.converters.StringToBooleanConverter;
 import io.github.mportilho.dfr.core.converter.converters.StringToInstantConverter;
 import io.github.mportilho.dfr.core.converter.converters.StringToJavaSqlDateConverter;
 import io.github.mportilho.dfr.core.converter.converters.StringToJavaUtilDateConverter;
@@ -132,6 +133,7 @@ public class DefaultFilterValueConverter implements FilterValueConverter {
 		formattedConverters.put(Pair.of(String.class, Date.class), new StringToJavaUtilDateConverter());
 		formattedConverters.put(Pair.of(String.class, java.sql.Date.class), new StringToJavaSqlDateConverter());
 		formattedConverters.put(Pair.of(String.class, Timestamp.class), new StringToTimestampConverter());
+		formattedConverters.put(Pair.of(String.class, Boolean.class), new StringToBooleanConverter());
 		return formattedConverters;
 	}
 

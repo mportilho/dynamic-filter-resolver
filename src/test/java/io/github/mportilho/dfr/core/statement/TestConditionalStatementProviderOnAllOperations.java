@@ -81,10 +81,10 @@ public class TestConditionalStatementProviderOnAllOperations {
 		assertThat(statement.getSubStatements()).isEmpty();
 
 		param = statement.getClauses().stream().filter(p -> IsNull.class.equals(p.getOperator())).findAny().orElse(null);
-		assertThat(param.getValues()).isNotEmpty().hasSize(1).containsNull();
+		assertThat(param.getValues()).isNotEmpty().hasSize(1).contains("true");
 
 		param = statement.getClauses().stream().filter(p -> IsNotNull.class.equals(p.getOperator())).findAny().orElse(null);
-		assertThat(param.getValues()).isNotEmpty().hasSize(1).containsNull();
+		assertThat(param.getValues()).isNotEmpty().hasSize(1).contains("true");
 
 		param = statement.getClauses().stream().filter(p -> IsIn.class.equals(p.getOperator())).findAny().orElse(null);
 		assertThat(param.getValues()).isNotEmpty().hasSize(1);

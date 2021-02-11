@@ -30,7 +30,11 @@ import io.github.mportilho.dfr.core.operator.FilterOperator;
 
 /**
  * Defines a set of steps for creating {@link ConditionalStatement}'s
- * representation graph
+ * representation graph.
+ * 
+ * <p>
+ * Validations of any kind about the required values must not be made here, to
+ * provide more flexibility to the {@link FilterOperator} implementations
  * 
  * @author Marcelo Portilho
  *

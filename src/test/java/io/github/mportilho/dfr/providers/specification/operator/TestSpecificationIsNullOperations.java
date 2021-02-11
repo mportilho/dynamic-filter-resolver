@@ -22,6 +22,7 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.providers.specification.operator;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -79,7 +80,7 @@ public class TestSpecificationIsNullOperations {
 		when(builder.upper(any())).thenReturn(path);
 
 		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, IsNull.class, false, false,
-				new String[] { "TestValue" }, null);
+				new String[] { "true" }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
@@ -98,12 +99,12 @@ public class TestSpecificationIsNullOperations {
 		when(builder.upper(any())).thenReturn(path);
 
 		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, IsNull.class, false, true,
-				new String[] { "TestValue" }, null);
+				new String[] { "false" }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
 
-		verify(builder, times(1)).isNull(any(Expression.class));
+		verify(builder, times(1)).isNotNull(any(Expression.class));
 	}
 
 	@Test
@@ -117,12 +118,12 @@ public class TestSpecificationIsNullOperations {
 		when(builder.upper(any())).thenReturn(path);
 
 		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, BigDecimal.class, IsNull.class, false, false,
-				new BigDecimal[] { BigDecimal.ONE }, null);
+				new String[] { "false" }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
 
-		verify(builder, times(1)).isNull(any(Expression.class));
+		verify(builder, times(1)).isNotNull(any(Expression.class));
 	}
 
 	@Test
@@ -136,12 +137,32 @@ public class TestSpecificationIsNullOperations {
 		when(builder.upper(any())).thenReturn(path);
 
 		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, BigDecimal.class, IsNull.class, false, true,
-				new BigDecimal[] { BigDecimal.ONE }, null);
+				new String[] { "true" }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
 
 		verify(builder, times(1)).isNull(any(Expression.class));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void test_IsNullOperation_OnNumber_Throwing_NoValues() {
+		SpecIsNull<Person> specOp = new SpecIsNull<>();
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(BigDecimal.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, BigDecimal.class, IsNull.class, false, false,
+				new String[] { null }, null);
+
+		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
+
+		assertThatThrownBy(() -> specification.toPredicate(root, query, builder)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("A boolean value must be provided to resolve the 'IsNull' operation");
+		verify(builder, times(0)).isNull(any(Expression.class));
 	}
 
 }

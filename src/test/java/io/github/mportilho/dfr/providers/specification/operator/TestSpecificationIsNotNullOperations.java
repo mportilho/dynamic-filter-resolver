@@ -22,6 +22,7 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.providers.specification.operator;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -48,6 +49,7 @@ import io.github.mportilho.apps.apptest.domain.model.Person;
 import io.github.mportilho.dfr.core.converter.DefaultFilterValueConverter;
 import io.github.mportilho.dfr.core.filter.FilterParameter;
 import io.github.mportilho.dfr.core.operator.type.IsNotNull;
+import io.github.mportilho.dfr.core.operator.type.IsNull;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -79,7 +81,7 @@ public class TestSpecificationIsNotNullOperations {
 		when(builder.upper(any())).thenReturn(path);
 
 		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, IsNotNull.class, false, false,
-				new String[] { "TestValue" }, null);
+				new String[] { "true" }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
@@ -98,12 +100,12 @@ public class TestSpecificationIsNotNullOperations {
 		when(builder.upper(any())).thenReturn(path);
 
 		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, IsNotNull.class, false, true,
-				new String[] { "TestValue" }, null);
+				new String[] { "false" }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
 
-		verify(builder, times(1)).isNotNull(any(Expression.class));
+		verify(builder, times(1)).isNull(any(Expression.class));
 	}
 
 	@Test
@@ -117,7 +119,7 @@ public class TestSpecificationIsNotNullOperations {
 		when(builder.upper(any())).thenReturn(path);
 
 		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, BigDecimal.class, IsNotNull.class, false,
-				false, new BigDecimal[] { BigDecimal.ONE }, null);
+				false, new String[] { "true" }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
@@ -136,12 +138,32 @@ public class TestSpecificationIsNotNullOperations {
 		when(builder.upper(any())).thenReturn(path);
 
 		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, BigDecimal.class, IsNotNull.class, false, true,
-				new BigDecimal[] { BigDecimal.ONE }, null);
+				new String[] { "false" }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
 
-		verify(builder, times(1)).isNotNull(any(Expression.class));
+		verify(builder, times(1)).isNull(any(Expression.class));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void test_IsNullOperation_OnNumber_Throwing_NoValues() {
+		SpecIsNotNull<Person> specOp = new SpecIsNotNull<>();
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(BigDecimal.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, BigDecimal.class, IsNull.class, false, false,
+				new String[] { null }, null);
+
+		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
+
+		assertThatThrownBy(() -> specification.toPredicate(root, query, builder)).isInstanceOf(IllegalArgumentException.class)
+				.hasMessage("A boolean value must be provided to resolve the 'IsNotNull' operation");
+		verify(builder, times(0)).isNull(any(Expression.class));
 	}
 
 }

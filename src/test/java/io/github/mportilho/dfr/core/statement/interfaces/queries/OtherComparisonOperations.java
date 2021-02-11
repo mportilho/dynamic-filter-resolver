@@ -30,10 +30,11 @@ import io.github.mportilho.dfr.core.operator.type.IsNotNull;
 import io.github.mportilho.dfr.core.operator.type.IsNull;
 
 @Conjunction(value = { 
-		@Filter(path = "addresses.number", parameters = "houseNumber", operator = IsNull.class),
-		@Filter(path = "name", parameters = "clientName", operator = IsNotNull.class),
+		@Filter(path = "addresses.number", parameters = "houseNumber", operator = IsNull.class, defaultValues = "true"),
+		@Filter(path = "name", parameters = "clientName", operator = IsNotNull.class, defaultValues = "true"),
 		@Filter(path = "height", parameters = "height", operator = IsIn.class, defaultValues = { "170", "180", "190" }),
-		@Filter(path = "addresses.number", parameters = "houseNumber", operator = IsNotIn.class, defaultValues = { "1010", "1020", "1030" }) 
+		@Filter(path = "addresses.number", parameters = "houseNumber", operator = IsNotIn.class, defaultValues = { "1010", "1020", "1030" }),
+		@Filter(path = "weight", parameters = "weight", operator = IsNotNull.class)
 	}
 )
 public interface OtherComparisonOperations {
