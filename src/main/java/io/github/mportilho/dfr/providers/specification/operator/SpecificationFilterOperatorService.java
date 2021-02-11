@@ -30,6 +30,7 @@ import org.springframework.data.jpa.domain.Specification;
 import io.github.mportilho.dfr.core.operator.FilterOperator;
 import io.github.mportilho.dfr.core.operator.FilterOperatorService;
 import io.github.mportilho.dfr.core.operator.type.Between;
+import io.github.mportilho.dfr.core.operator.type.Dynamic;
 import io.github.mportilho.dfr.core.operator.type.EndsWith;
 import io.github.mportilho.dfr.core.operator.type.Equals;
 import io.github.mportilho.dfr.core.operator.type.Greater;
@@ -61,6 +62,7 @@ public class SpecificationFilterOperatorService implements FilterOperatorService
 	public SpecificationFilterOperatorService() {
 		operators = new HashMap<>();
 		operators.put(Between.class, new SpecBetween());
+		operators.put(Dynamic.class, new SpecDynamic(this));
 		operators.put(EndsWith.class, new SpecEndsWith());
 		operators.put(Equals.class, new SpecEquals());
 		operators.put(Greater.class, new SpecGreater());
@@ -72,7 +74,7 @@ public class SpecificationFilterOperatorService implements FilterOperatorService
 		operators.put(LessOrEquals.class, new SpecLessOrEquals());
 		operators.put(Like.class, new SpecLike());
 		operators.put(NotEquals.class, new SpecNotEquals());
-		operators.put(IsNotIn.class, new SpecIsNotIn());
+		operators.put(IsNotIn.class, new SpecIsNotIn((SpecIsIn) operators.get(IsIn.class)));
 		operators.put(NotLike.class, new SpecNotLike());
 		operators.put(StartsWith.class, new SpecStartsWith());
 	}

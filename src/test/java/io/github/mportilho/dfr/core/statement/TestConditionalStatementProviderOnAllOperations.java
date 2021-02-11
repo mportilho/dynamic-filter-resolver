@@ -23,7 +23,6 @@ SOFTWARE.*/
 package io.github.mportilho.dfr.core.statement;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +54,6 @@ public class TestConditionalStatementProviderOnAllOperations {
 		assertThat(param).isNotNull();
 		assertThat(param.getParameters()).isNotEmpty().hasSize(2).containsExactlyInAnyOrder("startDate", "endDate");
 		assertThat(param.getValues()).isNotEmpty().hasSize(2).containsExactlyInAnyOrder("01/01/1980", "01/01/2000");
-		assertThatThrownBy(() -> param.findValue()).isInstanceOf(IllegalStateException.class);
 	}
 
 	@Test

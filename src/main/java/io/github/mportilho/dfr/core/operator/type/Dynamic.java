@@ -20,40 +20,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.providers.specification.operator;
+package io.github.mportilho.dfr.core.operator.type;
 
-import org.springframework.data.jpa.domain.Specification;
-
-import io.github.mportilho.dfr.core.converter.FilterValueConverter;
-import io.github.mportilho.dfr.core.filter.FilterParameter;
-import io.github.mportilho.dfr.core.operator.type.IsNotIn;
+import io.github.mportilho.dfr.core.operator.ComparisonOperator;
+import io.github.mportilho.dfr.core.operator.FilterOperator;
 
 /**
- * Implementation of {@link IsNotIn} for the Spring Data JPA's
- * {@link Specification} interface
+ * Represents a dynamic comparison operation. It must be receive two parameters,
+ * the comparison value and the {@link ComparisonOperator} value
  * 
  * @author Marcelo Portilho
  *
  * @param <T>
  */
-class SpecIsNotIn<T> implements IsNotIn<Specification<T>> {
-
-	@SuppressWarnings("rawtypes")
-	private final SpecIsIn isInOperator;
-
-	@SuppressWarnings("rawtypes")
-	public SpecIsNotIn(SpecIsIn isInOperator) {
-		super();
-		this.isInOperator = isInOperator;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
-		return Specification.not(isInOperator.createFilter(filterParameter, filterValueConverter));
-	}
+public interface Dynamic<T> extends FilterOperator<T> {
 
 }

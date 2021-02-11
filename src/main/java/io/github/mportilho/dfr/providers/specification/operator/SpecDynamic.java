@@ -22,38 +22,43 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.providers.specification.operator;
 
+import java.util.Objects;
+
 import org.springframework.data.jpa.domain.Specification;
 
 import io.github.mportilho.dfr.core.converter.FilterValueConverter;
 import io.github.mportilho.dfr.core.filter.FilterParameter;
-import io.github.mportilho.dfr.core.operator.type.IsNotIn;
+import io.github.mportilho.dfr.core.operator.ComparisonOperator;
+import io.github.mportilho.dfr.core.operator.FilterOperator;
+import io.github.mportilho.dfr.core.operator.type.Dynamic;
 
 /**
- * Implementation of {@link IsNotIn} for the Spring Data JPA's
- * {@link Specification} interface
+ * The implementation of {@link Dynamic} operator for Spring Data JPA's
+ * {@link Specification}
  * 
  * @author Marcelo Portilho
  *
  * @param <T>
  */
-class SpecIsNotIn<T> implements IsNotIn<Specification<T>> {
+class SpecDynamic<T> implements Dynamic<Specification<T>> {
 
-	@SuppressWarnings("rawtypes")
-	private final SpecIsIn isInOperator;
+	private SpecificationFilterOperatorService operatorService;
 
-	@SuppressWarnings("rawtypes")
-	public SpecIsNotIn(SpecIsIn isInOperator) {
-		super();
-		this.isInOperator = isInOperator;
+	public SpecDynamic(SpecificationFilterOperatorService operatorService) {
+		this.operatorService = Objects.requireNonNull(operatorService, "A filter operator service is required");
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked" })
 	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
-		return Specification.not(isInOperator.createFilter(filterParameter, filterValueConverter));
+		Object[] rawValues = filterParameter.getValues();
+		if (rawValues == null || rawValues.length < 2) {
+			throw new IllegalArgumentException(
+					"Wrong number of values for dynamic operator. The value array must contain the filtering value and the corresponding operator");
+		}
+		ComparisonOperator comparisonOperator = ComparisonOperator.valueOf(String.valueOf(rawValues[1]).toUpperCase());
+		FilterOperator<Specification<?>> filterOperator = operatorService.getOperatorFor(comparisonOperator.getOperator());
+		return (Specification<T>) filterOperator.createFilter(filterParameter, filterValueConverter);
 	}
 
 }

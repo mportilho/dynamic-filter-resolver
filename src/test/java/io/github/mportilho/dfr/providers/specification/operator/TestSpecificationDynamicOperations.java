@@ -16,14 +16,17 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARIsNotInG FROM,
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
 package io.github.mportilho.dfr.providers.specification.operator;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,6 +35,7 @@ import java.math.BigDecimal;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 
@@ -46,11 +50,11 @@ import org.springframework.data.jpa.domain.Specification;
 import io.github.mportilho.apps.apptest.domain.model.Person;
 import io.github.mportilho.dfr.core.converter.DefaultFilterValueConverter;
 import io.github.mportilho.dfr.core.filter.FilterParameter;
-import io.github.mportilho.dfr.core.operator.type.IsNotIn;
+import io.github.mportilho.dfr.core.operator.type.EndsWith;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class TestSpecificationIsNotInOperations {
+public class TestSpecificationDynamicOperations {
 
 	@Mock
 	private CriteriaBuilder builder;
@@ -69,78 +73,91 @@ public class TestSpecificationIsNotInOperations {
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void test_NotInOperation_OnString() {
-		SpecIsNotIn<Person> specOp = new SpecIsNotIn<>(new SpecIsIn<>());
+	public void testDynamic_Like_IgnoresCase_Operation() {
+		SpecDynamic<Person> specOp = new SpecDynamic<>(new SpecificationFilterOperatorService());
 
 		when(root.getJavaType()).thenReturn(Person.class);
 		when(root.get(anyString())).thenReturn(path);
 		when(path.getJavaType()).thenReturn(String.class);
 		when(builder.upper(any())).thenReturn(path);
 
-		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, IsNotIn.class, false, false,
-				new String[] { "v1", "v2", "v3" }, null);
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, EndsWith.class, false, true,
+				new String[] { "TestValue", "lk" }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
 
-		verify(path, times(1)).in("v1", "v2", "v3");
+		verify(builder, times(1)).like(any(Expression.class), (String) argThat(x -> x.toString().equals("%TESTVALUE%")));
 	}
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void test_NotInOperation_OnString_IgnoringCase() {
-		SpecIsNotIn<Person> specOp = new SpecIsNotIn<>(new SpecIsIn<>());
+	public void testDynamic_Equals_Operation() {
+		SpecDynamic<Person> specOp = new SpecDynamic<>(new SpecificationFilterOperatorService());
 
 		when(root.getJavaType()).thenReturn(Person.class);
 		when(root.get(anyString())).thenReturn(path);
 		when(path.getJavaType()).thenReturn(String.class);
 		when(builder.upper(any())).thenReturn(path);
 
-		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, IsNotIn.class, false, true,
-				new String[] { "v1", "v2", "v3" }, null);
+		FilterParameter filterParameter = new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, EndsWith.class, false,
+				false, new Object[] { BigDecimal.ZERO, "ne" }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
 
-		verify(path, times(1)).in("V1", "V2", "V3");
+		verify(builder, times(1)).notEqual(any(Expression.class), eq(BigDecimal.ZERO));
 	}
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void test_NotInOperation_OnNumber() {
-		SpecIsNotIn<Person> specOp = new SpecIsNotIn<>(new SpecIsIn<>());
+	public void testDynamic_Invalid_Operation_Throwing() {
+		SpecDynamic<Person> specOp = new SpecDynamic<>(new SpecificationFilterOperatorService());
 
 		when(root.getJavaType()).thenReturn(Person.class);
 		when(root.get(anyString())).thenReturn(path);
-		when(path.getJavaType()).thenReturn(BigDecimal.class);
+		when(path.getJavaType()).thenReturn(String.class);
 		when(builder.upper(any())).thenReturn(path);
 
-		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, BigDecimal.class, IsNotIn.class, false, false,
-				new BigDecimal[] { BigDecimal.ZERO, BigDecimal.ONE }, null);
+		FilterParameter filterParameter = new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, EndsWith.class, false,
+				false, new Object[] { BigDecimal.ZERO, "inv" }, null);
 
-		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
-		specification.toPredicate(root, query, builder);
-
-		verify(path, times(1)).in(BigDecimal.ZERO, BigDecimal.ONE);
+		assertThatThrownBy(() -> specOp.createFilter(filterParameter, new DefaultFilterValueConverter()))
+				.isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test
 	@SuppressWarnings("unchecked")
-	public void test_NotInOperation_OnNumber_IngoringCase() {
-		SpecIsNotIn<Person> specOp = new SpecIsNotIn<>(new SpecIsIn<>());
+	public void testDynamic_NotEnoughValues_Operation_Throwing() {
+		SpecDynamic<Person> specOp = new SpecDynamic<>(new SpecificationFilterOperatorService());
 
 		when(root.getJavaType()).thenReturn(Person.class);
 		when(root.get(anyString())).thenReturn(path);
-		when(path.getJavaType()).thenReturn(BigDecimal.class);
+		when(path.getJavaType()).thenReturn(String.class);
 		when(builder.upper(any())).thenReturn(path);
 
-		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, BigDecimal.class, IsNotIn.class, false, true,
-				new BigDecimal[] { BigDecimal.ZERO, BigDecimal.ONE }, null);
+		FilterParameter filterParameter = new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, EndsWith.class, false,
+				false, new Object[] { BigDecimal.ZERO }, null);
 
-		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
-		specification.toPredicate(root, query, builder);
+		assertThatThrownBy(() -> specOp.createFilter(filterParameter, new DefaultFilterValueConverter())).isInstanceOf(IllegalArgumentException.class)
+				.hasMessageStartingWith("Wrong number of values for dynamic operator");
+	}
 
-		verify(path, times(1)).in(BigDecimal.ZERO, BigDecimal.ONE);
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testDynamic_NullValue_Operation_Throwing() {
+		SpecDynamic<Person> specOp = new SpecDynamic<>(new SpecificationFilterOperatorService());
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(String.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, EndsWith.class, false,
+				false, new Object[] { null }, null);
+
+		assertThatThrownBy(() -> specOp.createFilter(filterParameter, new DefaultFilterValueConverter())).isInstanceOf(IllegalArgumentException.class)
+				.hasMessageStartingWith("Wrong number of values for dynamic operator");
 	}
 
 }

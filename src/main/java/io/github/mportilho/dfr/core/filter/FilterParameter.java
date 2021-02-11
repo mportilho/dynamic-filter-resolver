@@ -197,15 +197,12 @@ public class FilterParameter {
 	}
 
 	/**
-	 * @return the parameter's value if there's only one provided or null if none is
-	 *         found.
-	 * @throws IllegalStateException if more the one value are present
+	 * @return the parameter's value if there's one provided from the first array
+	 *         position. Returns null if none is found.
 	 */
 	public Object findValue() {
 		if (values == null || values.length == 0) {
 			return null;
-		} else if (values.length > 1) {
-			throw new IllegalStateException("Cannot get single value because multiple values are present");
 		}
 		return values[0];
 	}
