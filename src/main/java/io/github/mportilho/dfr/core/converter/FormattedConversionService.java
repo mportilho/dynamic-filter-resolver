@@ -35,19 +35,19 @@ public interface FormattedConversionService {
 	/**
 	 * Indicates if this conversion service can convert a sourceType to a targetType
 	 * 
-	 * @param sourceType
-	 * @param targetType
-	 * @return
+	 * @param sourceType The source's class to be converted from
+	 * @param targetType The source's target class to be converted to
+	 * @return an indication if there's a converter for the provided types
 	 */
 	boolean canConvert(Class<?> sourceType, Class<?> targetType);
 
 	/**
 	 * Converts an object to a target type
 	 * 
-	 * @param <T>
-	 * @param source
-	 * @param targetType
-	 * @return
+	 * @param <T>        The source's target type to be converted to
+	 * @param source     The value to be converted
+	 * @param targetType The source's target type to be converted to
+	 * @return The converted object
 	 */
 	<T> T convert(Object source, Class<T> targetType);
 

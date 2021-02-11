@@ -33,7 +33,7 @@ import io.github.mportilho.dfr.core.statement.ConditionalStatement;
  * 
  * @author Marcelo Portilho
  *
- * @param <T>
+ * @param <T> Return type of the target query object for this dynamic filter
  */
 public interface DynamicFilterResolver<T> {
 
@@ -41,13 +41,15 @@ public interface DynamicFilterResolver<T> {
 	 * Converts the conditional statement to a target framework's query structure
 	 * object
 	 * 
-	 * @param <R>
-	 * @param <K>
-	 * @param <V>
-	 * @param conditionalStatement the conditional statement to be converted
-	 * @param context              an optional context map containing additional
-	 *                             data for assisting the conversion
-	 * @return
+	 * @param <R>                  Return type of the target query object for this
+	 *                             dynamic filter
+	 * @param <K>                  Map key type
+	 * @param <V>                  Map value type
+	 * @param conditionalStatement Conditional statement representation for
+	 *                             conversion
+	 * @param context              Context map containing helping data for statement
+	 *                             conversion
+	 * @return The query object created from this dynamic filter resolver
 	 */
 	<R extends T, K, V> R convertTo(ConditionalStatement conditionalStatement, Map<K, V> context);
 
@@ -55,9 +57,10 @@ public interface DynamicFilterResolver<T> {
 	 * Converts the conditional statement to a target framework's query structure
 	 * object, without additional context
 	 * 
-	 * @param <R>
-	 * @param conditionalStatement
-	 * @return
+	 * @param <R>                  Return type
+	 * @param conditionalStatement Conditional statement representation for
+	 *                             conversion
+	 * @return The query object created from this dynamic filter resolver
 	 */
 	default <R extends T> R convertTo(ConditionalStatement conditionalStatement) {
 		return convertTo(conditionalStatement, null);
@@ -66,12 +69,13 @@ public interface DynamicFilterResolver<T> {
 	/**
 	 * A method that can be overridden to decorate the resulting converted object
 	 * 
-	 * @param <R>
-	 * @param <K>
-	 * @param <V>
-	 * @param response
-	 * @param context
-	 * @return
+	 * @param <R>      Return type of the target query object for this dynamic
+	 *                 filter
+	 * @param <K>      Map key type
+	 * @param <V>      Map value type
+	 * @param response The resulting query object created from this dynamic filter
+	 * @param context  Context map containing helping data for statement conversion
+	 * @return The decorated query object
 	 */
 	default <R extends T, K, V> R responseDecorator(R response, Map<K, V> context) {
 		return response;

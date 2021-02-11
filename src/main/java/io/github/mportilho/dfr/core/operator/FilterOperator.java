@@ -33,27 +33,30 @@ import io.github.mportilho.dfr.core.filter.FilterParameter;
  * 
  * @author Marcelo Portilho
  *
- * @param <T>
+ * @param <T> Return type of the query object created from this dynamic filter
+ *            resolver
  */
 public interface FilterOperator<T> {
 
 	/**
 	 * Creates a filtering operation for the provided parameter
 	 * 
-	 * @param filterParameter
-	 * @param filterValueConverter
-	 * @return
+	 * @param filterParameter      The representation of a query filter
+	 * @param filterValueConverter Convert filter values to the target attribute's
+	 *                             type
+	 * @return The resulting query object created from the {@link FilterParameter}
 	 */
 	T createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter);
 
 	/**
 	 * Helps applying transformation logic on non null values
 	 * 
-	 * @param <P>
-	 * @param <R>
-	 * @param value
-	 * @param function
-	 * @return
+	 * @param <P>      The source object's type
+	 * @param <R>      The converted object's type
+	 * @param value    The source value to be transformed
+	 * @param function The transformation function
+	 * @return The transformed object from the provided function, or null if source
+	 *         object is null
 	 */
 	default <P, R> R transformNonNull(P value, Function<P, R> function) {
 		if (value != null) {

@@ -45,12 +45,15 @@ public interface ConditionalStatementProvider {
 	 * Creates {@link ConditionalStatement} representations from types and
 	 * annotations
 	 * 
-	 * @param <K>
-	 * @param <V>
-	 * @param parameterInterface
-	 * @param parameterAnnotations
-	 * @param parametersMap
-	 * @return
+	 * @param <K>                  Map key type
+	 * @param <V>                  Map value type
+	 * @param parameterInterface   Class from which filter configuration will be
+	 *                             extracted
+	 * @param parameterAnnotations Annotations from which filter configuration will
+	 *                             be extracted
+	 * @param parametersMap        Map containing provided values for filter
+	 *                             operations
+	 * @return Conditional statement representation
 	 */
 	<K, V> ConditionalStatement createConditionalStatements(Class<?> parameterInterface, Annotation[] parameterAnnotations,
 			Map<K, V[]> parametersMap);
@@ -59,20 +62,18 @@ public interface ConditionalStatementProvider {
 	 * Decorator for each {@link FilterParameter} instance created for the
 	 * statements
 	 * 
-	 * @param <K>
-	 * @param <V>
-	 * @param filterParameter
-	 * @param parametersMap
-	 * @return
+	 * @param <K>             Map key type
+	 * @param <V>             Map value type
+	 * @param filterParameter The filter parameter to be decorated
+	 * @param parametersMap   Map containing provided values for filter operations
+	 * @return The decorated filter parameter
 	 */
 	default <K, V> FilterParameter decorateFilterParameter(FilterParameter filterParameter, Map<K, V[]> parametersMap) {
 		return filterParameter;
 	}
 
 	/**
-	 * 
-	 * 
-	 * @param clazz
+	 * @param clazz A {@link FilterOperator} to be checked for null acceptance
 	 * @return An indication if a {@link FilterOperator} accepts null when creating
 	 *         a filter parameter for this {@link ConditionalStatementProvider}
 	 *         implementation. Normally, parameters a not created if there's no

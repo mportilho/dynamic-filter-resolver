@@ -48,86 +48,76 @@ public @interface Filter {
 	 * For example: In a controller, the developer can reference to the DTO class
 	 * and it's properties with <code>attributePath</code> and indicate the target
 	 * JPA entity's attribute with <code>path</code>.
+	 * 
+	 * @return Optional path for another type's attribute
 	 */
 	String attributePath() default "";
 
 	/**
-	 * Name or path to the required attribute
-	 * 
-	 * <p>
 	 * <b>Path</b> is the notation which the target attribute can be found from a
 	 * specified root attribute, like <code>Person.addresses.streetName</code>
+	 * 
+	 * @return Name or path to the required attribute
 	 * 
 	 */
 	String path();
 
 	/**
-	 * Parameters needed to be supplied by the caller, exposed as input data
-	 * requirements
+	 * @return Parameters needed to be supplied by the caller, exposed as input data
+	 *         requirements
 	 */
 	String[] parameters();
 
 	/**
-	 * Target attribute type for convertion
+	 * @return Target attribute type for convertion
 	 */
 	Class<?> targetType() default Object.class;
 
 	/**
-	 * Operation to be used as a query filter
+	 * @return Operation to be used as a query filter
 	 */
 	@SuppressWarnings("rawtypes")
 	Class<? extends FilterOperator> operator();
 
 	/**
-	 * Indicates that the logic of this filter must be negated.
-	 * 
-	 * <table>
-	 * <tr>
-	 * <th>Normal Logic</th>
-	 * <th>Negated Logic</th>
-	 * </tr>
-	 * <tr>
-	 * <th>A & B</th>
-	 * <th>!(A & B)</th>
-	 * </tr>
-	 * </table>
+	 * Indicates that the logic of this filter must be negated. Can be parsed by the
+	 * Spring Expression Language
 	 * 
 	 * <p>
-	 * Can be parsed by the Spring Expression Language
+	 * Normal Logic: <b>A &amp; B</b>
+	 * 
+	 * <p>
+	 * Negated Logic: <b>!(A &amp; B)</b>
+	 * 
+	 * @return Indication if resulting clause must have it's result negated
 	 */
 	String negate() default "false";
 
 	/**
-	 * If the comparison attribute type is a {@link String}, tries to ignore case
-	 * while processing the dynamic filter
+	 * @return Indication to try to ignore case while processing the dynamic filter
+	 *         if the comparison attribute type is a {@link String}
 	 */
 	boolean ignoreCase() default false;
 
 	/**
-	 * Default values for each parameter, each at the same position as
-	 * <code>parameters</code>
-	 * 
-	 * <p>
-	 * Can be parsed by the Spring Expression Language
+	 * @return Default values for each parameter, each at the same position as
+	 *         <code>parameters</code>. Can be parsed by the Spring Expression
+	 *         Language
 	 */
 	String[] defaultValues() default {};
 
 	/**
-	 * Constant values for each parameter. If this field has any value, the
-	 * corresponding filter must not be requested from the user, as it will be used
-	 * only internally
-	 * 
-	 * <p>
-	 * Can be parsed by the Spring Expression Language
+	 * @return Constant values for each parameter. If this field has any value, the
+	 *         corresponding filter must not be requested from the user, as it will
+	 *         be used only internally. Can be parsed by the Spring Expression
+	 *         Language
 	 */
 	String[] constantValues() default {};
 
 	/**
-	 * Optional format pattern to assist data conversion for the corresponding path
-	 * type.
-	 * 
-	 * <p>
-	 * Can be parsed by the Spring Expression Language
+	 * @return Optional format pattern to assist data conversion for the
+	 *         corresponding path type. Can be parsed by the Spring Expression
+	 *         Language
 	 */
 	String format() default "";
 

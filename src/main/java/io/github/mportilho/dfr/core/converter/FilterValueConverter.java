@@ -35,10 +35,10 @@ public interface FilterValueConverter {
 	/**
 	 * Convert the value provided as parameter to an expected class
 	 * 
-	 * @param <R>
-	 * @param value
-	 * @param expectedClass
-	 * @param format
+	 * @param <R>          Return type
+	 * @param value        Value to be converted
+	 * @param expectedType Target class for value to be converted
+	 * @param format       An optional formatter for conversion
 	 * @return The converted value to an expected type. Returns null if parameter
 	 *         value is null.
 	 */

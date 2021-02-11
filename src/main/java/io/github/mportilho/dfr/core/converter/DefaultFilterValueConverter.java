@@ -93,8 +93,8 @@ public class DefaultFilterValueConverter implements FilterValueConverter {
 	/**
 	 * Convert values to the target {@link Class}
 	 * 
-	 * @param value
-	 * @param targetClass
+	 * @param value       Value to be converted
+	 * @param targetClass Target class for value to be converted
 	 * @return The converted value if a converter was found, null is a converter was
 	 *         not found or <code>null</code> if value parameter
 	 */

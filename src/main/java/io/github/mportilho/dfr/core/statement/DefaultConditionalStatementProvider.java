@@ -64,12 +64,7 @@ public class DefaultConditionalStatementProvider implements ConditionalStatement
 	}
 
 	/**
-	 * 
-	 * @param <P>
-	 * @param parameterInterface
-	 * @param parameterAnnotations
-	 * @param parametersMap
-	 * @return
+	 * {@inheritDoc}
 	 */
 	@Override
 	public <K, V> ConditionalStatement createConditionalStatements(Class<?> parameterInterface, Annotation[] parameterAnnotations,
@@ -100,10 +95,13 @@ public class DefaultConditionalStatementProvider implements ConditionalStatement
 
 	/**
 	 * 
-	 * @param <P>
-	 * @param parameterInterface
-	 * @param parametersMap
-	 * @return
+	 * @param <K>                Map key type
+	 * @param <V>                Map value type
+	 * @param parameterInterface Class from which filter configuration will be
+	 *                           extracted
+	 * @param parametersMap      Map containing provided values for filter
+	 *                           operations
+	 * @return A new {@link ConditionalStatement}
 	 */
 	private <K, V> ConditionalStatement createConditionalStatementsFromParameterInterface(Class<?> parameterInterface, Map<K, V[]> parametersMap) {
 		List<ConditionalStatement> statements = new ArrayList<>();
@@ -132,10 +130,13 @@ public class DefaultConditionalStatementProvider implements ConditionalStatement
 
 	/**
 	 * 
-	 * @param <P>
-	 * @param parameterAnnotations
-	 * @param parametersMap
-	 * @return
+	 * @param <K>                  Map key type
+	 * @param <V>                  Map value type
+	 * @param parameterAnnotations Annotations from which filter configuration will
+	 *                             be extracted
+	 * @param parametersMap        Map containing provided values for filter
+	 *                             operations
+	 * @return A new {@link ConditionalStatement}
 	 */
 	private <K, V> ConditionalStatement createConditionalStatementsFromAnnotations(Annotation parameterAnnotation, Map<K, V[]> parametersMap) {
 		if (parameterAnnotation == null) {
@@ -186,9 +187,11 @@ public class DefaultConditionalStatementProvider implements ConditionalStatement
 
 	/**
 	 * 
-	 * @param filters
-	 * @param parametersMap
-	 * @return
+	 * @param <K>           Map key type
+	 * @param <V>           Map value type
+	 * @param filters       Data for creating {@link FilterParameter}
+	 * @param parametersMap Map containing provided values for filter operations
+	 * @return A new list of {@link FilterParameter}
 	 */
 	private final <K, V> List<FilterParameter> createFilterParameters(Filter[] filters, Map<K, V[]> parametersMap) {
 		if (filters == null || filters.length == 0) {

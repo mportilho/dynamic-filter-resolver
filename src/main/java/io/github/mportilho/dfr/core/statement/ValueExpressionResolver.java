@@ -38,8 +38,8 @@ public interface ValueExpressionResolver {
 	/**
 	 * Resolves an expression to a dynamic value
 	 * 
-	 * @param value
-	 * @return
+	 * @param value The source String value
+	 * @return The resolved value from the source
 	 */
 	String resolveStringValue(String value);
 

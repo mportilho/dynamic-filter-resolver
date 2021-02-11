@@ -38,7 +38,8 @@ import io.github.mportilho.dfr.core.statement.LogicType;
  * 
  * @author Marcelo Portilho
  *
- * @param <T>
+ * @param <T> Return type of the query object created from this dynamic filter
+ *            resolver
  */
 public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterResolver<T> {
 
@@ -54,23 +55,26 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 	 * Provides the default object for when there's no conditional statement to
 	 * convert
 	 * 
-	 * @param <R>
-	 * @param <K>
-	 * @param <V>
-	 * @param context
-	 * @return
+	 * @param <R>     Return type of the target query object for this dynamic filter
+	 * @param <K>     Map key type
+	 * @param <V>     Map value type
+	 * @param context Context map containing helping data for statement conversion
+	 * @return An empty representation of the query object. Can be null
 	 */
 	public abstract <R extends T, K, V> R emptyPredicate(Map<K, V> context);
 
 	/**
 	 * Converts a single statement to the desired object representation
 	 * 
-	 * @param <R>
-	 * @param <K>
-	 * @param <V>
-	 * @param conditionalStatement
-	 * @param context
-	 * @return
+	 * @param <R>                  Return type of the target query object for this
+	 *                             dynamic filter
+	 * @param <K>                  Map key type
+	 * @param <V>                  Map value type
+	 * @param conditionalStatement Conditional statement representation for
+	 *                             conversion
+	 * @param context              Context map containing helping data for statement
+	 *                             conversion
+	 * @return The query object created from this dynamic filter resolver
 	 */
 	public abstract <R extends T, K, V> R createPredicateFromStatement(ConditionalStatement conditionalStatement, Map<K, V> context);
 
@@ -78,14 +82,19 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 	 * Compose, when necessary, a converted statement and it's raw sub-statements to
 	 * a new object representation
 	 * 
-	 * @param <R>
-	 * @param <K>
-	 * @param <V>
-	 * @param logicType
-	 * @param predicate
-	 * @param subStatementPredicates
-	 * @param context
-	 * @return
+	 * @param <R>                    Return type of the target query object for this
+	 *                               dynamic filter
+	 * @param <K>                    Map key type
+	 * @param <V>                    Map value type
+	 * @param logicType              The logic type to be used for creating the
+	 *                               query object
+	 * @param predicate              The query object created from the statement's
+	 *                               clauses
+	 * @param subStatementPredicates The sub-statements related to the current
+	 *                               statement being converted
+	 * @param context                Context map containing helping data for
+	 *                               statement conversion
+	 * @return The query object created from this dynamic filter resolver
 	 */
 	public abstract <R extends T, K, V> R composePredicatesFromSubStatements(LogicType logicType, R predicate, List<R> subStatementPredicates,
 			Map<K, V> context);
@@ -104,12 +113,15 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 	/**
 	 * Assists on navigation through the conditional statement's graph
 	 * 
-	 * @param <R>
-	 * @param <K>
-	 * @param <V>
-	 * @param conditionalStatement
-	 * @param context
-	 * @return
+	 * @param <R>                  Return type of the target query object for this
+	 *                             dynamic filter
+	 * @param <K>                  Map key type
+	 * @param <V>                  Map value type
+	 * @param conditionalStatement Conditional statement representation for
+	 *                             conversion
+	 * @param context              Context map containing helping data for statement
+	 *                             conversion
+	 * @return The query object created from this dynamic filter resolver
 	 */
 	private final <R extends T, K, V> R convertRecursively(ConditionalStatement conditionalStatement, Map<K, V> context) {
 		if (conditionalStatement == null || !conditionalStatement.hasAnyCondition()) {
@@ -125,7 +137,8 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
 	}
 
 	/**
-	 * @param <R>
+	 * @param <R> Return type of the query object created from this dynamic filter
+	 *            resolver
 	 * @return the instance responsible to apply the filter logic operation to a
 	 *         statement's clause
 	 */

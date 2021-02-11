@@ -29,7 +29,8 @@ import io.github.mportilho.dfr.core.operator.FilterOperator;
  * 
  * @author Marcelo Portilho
  *
- * @param <T>
+ * @param <T> Return type of the query object created from this dynamic filter
+ *            resolver
  */
 public interface IsNull<T> extends FilterOperator<T> {
 

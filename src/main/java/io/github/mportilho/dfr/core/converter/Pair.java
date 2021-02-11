@@ -29,8 +29,8 @@ import java.util.Objects;
  * 
  * @author Marcelo Portilho
  *
- * @param <L>
- * @param <R>
+ * @param <L> The type of the left object
+ * @param <R> The type of the right object
  */
 class Pair<L, R> {
 
@@ -45,11 +45,11 @@ class Pair<L, R> {
 	/**
 	 * Creats a new pair
 	 * 
-	 * @param <L>
-	 * @param <R>
-	 * @param left
-	 * @param right
-	 * @return
+	 * @param <L>   The type of the left object
+	 * @param <R>   The type of the right object
+	 * @param left  The value for the left position
+	 * @param right The value for the right position
+	 * @return A new Pair object with the provided values
 	 */
 	public static final <L, R> Pair<L, R> of(L left, R right) {
 		return new Pair<L, R>(left, right);
@@ -58,9 +58,9 @@ class Pair<L, R> {
 	/**
 	 * Returns an empty pair, initialized with null values
 	 * 
-	 * @param <L>
-	 * @param <R>
-	 * @return
+	 * @param <L> The type of the left object
+	 * @param <R> The type of the right object
+	 * @return An empty Pair object
 	 */
 	public static final <L, R> Pair<L, R> empty() {
 		return new Pair<L, R>(null, null);

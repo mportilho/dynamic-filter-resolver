@@ -28,12 +28,13 @@ package io.github.mportilho.dfr.core.operator;
  * 
  * @author Marcelo Portilho
  *
- * @param <T>
+ * @param <T> Return type of the query object created from this dynamic filter
+ *            resolver
  */
 public interface FilterOperatorService<T> {
 
 	/**
-	 * @param <R>
+	 * @param <R>      The current {@link FilterOperator} type implementation
 	 * @param operator the {@link FilterOperator} class used to query a specific
 	 *                 implementation
 	 * @return the implementation of a requested {@link FilterOperator}

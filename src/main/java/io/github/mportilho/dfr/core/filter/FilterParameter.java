@@ -171,10 +171,10 @@ public class FilterParameter {
 	}
 
 	/**
-	 * @param <V>
-	 * @param key
-	 * @return the value of the mutable parameter's state, indexed the be key
-	 *         parameter
+	 * @param <V> Return type of the indexed context value
+	 * @param key The index of the context value
+	 * @return the value of the mutable filter parameter's state, indexed by the
+	 *         provided key
 	 */
 	@SuppressWarnings("unchecked")
 	public <V> V findState(Object key) {
@@ -183,11 +183,11 @@ public class FilterParameter {
 
 	/**
 	 * 
-	 * @param <V>
-	 * @param key
-	 * @param defaultValue
-	 * @return the value of the mutable parameter's state, indexed the be key
-	 *         parameter. When no value is found, returns the default parameter's
+	 * @param <V>          Return type of the indexed context value
+	 * @param key          The index of the context value
+	 * @param defaultValue A default value if there's no value for the provided key
+	 * @return the value of the mutable filter parameter's state, indexed by the
+	 *         provided key. When no value is found, returns the default parameter's
 	 *         value
 	 */
 	@SuppressWarnings("unchecked")

@@ -32,9 +32,9 @@ import java.util.function.Function;
  * 
  * @author Marcelo Portilho
  *
- * @param <S>
- * @param <T>
- * @param <F>
+ * @param <S> The type of the object to be converter
+ * @param <T> The target type
+ * @param <F> The optional formatter
  */
 public abstract class AbstractCachedFormattedConverter<S, T, F> implements FormattedConverter<S, T, F> {
 
@@ -43,10 +43,10 @@ public abstract class AbstractCachedFormattedConverter<S, T, F> implements Forma
 	/**
 	 * Caches the instance responsible for formatting an specific pattern
 	 * 
-	 * @param <U>
-	 * @param format
-	 * @param supplier
-	 * @return
+	 * @param <U>      The formatter type
+	 * @param format   The format pattern representation
+	 * @param supplier The supplier method for the desired format
+	 * @return The newly created or cached formatter instance
 	 */
 	@SuppressWarnings("unchecked")
 	protected <U> U cache(F format, Function<F, U> supplier) {
