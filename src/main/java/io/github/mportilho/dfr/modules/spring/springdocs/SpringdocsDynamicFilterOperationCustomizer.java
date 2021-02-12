@@ -58,6 +58,7 @@ import io.github.mportilho.dfr.core.annotation.Conjunction;
 import io.github.mportilho.dfr.core.annotation.Disjunction;
 import io.github.mportilho.dfr.core.annotation.Filter;
 import io.github.mportilho.dfr.core.annotation.Statement;
+import io.github.mportilho.dfr.core.operator.type.Dynamic;
 import io.swagger.v3.core.util.AnnotationsUtils;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.models.Operation;
@@ -103,27 +104,31 @@ public class SpringdocsDynamicFilterOperationCustomizer implements OperationCust
 	 * 
 	 * @param operation
 	 * @param methodParameter
-	 * @param spec
+	 * @param filter
 	 * @throws Exception
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static void customizeParameter(Operation operation, MethodParameter methodParameter, Filter spec) throws Exception {
+	private static void customizeParameter(Operation operation, MethodParameter methodParameter, Filter filter) throws Exception {
 		ParameterizedType parameterizedType = (ParameterizedType) methodParameter.getParameter().getParameterizedType();
 		Class<?> parameterizedClassType = Class.forName(parameterizedType.getActualTypeArguments()[0].getTypeName());
 
-		Field field = getPropertyField(parameterizedClassType, spec.path());
+		Field field = getPropertyField(parameterizedClassType, filter.path());
 		Class<?> fieldClass = field.getType();
 
 		JsonView jsonView = getJsonViewFromMethod(methodParameter);
 		Schema tempSchema = AnnotationsUtils.resolveSchemaFromType(fieldClass, null, jsonView);
 
-		for (String parameterName : spec.parameters()) {
+		for (String parameterName : filter.parameters()) {
 			Optional<io.swagger.v3.oas.models.parameters.Parameter> optParameter = operation.getParameters().stream()
 					.filter(p -> p.getName().equals(parameterName)).findFirst();
 			boolean parameterExists = optParameter.isPresent();
 
 			io.swagger.v3.oas.models.parameters.Parameter parameter = optParameter.orElse(new io.swagger.v3.oas.models.parameters.Parameter());
 			parameter.setName(parameterName);
+
+//			if (Dynamic.class.equals(filter.operator())) {
+//				tempSchema.type("array");
+//			}
 
 			Optional<Schema> optSchema = Optional.ofNullable(parameter.getSchema());
 			boolean schemaExists = optSchema.isPresent();

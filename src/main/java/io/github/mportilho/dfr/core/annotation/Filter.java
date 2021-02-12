@@ -54,8 +54,8 @@ public @interface Filter {
 	String attributePath() default "";
 
 	/**
-	 * <b>Path</b> is the notation which the target attribute can be found from a
-	 * specified root attribute, like <code>Person.addresses.streetName</code>
+	 * <b>Path</b> is the notation from which the target attribute can be found on a
+	 * specified root type, like <code>Person.addresses.streetName</code>
 	 * 
 	 * @return Name or path to the required attribute
 	 * 
@@ -94,23 +94,21 @@ public @interface Filter {
 	String negate() default "false";
 
 	/**
-	 * @return Indication to try to ignore case while processing the dynamic filter
-	 *         if the comparison attribute type is a {@link String}
+	 * @return Indication to try to ignore case while processing creating dynamic
+	 *         filters on text like types, as a {@link String}
 	 */
 	boolean ignoreCase() default false;
 
 	/**
-	 * @return Default values for each parameter, each at the same position as
-	 *         <code>parameters</code>. Can be parsed by the Spring Expression
-	 *         Language
+	 * @return Default values for parameters if none is provided by the user. Can be
+	 *         parsed by the Spring Expression Language
 	 */
 	String[] defaultValues() default {};
 
 	/**
-	 * @return Constant values for each parameter. If this field has any value, the
-	 *         corresponding filter must not be requested from the user, as it will
-	 *         be used only internally. Can be parsed by the Spring Expression
-	 *         Language
+	 * @return Constant values for parameters. Having any value, the corresponding
+	 *         filter value will not be requested from the user. Can be parsed by
+	 *         the Spring Expression Language
 	 */
 	String[] constantValues() default {};
 
