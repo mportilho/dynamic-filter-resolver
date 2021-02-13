@@ -4,18 +4,9 @@ An extensible library for creating dynamic filters for multiple data query provi
 
 The library reads a set of user's inputs, converted into conditional statements that are later transformed into a target engine's query objects by the dynamic filter resolver implementation.
 
-```mermaid
-graph LR
-A[User Parameters] --> B[Filter Parameters];
-B --> C[Conditional Statements];
-C --> D[Dynamic Resolver Resolver];
-D --> E[Target Query Object];
-style B fill:#caffb9,stroke:#333,stroke-width:4px
-style C fill:#caffb9,stroke:#333,stroke-width:4px
-style D fill:#caffb9,stroke:#333,stroke-width:4px
-```
+User Parameters --> ***Filter Parameters*** --> ***Conditional Statements*** --> ***Dynamic Resolver Resolver*** --> Target Query Object
 
-The green elements on the graphic above are plugin providers. They facilitate changes in how those elements interact with each other.
+The highlighted elements above are plugin providers. They facilitate changes in how those elements interact with each other.
 
 ## Filter Parameters
 
