@@ -22,7 +22,9 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.providers.specification.operator;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 import org.springframework.data.jpa.domain.Specification;
 
@@ -42,6 +44,16 @@ import io.github.mportilho.dfr.core.operator.type.Dynamic;
  */
 class SpecDynamic<T> implements Dynamic<Specification<T>> {
 
+	private static final Set<String> COMPARISON_OPS;
+
+	static {
+		COMPARISON_OPS = new HashSet<>(ComparisonOperator.values().length * 2);
+		for (ComparisonOperator comparisonOperator : ComparisonOperator.values()) {
+			COMPARISON_OPS.add(comparisonOperator.name());
+			COMPARISON_OPS.add(comparisonOperator.name().toLowerCase());
+		}
+	}
+
 	private SpecificationFilterOperatorService operatorService;
 
 	public SpecDynamic(SpecificationFilterOperatorService operatorService) {
@@ -52,13 +64,40 @@ class SpecDynamic<T> implements Dynamic<Specification<T>> {
 	@SuppressWarnings({ "unchecked" })
 	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		Object[] rawValues = filterParameter.getValues();
-		if (rawValues == null || rawValues.length < 2) {
+		if (rawValues == null || rawValues.length != 2) {
 			throw new IllegalArgumentException(
 					"Wrong number of values for dynamic operator. The value array must contain the filtering value and the corresponding operator");
 		}
-		ComparisonOperator comparisonOperator = ComparisonOperator.valueOf(String.valueOf(rawValues[1]).toUpperCase());
+
+		Object value;
+		ComparisonOperator comparisonOperator = convertComparisonOperator(rawValues[0]);
+		if (comparisonOperator != null) {
+			value = rawValues[1];
+		} else {
+			comparisonOperator = convertComparisonOperator(rawValues[1]);
+			if (comparisonOperator != null) {
+				value = rawValues[0];
+			} else {
+				throw new IllegalArgumentException("No valid operation was informed for dynamic comparison");
+			}
+		}
+
+		FilterParameter newFilter = new FilterParameter(filterParameter.getAttributePath(), filterParameter.getPath(),
+				filterParameter.getParameters(), filterParameter.getTargetType(), filterParameter.getOperator(), filterParameter.isNegate(),
+				filterParameter.isIgnoreCase(), new Object[] { value }, filterParameter.getFormat());
+
 		FilterOperator<Specification<?>> filterOperator = operatorService.getOperatorFor(comparisonOperator.getOperator());
-		return (Specification<T>) filterOperator.createFilter(filterParameter, filterValueConverter);
+		return (Specification<T>) filterOperator.createFilter(newFilter, filterValueConverter);
+	}
+
+	private static final ComparisonOperator convertComparisonOperator(Object value) {
+		if (value == null) {
+			return null;
+		} else if (value instanceof String) {
+			String temp = (String) value;
+			return temp.length() == 2 && COMPARISON_OPS.contains(temp) ? ComparisonOperator.valueOf(temp.toUpperCase()) : null;
+		}
+		return value instanceof ComparisonOperator ? (ComparisonOperator) value : null;
 	}
 
 }

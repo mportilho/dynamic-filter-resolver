@@ -50,6 +50,7 @@ import org.springframework.data.jpa.domain.Specification;
 import io.github.mportilho.apps.apptest.domain.model.Person;
 import io.github.mportilho.dfr.core.converter.DefaultFilterValueConverter;
 import io.github.mportilho.dfr.core.filter.FilterParameter;
+import io.github.mportilho.dfr.core.operator.ComparisonOperator;
 import io.github.mportilho.dfr.core.operator.type.EndsWith;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,6 +74,44 @@ public class TestSpecificationDynamicOperations {
 
 	@Test
 	@SuppressWarnings("unchecked")
+	public void testDynamic_Like_IgnoresCase_WithComparisonEnum_Operation() {
+		SpecDynamic<Person> specOp = new SpecDynamic<>(new SpecificationFilterOperatorService());
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(String.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, EndsWith.class, false, true,
+				new Object[] { "TestValue", ComparisonOperator.LK }, null);
+
+		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
+		specification.toPredicate(root, query, builder);
+
+		verify(builder, times(1)).like(any(Expression.class), (String) argThat(x -> x.toString().equals("%TESTVALUE%")));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testDynamic_Like_IgnoresCase_WithComparisonEnum_Operation__InvertedValuesPosition() {
+		SpecDynamic<Person> specOp = new SpecDynamic<>(new SpecificationFilterOperatorService());
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(String.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, EndsWith.class, false, true,
+				new Object[] { ComparisonOperator.LK, "TestValue" }, null);
+
+		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
+		specification.toPredicate(root, query, builder);
+
+		verify(builder, times(1)).like(any(Expression.class), (String) argThat(x -> x.toString().equals("%TESTVALUE%")));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
 	public void testDynamic_Like_IgnoresCase_Operation() {
 		SpecDynamic<Person> specOp = new SpecDynamic<>(new SpecificationFilterOperatorService());
 
@@ -92,6 +131,25 @@ public class TestSpecificationDynamicOperations {
 
 	@Test
 	@SuppressWarnings("unchecked")
+	public void testDynamic_Like_IgnoresCase_Operation__InvertedValuesPosition() {
+		SpecDynamic<Person> specOp = new SpecDynamic<>(new SpecificationFilterOperatorService());
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(String.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, EndsWith.class, false, true,
+				new String[] { "lk", "TestValue" }, null);
+
+		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
+		specification.toPredicate(root, query, builder);
+
+		verify(builder, times(1)).like(any(Expression.class), (String) argThat(x -> x.toString().equals("%TESTVALUE%")));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
 	public void testDynamic_Equals_Operation() {
 		SpecDynamic<Person> specOp = new SpecDynamic<>(new SpecificationFilterOperatorService());
 
@@ -102,6 +160,25 @@ public class TestSpecificationDynamicOperations {
 
 		FilterParameter filterParameter = new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, EndsWith.class, false,
 				false, new Object[] { BigDecimal.ZERO, "ne" }, null);
+
+		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
+		specification.toPredicate(root, query, builder);
+
+		verify(builder, times(1)).notEqual(any(Expression.class), eq(BigDecimal.ZERO));
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testDynamic_Equals_Operation__InvertedValuesPosition() {
+		SpecDynamic<Person> specOp = new SpecDynamic<>(new SpecificationFilterOperatorService());
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(String.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, EndsWith.class, false,
+				false, new Object[] { "ne", BigDecimal.ZERO }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
@@ -158,6 +235,40 @@ public class TestSpecificationDynamicOperations {
 
 		assertThatThrownBy(() -> specOp.createFilter(filterParameter, new DefaultFilterValueConverter())).isInstanceOf(IllegalArgumentException.class)
 				.hasMessageStartingWith("Wrong number of values for dynamic operator");
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testDynamic_NoValidOperation_Throwing() {
+		SpecDynamic<Person> specOp = new SpecDynamic<>(new SpecificationFilterOperatorService());
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(String.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, EndsWith.class, false,
+				false, new Object[] { 2, 3 }, null);
+
+		assertThatThrownBy(() -> specOp.createFilter(filterParameter, new DefaultFilterValueConverter())).isInstanceOf(IllegalArgumentException.class)
+				.hasMessageStartingWith("No valid operation was informed for dynamic comparison");
+	}
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testDynamic_NoValidOperation_WithStrings_Throwing() {
+		SpecDynamic<Person> specOp = new SpecDynamic<>(new SpecificationFilterOperatorService());
+
+		when(root.getJavaType()).thenReturn(Person.class);
+		when(root.get(anyString())).thenReturn(path);
+		when(path.getJavaType()).thenReturn(String.class);
+		when(builder.upper(any())).thenReturn(path);
+
+		FilterParameter filterParameter = new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, EndsWith.class, false,
+				false, new Object[] { "2", "lte" }, null);
+
+		assertThatThrownBy(() -> specOp.createFilter(filterParameter, new DefaultFilterValueConverter())).isInstanceOf(IllegalArgumentException.class)
+				.hasMessageStartingWith("No valid operation was informed for dynamic comparison");
 	}
 
 }
