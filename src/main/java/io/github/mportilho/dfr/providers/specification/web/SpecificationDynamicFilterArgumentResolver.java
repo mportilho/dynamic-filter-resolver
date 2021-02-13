@@ -46,7 +46,7 @@ import io.github.mportilho.dfr.core.annotation.Conjunction;
 import io.github.mportilho.dfr.core.annotation.Disjunction;
 import io.github.mportilho.dfr.core.filter.DynamicFilterResolver;
 import io.github.mportilho.dfr.core.statement.ConditionalStatement;
-import io.github.mportilho.dfr.core.statement.ConditionalStatementProvider;
+import io.github.mportilho.dfr.core.statement.annontation.AnnotationConditionalStatementProvider;
 import io.github.mportilho.dfr.providers.specification.annotation.Fetching;
 
 /**
@@ -59,12 +59,12 @@ import io.github.mportilho.dfr.providers.specification.annotation.Fetching;
  */
 public class SpecificationDynamicFilterArgumentResolver implements HandlerMethodArgumentResolver {
 
-	private ConditionalStatementProvider conditionalStatementProvider;
+	private AnnotationConditionalStatementProvider annotationConditionalStatementProvider;
 	private DynamicFilterResolver<Specification<?>> dynamicFilterResolver;
 
-	public SpecificationDynamicFilterArgumentResolver(ConditionalStatementProvider conditionalStatementProvider,
+	public SpecificationDynamicFilterArgumentResolver(AnnotationConditionalStatementProvider annotationConditionalStatementProvider,
 			DynamicFilterResolver<Specification<?>> dynamicFilterResolver) {
-		this.conditionalStatementProvider = conditionalStatementProvider;
+		this.annotationConditionalStatementProvider = annotationConditionalStatementProvider;
 		this.dynamicFilterResolver = dynamicFilterResolver;
 	}
 
@@ -96,7 +96,7 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 		Map<Object, Object[]> providedParameterValuesMap = createProvidedValuesMap(parameter, webRequest);
 		Map<Object, Object> contextMap = createContextMap(parameter);
 
-		ConditionalStatement statement = conditionalStatementProvider.createConditionalStatements(
+		ConditionalStatement statement = annotationConditionalStatementProvider.createConditionalStatements(
 				(Class<Specification<?>>) parameter.getParameterType(), parameter.getParameterAnnotations(), providedParameterValuesMap);
 
 		return createProxy(parameter, dynamicFilterResolver.convertTo(statement, contextMap), parameter.getParameterType());
@@ -126,7 +126,7 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 	}
 
 	/**
-	 * Creates a context map for the {@link ConditionalStatementProvider}
+	 * Creates a context map for the {@link AnnotationConditionalStatementProvider}
 	 * 
 	 * @param parameter
 	 * @return

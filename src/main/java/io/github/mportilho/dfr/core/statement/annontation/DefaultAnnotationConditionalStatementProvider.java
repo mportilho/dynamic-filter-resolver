@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.statement;
+package io.github.mportilho.dfr.core.statement.annontation;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
@@ -42,15 +42,18 @@ import io.github.mportilho.dfr.core.filter.FilterParameter;
 import io.github.mportilho.dfr.core.operator.FilterOperator;
 import io.github.mportilho.dfr.core.operator.type.IsIn;
 import io.github.mportilho.dfr.core.operator.type.IsNotIn;
+import io.github.mportilho.dfr.core.statement.ConditionalStatement;
+import io.github.mportilho.dfr.core.statement.LogicType;
+import io.github.mportilho.dfr.core.statement.ValueExpressionResolver;
 
 /**
- * Provides a default and generic implementation of a
- * {@link ConditionalStatementProvider} that can be used on most situations
+ * Provides an annotation based implementation of a
+ * {@link AnnotationConditionalStatementProvider} that can be used on most situations
  * 
  * @author Marcelo Portilho
  *
  */
-public class DefaultConditionalStatementProvider implements ConditionalStatementProvider {
+public class DefaultAnnotationConditionalStatementProvider implements AnnotationConditionalStatementProvider {
 
 	@SuppressWarnings("rawtypes")
 	private static final Set<Class<? extends FilterOperator>> MULTIPLE_VALUES_OPERATORS = new HashSet<>(Arrays.asList(IsIn.class, IsNotIn.class));
@@ -59,7 +62,7 @@ public class DefaultConditionalStatementProvider implements ConditionalStatement
 
 	private ValueExpressionResolver valueExpressionResolver;
 
-	public DefaultConditionalStatementProvider(ValueExpressionResolver valueExpressionResolver) {
+	public DefaultAnnotationConditionalStatementProvider(ValueExpressionResolver valueExpressionResolver) {
 		this.valueExpressionResolver = valueExpressionResolver;
 	}
 

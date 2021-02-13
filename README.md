@@ -1,17 +1,25 @@
-# Dynamic Filter Resolver (DOC WIP)
+# Dynamic Filter Resolver
 
-An extensible library for creating dynamic filters for multiple data query providers. It has a built-in filter provider for Spring Data JPA's Specification, but more providers can be delivered in the future or extended by users for their project's needs.
+An extensible library for creating dynamic filters for multiple data query providers. Currently, it has a built-in provider for Spring Data JPA's Specification, but more providers can be delivered in the future or it can be extended locally by users for their project's needs.
 
-The library read a set of inputs that are converted into conditional statements and later transformed into the target engine's query objects.
+The library reads a set of user's inputs, converted into conditional statements that are later transformed into a target engine's query objects by the dynamic filter resolver implementation.
 
-Filter Parameters -> Conditional Statements -> Operators -> Query Objects
+```mermaid
+graph LR
+A[User Parameters] --> B[Filter Parameters];
+B --> C[Conditional Statements];
+C --> D[Dynamic Resolver Resolver];
+D --> E[Target Query Object];
+style B fill:#caffb9,stroke:#333,stroke-width:4px
+style C fill:#caffb9,stroke:#333,stroke-width:4px
+style D fill:#caffb9,stroke:#333,stroke-width:4px
+```
 
-Flexibility for creating plugable conditional statements providers and plugable dynamic filter resolvers ...
-
+The green elements on the graphic above are plugin providers. They facilitate changes in how those elements interact with each other.
 
 ## Filter Parameters
 
-Parameters provided by users that indicate how a particular *comparison operation* should be performed for a *given value* and *related attribute*.
+Parameters provided by users that indicate how a particular *comparison operation* should be performed for a *given value* on a *related attribute*.
 
 The minimum required parameter's attributes are: ***path*** (to the object's attribute), comparison ***operator*** and a ***value***.
 
@@ -49,11 +57,30 @@ The resulting logic statement is:
 
 (**A** *and* **B** *and* **C**) *and* (**D** *or* **E**) *and* (**F** *and* **G**)
 
+Additionaly, inverting the logic type of the conditional structure above, we get:
+
+```yaml
+conditional-statement:
+  logic-type: DISJUNCTION
+  clauses: [A, B, C]
+  sub-statements:
+    - conditional-statement:
+        logic-type: CONJUNCTION
+        clauses: [D, E]
+        sub-statements: null
+    - conditional-statement:
+        logic-type: DISJUNCTION
+        clauses: [F, G]
+        sub-statements: null
+```
+
+(**A** *or* **B** *or* **C**) *or* (**D** *and* **E**) *or* (**F** *or* **G**)
+
 ## Filter Annotations
 
-The library includes annotations for implementing filter parameter capturing more easily and have attributes corresponding to the filter parameters. The annotations are:
+The library includes annotations for implementing filter parameter capturing more easily:
 
-#### ***@Filter***
+### ***@Filter***
 
 Representation of a Filter Parameter. It's attributes are:
 
@@ -69,18 +96,18 @@ Representation of a Filter Parameter. It's attributes are:
 - ***negate***: Indicates that the logic of this filter must be negated
 - ***ignoreCase***: Indication to try to ignore case while processing creating dynamic filters on text like types
 - ***defaultValues***: Default values for parameters if none is provided by the user
-- ***constantValues***: Constant values for parameters. Having any value, the corresponding filter value will not be requested from the user
-- ***format***: A format pattern to assist data conversion for the corresponding target type
+- ***constantValues***: Constant values for parameters. If used, no value will not be requested from the user
+- ***format***: A format pattern to assist data conversion to the corresponding target type
 - ***attributePath***: A path for another object type's attribute. Useful for providing metadata for creating filter parameters and metadata for the target type's attribute
 
-#### ***@Statement***
+### ***@Statement***
 
 A set of related filters. It's attributes are:
 
 - ***value***: An array of @Filter annotations
 - ***negate***: If true, negates the whole conditional statement result
 
-#### ***@Conjunction***
+### ***@Conjunction***
 
 Aggregates filters into AND logic operations. It's attributes are:
 
@@ -95,7 +122,7 @@ Aggregates filters into AND logic operations. It's attributes are:
 })
 ```
 
-#### ***@Disjunction***
+### ***@Disjunction***
 
 Aggregates filter parameters into OR logic operations. It's attributes are:
 
@@ -109,6 +136,47 @@ Aggregates filter parameters into OR logic operations. It's attributes are:
   @Filter(path = "height", parameters = "height", operator = Greater.class) 
 })
 ```
+
+## Composing Interfaces and Annotations
+
+The library's annotations can be used on *types* and *method's parameters*, where they are extracted and converted to `ConditionalStatement` from `AnnotationConditionalStatementProvider` interface implementations.
+
+Additionally, they can composed through the type's hierarchy, which annotations can be searched recursively, as shown below:
+
+- *Supertype **NoDelete***
+
+```java
+@Conjunction(value = {
+	@Filter(path = "deleted", parameters = "delete", operator = Equals.class, constantValues = "false", targetType = Boolean.class)
+})
+public interface NoDelete {
+}
+```
+
+- *Subtype **NoDeleteExtendedStatusOK***
+
+```java
+@Conjunction(value = {
+  @Filter(path = "status", parameters = "status", operator = Equals.class, constantValues = "OK", targetType = StatusEnum.class)
+})
+public interface NoDeleteAndStatusOK extends NoDelete, Serializable {
+}
+```
+
+And then, used as a method parameter's type:
+
+```java
+public Object searchPerson(
+    @Conjunction( {
+      @Filter(path = "name", attributes = "clientName", operator = Like.class)
+    }) NoDeleteAndStatusOK filters) {
+  return searchEngine.search(filters);
+}
+```
+
+When composing filters from different locations, *conjunction logic* will always be applied
+
+> Some sort of aspect oriented or proxy implementation are recommended for a transparent parameter injection.
 
 ## Operations
 
@@ -241,7 +309,7 @@ Values: { 'true' }
 
 An operator that performs comparison types required by the user. It receives two parameters: an user defined operation type and a given value.
 
-The possible comparison types and corresponding constant values are: 
+The possible comparison types and corresponding constant values (not case sensitive) are: 
 
 - *Equals*: `EQ`
 - *NotEquals*: `NE`
@@ -258,45 +326,155 @@ The possible comparison types and corresponding constant values are:
 Parameters: { 'salary' }
 Values: { 'LE', '2500' }
 
-## Composing Interfaces and Annotations
 
-```java
-@Conjunction(value = {
-  @Filter(path = "status", parameters = "status", operator = Equals.class, constantValues = "OK", targetType = StatusEnum.class)
-})
-public interface NoDeleteExtendedStatusOK extends NoDelete, Serializable {
-}
-```
-
-```java
-@Conjunction(value = {
-	@Filter(path = "deleted", parameters = "delete", operator = Equals.class, constantValues = "false", targetType = Boolean.class)
-})
-public interface NoDelete {
-}
-```
 
 ## Spring Data JPA's Specification
 
-This library currently provides an default implementation of a Dynamic Filter Provider for Spring Data JPA's Specification.
+This library currently provides an default implementation of a Dynamic Filter Provider for Spring Data JPA's Specification through the `SpecificationDynamicFilterResolver` class.
+
+### Web Environment Configuration
+
+For a web environment, `SpecificationDynamicFilterArgumentResolver` class can be configured on Spring's *WebMvcConfigurer* to enable auto-injection of `Specification` instances on controllers. Interfaces that extends *Specification*, defining their own filter annotations configuration, can also be used as method parameter type.
+
+```java
+@GetMapping("/person")
+public Object searchPerson(
+    @Conjunction( {
+      @Filter(path = "name", attributes = "clientName",operator = Like.class)
+    }) Specification<Person> filters) {
+  return searchEngine.search(filters);
+}
+```
 
 
-Spring data jpa starter ...
+The `@EnableMvcSpecificationFilterResolver` annotation should be used on a Spring Configuration bean to enable *SpecificationDynamicFilterArgumentResolver* auto-configuration in a Spring Boot project. *Spring Data JPA* and *Spring Boot Web Starter* dependencies must be included manually as project's dependency.
 
-EnableMvcSpecificationFilterResolver autoconfiguration ...
+The `SpecificationDynamicFilterArgumentResolver` obtains user provided filter values from *HTTP Request* parameters.
 
-@Fetching ...
+```bash
+curl http://localhost:8080/person?clientName=Foobar
+```
 
-Annotating method controllers ...
+When a HTTP Request parameter is absent, it's corresponding filter parameter will not be included as a filtering condition.
+
+### Attribute Path Navigation
+
+This dynamic filter provider adds *sql ***inner*** join operations* automatically then a path navigation is detected.
+
+Consider the following entities:
+
+***Person***
+```java
+@Entity
+@Table
+public class Person {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  private String name;
+
+  private BigDecimal height;
+
+  private BigDecimal weight;
+
+  private LocalDate birthday;
+
+  private LocalDateTime registerDate;
+
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "person")
+  private List<Address> addresses;
+
+  ...
+}
+```
+
+***Address***
+
+```java
+@Entity
+@Table
+public class Address {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  private String street;
+
+  private String number;
+
+  @ManyToOne
+  @JoinColumn(name = "ID_PERSON")
+  private Person person;
+
+  @OneToOne
+  @JoinColumn(name = "ID_LOCATION")
+  private Location location;
+
+  ...
+}
+```
+
+***Location***
+
+```java
+@Entity
+@Table
+public class Location {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  private String city;
+
+  private String state;
+
+  ...
+}
+```
+
+
+The developer can adds a filter that searches people through their street's name by indicating `path` as:
+
+```java
+@Filter(path = "addresses.street", parameters = "streetName", operator = StartsWith.class)
+```
+
+or searches people through their city by indicating `path` as:
+
+```java
+@Filter(path = "addresses.location.city", parameters = "clientCity", operator = Equals.class)
+```
+
+### Earger Fetches
+
+The repeatable annotation `@Fetching` enables earger fetch of entites when used in addition with *@Conjunction* or *@Disjunction*. By default, it uses *left outer join operation* but it can be changed by using the `joinType` annotation attribute.
+
+```java
+public Object searchPerson(
+    @Fetching("addresses.location")
+    @Conjunction( {
+      @Filter(path = "name", attributes = "clientName",operator = Like.class)
+    }) Specification<Person> filters) {
+  return searchEngine.search(filters);
+}
+```
+
+> Beware of the [*MultipleBagFetchException*](https://docs.jboss.org/hibernate/stable/core/javadocs/org/hibernate/loader/MultipleBagFetchException.html)
+
 
 ## Optional Modules
 
-### Springdocs Swagger
+### Springdocs OpenAPI 3
 
-SpringdocsDynamicFilterOperationCustomizer ...
+When using the library [Springdocs](https://springdoc.org/), for adding HTTP Request parameter descriptions automatically on OpenAPI 3 documentation, based on ***filtering annotations***, include a instance of `SpringdocsDynamicFilterOperationCustomizer` as an application bean, as stated in the [Springdocs' documentation](https://springdoc.org/#can-i-customize-openapi-object-programmatically):
 
-## Converters
-
-Explain generic DateTimeFormatter converters ... 
-FormattedConversionService ...
-FormattedConverter
+```java
+@Bean
+public OperationCustomizer operationCustomizer() {
+  return new SpringdocsDynamicFilterOperationCustomizer();
+}
+```

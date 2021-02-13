@@ -32,6 +32,8 @@ import io.github.mportilho.dfr.core.operator.type.IsIn;
 import io.github.mportilho.dfr.core.operator.type.IsNotIn;
 import io.github.mportilho.dfr.core.operator.type.IsNotNull;
 import io.github.mportilho.dfr.core.operator.type.IsNull;
+import io.github.mportilho.dfr.core.statement.annontation.AnnotationConditionalStatementProvider;
+import io.github.mportilho.dfr.core.statement.annontation.DefaultAnnotationConditionalStatementProvider;
 import io.github.mportilho.dfr.core.statement.interfaces.queries.ComparisonOperations;
 import io.github.mportilho.dfr.core.statement.interfaces.queries.OtherComparisonOperations;
 import io.github.mportilho.dfr.core.statement.interfaces.queries.StringComparisonOperations;
@@ -40,7 +42,7 @@ public class TestConditionalStatementProviderOnAllOperations {
 
 	@Test
 	public void testComparisonOperations() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(ComparisonOperations.class, null, null);
 		FilterParameter param;
 
@@ -58,7 +60,7 @@ public class TestConditionalStatementProviderOnAllOperations {
 
 	@Test
 	public void testStringComparisonOperations() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(StringComparisonOperations.class, null, null);
 
 		assertThat(statement).isNotNull();
@@ -70,7 +72,7 @@ public class TestConditionalStatementProviderOnAllOperations {
 
 	@Test
 	public void testOtherComparisonOperations() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(OtherComparisonOperations.class, null, null);
 		FilterParameter param;
 

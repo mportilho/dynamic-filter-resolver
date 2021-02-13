@@ -39,9 +39,9 @@ import io.github.mportilho.dfr.core.converter.DefaultFilterValueConverter;
 import io.github.mportilho.dfr.core.converter.FilterValueConverter;
 import io.github.mportilho.dfr.core.filter.DynamicFilterResolver;
 import io.github.mportilho.dfr.core.operator.FilterOperatorService;
-import io.github.mportilho.dfr.core.statement.ConditionalStatementProvider;
-import io.github.mportilho.dfr.core.statement.DefaultConditionalStatementProvider;
 import io.github.mportilho.dfr.core.statement.ValueExpressionResolver;
+import io.github.mportilho.dfr.core.statement.annontation.AnnotationConditionalStatementProvider;
+import io.github.mportilho.dfr.core.statement.annontation.DefaultAnnotationConditionalStatementProvider;
 import io.github.mportilho.dfr.modules.spring.conversionservice.SpringConversionServiceAdapter;
 import io.github.mportilho.dfr.providers.specification.filter.SpecificationDynamicFilterResolver;
 import io.github.mportilho.dfr.providers.specification.operator.SpecificationFilterOperatorService;
@@ -90,7 +90,7 @@ public class MvcDynamicFilterResolverAutoConfiguration {
 				DynamicFilterResolver<Specification<?>> dynamicFilterResolver = new SpecificationDynamicFilterResolver(filterOperatorService,
 						filterValueConverter);
 
-				ConditionalStatementProvider statementProvider = new DefaultConditionalStatementProvider(resolver);
+				AnnotationConditionalStatementProvider statementProvider = new DefaultAnnotationConditionalStatementProvider(resolver);
 				resolvers.add(new SpecificationDynamicFilterArgumentResolver(statementProvider, dynamicFilterResolver));
 			}
 		};

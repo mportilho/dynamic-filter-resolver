@@ -31,6 +31,8 @@ import org.junit.jupiter.api.Test;
 
 import io.github.mportilho.dfr.core.filter.FilterParameter;
 import io.github.mportilho.dfr.core.operator.type.Equals;
+import io.github.mportilho.dfr.core.statement.annontation.AnnotationConditionalStatementProvider;
+import io.github.mportilho.dfr.core.statement.annontation.DefaultAnnotationConditionalStatementProvider;
 import io.github.mportilho.dfr.core.statement.annotation.AnnotationContainerInterface;
 import io.github.mportilho.dfr.core.statement.annotation.MethodArgumentAnnotations;
 import io.github.mportilho.dfr.core.statement.interfaces.FullyRequiringConjunction;
@@ -52,7 +54,7 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testOneExtendedInterfaceWithOneDefaultParameter() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(NoDelete.class, null, Collections.emptyMap());
 
 		assertThat(statement).isNotNull();
@@ -73,7 +75,7 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testOneExtendedInterfaceWithOneDefaultParameterNegatingPredicate() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(NoDeleteNegatingPredicate.class, null, Collections.emptyMap());
 
 		assertThat(statement).isNotNull();
@@ -94,7 +96,7 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testOneExtendedInterfaceWithOneDefaultParameterWithStringValueResolver() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(str -> str + "1");
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(str -> str + "1");
 		ConditionalStatement statement = provider.createConditionalStatements(NoDelete.class, null, Collections.emptyMap());
 
 		assertThat(statement).isNotNull();
@@ -115,7 +117,7 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testOneExtendedInterfaceWithTwoDefaultParameters() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(NoDeleteAndStatusOk.class, null, Collections.emptyMap());
 		FilterParameter filterParameter;
 
@@ -146,7 +148,7 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testOneComposedExtendedInterfaceWithOneDefaultParametersEach() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(NoDeleteExtendedStatusOK.class, null, Collections.emptyMap());
 		FilterParameter filterParameter;
 
@@ -191,7 +193,7 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testAnnotatedInterfaceAndAnnotatedParameter() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		Annotation[] methodArgumentAnnotations = MethodArgumentAnnotations.class.getAnnotations();
 
 		ConditionalStatement statement = provider.createConditionalStatements(AnnotationContainerInterface.class, methodArgumentAnnotations,
@@ -241,7 +243,7 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testWithRequiredValuesProvided() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement;
 
 		statement = provider.createConditionalStatements(RequiringValues.class, null, Collections.singletonMap("delete", new String[] { "true" }));
@@ -265,14 +267,14 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testWithRequiredValuesNotProvided() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(RequiringValues.class, null, Collections.emptyMap());
 		assertThat(statement).isNull();
 	}
 
 	@Test
 	public void testWithSomeRequiredValuesProvided() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(RequiringSomeValues.class, null, Collections.emptyMap());
 		assertThat(statement).isNotNull();
 		assertThat(statement.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.CONJUNCTION);
@@ -284,7 +286,7 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testWithSomeMoreRequiredValuesProvided() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(RequiringSomeMoreValues.class, null, Collections.emptyMap());
 
 		assertThat(statement).isNotNull();
@@ -305,7 +307,7 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testWithSomeMoreRequiredValuesAndSomeDefaultsProvided() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(RequiringSomeValuesAndSomeDefaults.class, null, Collections.emptyMap());
 
 		assertThat(statement).isNotNull();
@@ -334,7 +336,7 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testRequiredValuesWithDefaultDataProvided() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement;
 
 		statement = provider.createConditionalStatements(RequiringValuesDefaultData.class, null, Collections.emptyMap());
@@ -360,7 +362,7 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testWithConjunctionAnnotationFullyProvided() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(FullyRequiringConjunction.class, null, Collections.emptyMap());
 
 		assertThat(statement).isNotNull();
@@ -391,7 +393,7 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testWithConjunctionAnnotationFullyProvidedNegatingAll() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(FullyRequiringConjunctionNegatingAll.class, null,
 				Collections.emptyMap());
 
@@ -423,7 +425,7 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testWithDisjunctionAnnotationFullyProvided() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(FullyRequiringDisjunction.class, null, Collections.emptyMap());
 		assertThat(statement).isNotNull();
 		assertThat(statement.getLogicType()).isNotNull().isEqualByComparingTo(LogicType.DISJUNCTION);
@@ -453,7 +455,7 @@ public class TestConditionalStatementProvider {
 
 	@Test
 	public void testWithDisjunctionAnnotationFullyProvidedNegatingAll() {
-		ConditionalStatementProvider provider = new DefaultConditionalStatementProvider(null);
+		AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
 		ConditionalStatement statement = provider.createConditionalStatements(FullyRequiringDisjunctionNegatingAll.class, null,
 				Collections.emptyMap());
 		assertThat(statement).isNotNull();
