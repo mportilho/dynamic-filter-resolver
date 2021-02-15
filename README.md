@@ -7,7 +7,23 @@ The library reads a set of user's inputs, converted into conditional statements 
 
 `User Parameters --> [Filter Parameters] --> [Conditional Statements] --> [Dynamic Resolver Resolver] --> Target Query Object`
 
-The highlighted elements above are plug-and-play providers, facilitating changes in how those elements interact with each other.
+The highlighted elements above are plug-and-play providers, facilitating changes in how those elements interact with each other, as shown below: 
+
+```java
+// Retrieve users parameters
+Collection<Object, Object[]> parametersMap = retrieveUserParameters();
+
+// Creates conditional statements from annotations
+AnnotationConditionalStatementProvider provider = new DefaultAnnotationConditionalStatementProvider(null);
+ConditionalStatement statement = provider.createConditionalStatements(QueryDefinitions.class, null, parametersMap);
+
+// Creates the target query object
+DynamicFilterResolver<List<Query>> resolver = new GenericDynamicFilterResolver();
+List<Query> filterClauses = resolver.convertTo(condition);
+queryProvider.query(filterClauses);
+```
+
+This example can be used as base to create filters from any parameter source to any target query provider. When applicable, aspect oriented or proxied call implementation can be written for a transparent query object injection.
 
 ## Filter Parameters
 
@@ -177,8 +193,6 @@ public Object searchPerson(
 ```
 
 When composing filters from different locations, *conjunction logic* will always be applied
-
-> Some sort of aspect oriented or proxy implementation are recommended for a transparent parameter injection.
 
 ## Operations
 
