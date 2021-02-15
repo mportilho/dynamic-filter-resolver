@@ -64,7 +64,11 @@ class SpecDynamic<T> implements Dynamic<Specification<T>> {
 	@SuppressWarnings({ "unchecked" })
 	public Specification<T> createFilter(FilterParameter filterParameter, FilterValueConverter filterValueConverter) {
 		Object[] rawValues = filterParameter.getValues();
-		if (rawValues == null || rawValues.length != 2) {
+		if (rawValues != null && rawValues.length == 2) {
+			// All good
+		} else if (rawValues != null && rawValues.length == 1 && rawValues[0] instanceof Object[] && ((Object[]) rawValues[0]).length == 2) {
+			rawValues = (Object[]) rawValues[0];
+		} else {
 			throw new IllegalArgumentException(
 					"Wrong number of values for dynamic operator. The value array must contain the filtering value and the corresponding operator");
 		}

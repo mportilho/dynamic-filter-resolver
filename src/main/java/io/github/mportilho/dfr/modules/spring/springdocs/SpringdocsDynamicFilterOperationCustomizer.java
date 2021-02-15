@@ -115,33 +115,43 @@ public class SpringdocsDynamicFilterOperationCustomizer implements OperationCust
 		Field field = getPropertyField(parameterizedClassType, filter.path());
 		Class<?> fieldClass = field.getType();
 
-		JsonView jsonView = getJsonViewFromMethod(methodParameter);
-		Schema tempSchema = AnnotationsUtils.resolveSchemaFromType(fieldClass, null, jsonView);
+		if (Dynamic.class.equals(filter.operator()) && filter.parameters().length > 1) {
+			throw new IllegalStateException("Dynamic filter operator cannot have two parameters");
+		}
 
+		Schema tempSchema = AnnotationsUtils.resolveSchemaFromType(fieldClass, null, getJsonViewFromMethod(methodParameter));
 		for (String parameterName : filter.parameters()) {
 			Optional<io.swagger.v3.oas.models.parameters.Parameter> optParameter = operation.getParameters().stream()
 					.filter(p -> p.getName().equals(parameterName)).findFirst();
-			boolean parameterExists = optParameter.isPresent();
 
+			boolean parameterExists = optParameter.isPresent();
 			io.swagger.v3.oas.models.parameters.Parameter parameter = optParameter.orElse(new io.swagger.v3.oas.models.parameters.Parameter());
 			parameter.setName(parameterName);
 
-//			if (Dynamic.class.equals(filter.operator())) {
-//				tempSchema.type("array");
-//			}
+			if (Dynamic.class.equals(filter.operator())) {
+				Schema schema = new Schema<>();
+				schema.type("string");
 
-			Optional<Schema> optSchema = Optional.ofNullable(parameter.getSchema());
-			boolean schemaExists = optSchema.isPresent();
-			Schema schema = optSchema.orElse(new Schema<>());
-
-			if (schemaExists) {
-				schema.setType(tempSchema.getType());
-				schema.setEnum(tempSchema.getEnum());
+				ArraySchema arraySchema = new ArraySchema();
+				arraySchema.type("array");
+				arraySchema.minItems(2);
+				arraySchema.maxItems(2);
+				arraySchema.items(schema);
+				parameter.setSchema(arraySchema);
 			} else {
-				schema = tempSchema;
-				parameter.setSchema(schema);
+				Optional<Schema> optSchema = Optional.ofNullable(parameter.getSchema());
+				boolean schemaExists = optSchema.isPresent();
+				Schema schema = optSchema.orElse(new Schema<>());
+
+				if (schemaExists) {
+					schema.setType(tempSchema.getType());
+					schema.setEnum(tempSchema.getEnum());
+				} else {
+					schema = tempSchema;
+					parameter.setSchema(schema);
+				}
+				applyBeanValidatorAnnotations(schema, field.getAnnotations(), null);
 			}
-			applyBeanValidatorAnnotations(schema, field.getAnnotations(), null);
 
 			if (parameterExists) {
 				if (parameter.getIn() == null || ParameterIn.DEFAULT.toString().equals(parameter.getIn())) {

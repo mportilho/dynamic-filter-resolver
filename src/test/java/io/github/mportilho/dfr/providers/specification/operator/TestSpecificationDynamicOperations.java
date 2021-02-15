@@ -140,7 +140,7 @@ public class TestSpecificationDynamicOperations {
 		when(builder.upper(any())).thenReturn(path);
 
 		FilterParameter filterParameter = new FilterParameter("name", "name", new String[] { "name" }, String.class, EndsWith.class, false, true,
-				new String[] { "lk", "TestValue" }, null);
+				new String[][] { new String[] { "lk", "TestValue" } }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
@@ -178,7 +178,7 @@ public class TestSpecificationDynamicOperations {
 		when(builder.upper(any())).thenReturn(path);
 
 		FilterParameter filterParameter = new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, EndsWith.class, false,
-				false, new Object[] { "ne", BigDecimal.ZERO }, null);
+				false, new Object[][] { new Object[] { "ne", BigDecimal.ZERO } }, null);
 
 		Specification<Person> specification = specOp.createFilter(filterParameter, new DefaultFilterValueConverter());
 		specification.toPredicate(root, query, builder);
@@ -197,7 +197,7 @@ public class TestSpecificationDynamicOperations {
 		when(builder.upper(any())).thenReturn(path);
 
 		FilterParameter filterParameter = new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, EndsWith.class, false,
-				false, new Object[] { BigDecimal.ZERO, "inv" }, null);
+				false, new Object[][] { new Object[] { BigDecimal.ZERO, "inv" } }, null);
 
 		assertThatThrownBy(() -> specOp.createFilter(filterParameter, new DefaultFilterValueConverter()))
 				.isInstanceOf(IllegalArgumentException.class);
@@ -214,7 +214,7 @@ public class TestSpecificationDynamicOperations {
 		when(builder.upper(any())).thenReturn(path);
 
 		FilterParameter filterParameter = new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, EndsWith.class, false,
-				false, new Object[] { BigDecimal.ZERO }, null);
+				false, new Object[][] { new Object[] { BigDecimal.ZERO } }, null);
 
 		assertThatThrownBy(() -> specOp.createFilter(filterParameter, new DefaultFilterValueConverter())).isInstanceOf(IllegalArgumentException.class)
 				.hasMessageStartingWith("Wrong number of values for dynamic operator");
@@ -248,7 +248,7 @@ public class TestSpecificationDynamicOperations {
 		when(builder.upper(any())).thenReturn(path);
 
 		FilterParameter filterParameter = new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, EndsWith.class, false,
-				false, new Object[] { 2, 3 }, null);
+				false, new Object[][] { new Object[] { 2, 3 } }, null);
 
 		assertThatThrownBy(() -> specOp.createFilter(filterParameter, new DefaultFilterValueConverter())).isInstanceOf(IllegalArgumentException.class)
 				.hasMessageStartingWith("No valid operation was informed for dynamic comparison");
@@ -265,7 +265,7 @@ public class TestSpecificationDynamicOperations {
 		when(builder.upper(any())).thenReturn(path);
 
 		FilterParameter filterParameter = new FilterParameter("weight", "weight", new String[] { "weight" }, String.class, EndsWith.class, false,
-				false, new Object[] { "2", "lte" }, null);
+				false, new Object[][] { new Object[] { "2", "lte" } }, null);
 
 		assertThatThrownBy(() -> specOp.createFilter(filterParameter, new DefaultFilterValueConverter())).isInstanceOf(IllegalArgumentException.class)
 				.hasMessageStartingWith("No valid operation was informed for dynamic comparison");

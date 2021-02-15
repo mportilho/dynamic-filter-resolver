@@ -1,12 +1,13 @@
 # Dynamic Filter Resolver
 
-An extensible library for creating dynamic filters for multiple data query providers. Currently, it has a built-in provider for Spring Data JPA's Specification, but more providers can be delivered in the future or it can be extended locally by users for their project's needs.
+An extensible library for creating dynamic filters for multiple data query providers, automatically from user's parameters. Currently, it has a built-in provider for Spring Data JPA's Specification, but more providers can be delivered in the future or it can be extended locally by users for their project's needs.
 
 The library reads a set of user's inputs, converted into conditional statements that are later transformed into a target engine's query objects by the dynamic filter resolver implementation.
 
-User Parameters --> ***Filter Parameters*** --> ***Conditional Statements*** --> ***Dynamic Resolver Resolver*** --> Target Query Object
 
-The highlighted elements above are plugin providers. They facilitate changes in how those elements interact with each other.
+`User Parameters --> [Filter Parameters] --> [Conditional Statements] --> [Dynamic Resolver Resolver] --> Target Query Object`
+
+The highlighted elements above are plug-and-play providers, facilitating changes in how those elements interact with each other.
 
 ## Filter Parameters
 
@@ -27,7 +28,7 @@ They are a set of logical clauses grouped by a logic operation type, a *conjunct
 
 Conjunctions are a set of operands that is only true when all of its operands are true, functioning like the *AND* logic gate. Disjunction are a set of operands that is true is at least one of its operands is true, like the *OR* logic gate.
 
-So, the structure of a conditional statement on this library is:
+So, the structure of a conditional statement is represented visually below as a YAML document:
 
 ```yaml
 conditional-statement:
@@ -107,9 +108,14 @@ Aggregates filters into AND logic operations. It's attributes are:
 - ***negate***: If true, negates the whole conjunction result
 
 ```java
-@Conjunction(value = {
-  @Filter(path = "deleted", parameters = "delete", operator = Equals.class, constantValues = "false", targetType = Boolean.class),
-  @Filter(path = "status", parameters = "status", operator = Equals.class)
+@Conjunction(
+  value = {
+    @Filter(path = "deleted", parameters = "delete", operator = Equals.class, constantValues = "false", targetType = Boolean.class),
+    @Filter(path = "status", parameters = "status", operator = Equals.class),
+  disjunctions = {
+    @Statement({
+      @Filter(path = "status", parameters = "status", operator = Equals.class, targetType = StatusEnum.class)
+    })
 })
 ```
 
@@ -122,9 +128,14 @@ Aggregates filter parameters into OR logic operations. It's attributes are:
 - ***negate***: If true, negates the whole disjunction result
 
 ```java
-@Disjunction(value = {
-  @Filter(path = "birthday", parameters = "birthday", operator = GreaterOrEquals.class, defaultValues = "12/12/2012", targetType = LocalDate.class),
-  @Filter(path = "height", parameters = "height", operator = Greater.class) 
+@Disjunction(
+  value = {
+    @Filter(path = "birthday", parameters = "birthday", operator = GreaterOrEquals.class, defaultValues = "12/12/2012", targetType = LocalDate.class),
+    @Filter(path = "height", parameters = "height", operator = Greater.class),
+  conjunctions = {
+    @Statement({
+      @Filter(path = "status", parameters = "status", operator = Equals.class, targetType = StatusEnum.class)
+    })
 })
 ```
 
@@ -469,3 +480,5 @@ public OperationCustomizer operationCustomizer() {
   return new SpringdocsDynamicFilterOperationCustomizer();
 }
 ```
+
+This module reads the attributes' metadata, as *Class*, *Enums* or *Bean Validation API* annotations, to augment the resulting OpenAPI 3 documentation. Because of some restrictions encountered on array type, this library cannot apply type or validation metadata from the original source attribute.
