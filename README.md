@@ -1,5 +1,19 @@
 # Dynamic Filter Resolver
 
+## Download
+
+Maven:
+
+```xml
+<dependency>
+  <groupId>io.github.mportilho</groupId>
+  <artifactId>dynamic-filter-resolver</artifactId>
+  <version>1.0.1</version>
+</dependency>
+```
+
+## Description
+
 An extensible library for creating dynamic filters for multiple data query providers, automatically from user's parameters. Currently, it has a built-in provider for Spring Data JPA's Specification, but more providers can be delivered in the future or it can be extended locally by users for their project's needs.
 
 The library reads a set of user's inputs, converted into conditional statements that are later transformed into a target engine's query objects by the dynamic filter resolver implementation.
@@ -204,9 +218,9 @@ These are the current operations this library provides:
 
 An operator that searches data which value is equals to a given parameter
 
-***Example:***
-Parameters: { 'username' }
-Values: { 'foobar' }
+***Example:***  
+Parameters: { 'username' }  
+Values: { 'foobar' }  
 
 ### NotEquals
 
