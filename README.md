@@ -14,10 +14,7 @@ Maven:
 
 ## Description
 
-An extensible library for creating dynamic filters for multiple data query providers, automatically from user's parameters. Currently, it has a built-in provider for Spring Data JPA's Specification, but more providers can be delivered in the future or it can be extended locally by users for their project's needs.
-
-The library reads a set of user's inputs, converted into conditional statements that are later transformed into a target engine's query objects by the dynamic filter resolver implementation.
-
+An extensible library for creating dynamic filters for multiple data query providers, automatically from user's parameters. The library reads a set of user's inputs, converted into conditional statements that are later transformed into a target engine's query objects by the dynamic filter resolver implementation.
 
 `User Parameters --> [Filter Parameters] --> [Conditional Statements] --> [Dynamic Resolver Resolver] --> Target Query Object`
 
@@ -37,7 +34,24 @@ List<Query> filterClauses = resolver.convertTo(condition);
 queryProvider.query(filterClauses);
 ```
 
-This example can be used as base to create filters from any parameter source to any target query provider. When applicable, aspect oriented or proxied call implementation can be written for a transparent query object injection.
+The example can be used as base to create filters from any parameter source to any target query provider. When applicable, aspect oriented or proxied call implementation can be written for a transparent query object injection.
+
+This library includes a Spring MVC and a Spring Data JPA integration for converting HTTP request parameters to Spring's Specification instance for database query, as shown in the example bellow+
+
+```java
+@Autowired
+private PersonRepository repository;
+
+@GetMapping("/person")
+public Object searchPerson(
+    @Conjunction( {
+      @Filter(path = "name", attributes = "clientName",operator = Like.class)
+    }) Specification<Person> filters) {
+  return repository.findAll(filters);
+}
+```
+
+> It's possible to add more integrations in the future
 
 ## Filter Parameters
 
