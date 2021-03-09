@@ -241,48 +241,48 @@ Values: { 'foobar' }
 An operator that searches data which value is equals to a given parameter
 
 ***Example:***
-Parameters: { 'username' }
-Values: { 'xpto' }
+Parameters: { 'username' }  
+Values: { 'xpto' }  
 
 ### Greater
 
 An operator that searches data which value is greater than a given parameter.
 
 ***Example:***
-Parameters: { 'salary' }
-Values: { '2000' }
+Parameters: { 'salary' }  
+Values: { '2000' }  
 
 ### GreaterOrEquals
 
 An operator that searches data which value is greater or equals than a given parameter.
 
 ***Example:***
-Parameters: { 'salary' }
-Values: { '3000' }
+Parameters: { 'salary' }  
+Values: { '3000' }  
 
 ### Less
 
 An operator that searches data which value is less than a given parameter.
 
 ***Example:***
-Parameters: { 'salary' }
-Values: { '2000' }
+Parameters: { 'salary' }  
+Values: { '2000' }  
 
 ### LessOrEquals
 
 An operator that searches data which value is less or equals than a given parameter.
 
 ***Example:***
-Parameters: { 'salary' }
-Values: { '2000' }
+Parameters: { 'salary' }  
+Values: { '2000' }  
 
 ### Between
 
 An operator that verifies if a given value is between a lower and upper limit. Needs two parameters to create the conditional statement.
 
 ***Example:***
-Parameters: { 'lowerDate', 'upperDate' }
-Values: { '20/12/2015', '20/12/2020' }
+Parameters: { 'lowerDate', 'upperDate' }  
+Values: { '20/12/2015', '20/12/2020' }  
 
 
 ### Like
@@ -290,64 +290,64 @@ Values: { '20/12/2015', '20/12/2020' }
 An operator that searches texts which value contains a given parameter.
 
 ***Example:***
-Parameters: { 'message' }
-Values: { 'success' }
+Parameters: { 'message' }  
+Values: { 'success' }  
 
 ### NotLike
 
 An operator that searches texts which value does not contains a given parameter.
 
 ***Example:***
-Parameters: { 'message' }
-Values: { 'NullpointerException' }
+Parameters: { 'message' }  
+Values: { 'NullpointerException' }  
 
 ### StartsWith
 
 An operator that searches texts which value starts with a given parameter.
 
 ***Example:***
-Parameters: { 'message' }
-Values: { 'Object found: ' }
+Parameters: { 'message' }  
+Values: { 'Object found: ' }  
 
 ### EndsWith
 
 An operator that searches texts which value ends with a given parameter.
 
 ***Example:***
-Parameters: { 'message' }
-Values: { 'not found' }
+Parameters: { 'message' }  
+Values: { 'not found' }  
 
 ### IsIn
 
 An operator that searches data which value contains a given number of parameters.
 
 ***Example:***
-Parameters: { 'workType' }
-Values: { 'FULL_TIME', 'PART_TIME' }
+Parameters: { 'workType' }  
+Values: { 'FULL_TIME', 'PART_TIME' }  
 
 ### IsNotIn
 
 An operator that searches data which value does not contains a given number of parameters.
 
 ***Example:***
-Parameters: { 'workType' }
-Values: { 'OVER_TIME', 'NIGHT_TIME' }
+Parameters: { 'workType' }  
+Values: { 'OVER_TIME', 'NIGHT_TIME' }  
 
 ### IsNull
 
 An operator that searches attributes which value is null. It receives a boolean value where 'true' indicates that null attributes must be queried and 'false' indicates that non null attributes must be queried. 
 
 ***Example:***
-Parameters: { 'status' }
-Values: { 'true' }
+Parameters: { 'status' }  
+Values: { 'true' }  
 
 ### IsNotNull
 
 A similar operator as 'IsNull', but inverted logic. Searches attributes which value is not null. It receives a boolean value where 'true' indicates that non null attributes must be queried and 'false' indicates that null attributes must be queried. 
 
 ***Example:***
-Parameters: { 'status' }
-Values: { 'true' }
+Parameters: { 'status' }  
+Values: { 'true' }  
 
 ### Dynamic
 
@@ -367,10 +367,10 @@ The possible comparison types and corresponding constant values (not case sensit
 - *EndsWith*: `EW`
 
 ***Example:***
-Parameters: { 'salary' }
-Values: { 'LE', '2500' }
+Parameters: { 'salary' }  
+Values: { 'LE', '2500' }  
 
-
+> There's no restriction about the values order 
 
 ## Spring Data JPA's Specification
 
