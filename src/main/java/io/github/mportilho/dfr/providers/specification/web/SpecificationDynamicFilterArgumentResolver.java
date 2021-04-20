@@ -165,8 +165,6 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 				providedParameterValuesMap.put(key, isArray ? (Object[]) value : new Object[] { value });
 			});
 		}
-
-		providedParameterValuesMap.putAll((Map<String, String[]>) httpServletRequest.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE));
 		return providedParameterValuesMap;
 	}
 
