@@ -20,31 +20,32 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.annotation;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+package io.github.mportilho.dfr.core.processor;
 
 /**
- * Defines a statement of logic clauses
+ * Represents a logic statement type
  * 
  * @author Marcelo Portilho
  *
  */
-@Documented
-@Retention(RUNTIME)
-public @interface Statement {
+public enum LogicType {
+
+	CONJUNCTION, DISJUNCTION;
 
 	/**
-	 * @return An array of logic clauses
+	 * @return a representation of the inverted logic statement of this instance
 	 */
-	Filter[] value();
+	public LogicType opposite() {
+		if (CONJUNCTION.equals(this)) {
+			return DISJUNCTION;
+		}
+		return CONJUNCTION;
+	}
 
 	/**
-	 * @return a boolean indicating if the whole statement must be negated
+	 * @return True if this instance represents a conjunction. False if otherwise.
 	 */
-	String negate() default "false";
-
+	public boolean isConjunction() {
+		return CONJUNCTION.equals(this);
+	}
 }

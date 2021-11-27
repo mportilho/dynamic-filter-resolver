@@ -20,31 +20,27 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.annotation;
+package io.github.mportilho.dfr.converters.impl;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.time.Year;
+import java.time.format.DateTimeFormatter;
 
 /**
- * Defines a statement of logic clauses
- * 
- * @author Marcelo Portilho
+ * Converts a {@link Year} from a {@link String}
  *
+ * @author Marcelo Portilho
  */
-@Documented
-@Retention(RUNTIME)
-public @interface Statement {
+public class StringToYearConverter extends AbstractCachedFormattedConverter<String, Year, String> {
 
-	/**
-	 * @return An array of logic clauses
-	 */
-	Filter[] value();
-
-	/**
-	 * @return a boolean indicating if the whole statement must be negated
-	 */
-	String negate() default "false";
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Year convert(String source, String format) {
+        if (format == null || format.isEmpty()) {
+            return Year.parse(source);
+        }
+        return cache(format, DateTimeFormatter::ofPattern).parse(source, Year::from);
+    }
 
 }

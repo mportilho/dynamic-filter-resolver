@@ -22,101 +22,103 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.core.annotation;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import io.github.mportilho.dfr.core.operation.FilterOperation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 
-import io.github.mportilho.dfr.core.operator.FilterOperator;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Defines a logic clause, indicating it's parameters and operation to be
  * applied
- * 
- * @author Marcelo Portilho
  *
+ * @author Marcelo Portilho
  */
 @Documented
 @Retention(RUNTIME)
 public @interface Filter {
 
-	/**
-	 * <b>Optional:</b> Used to indicate the path to the attribute of the type's
-	 * parameter type.
-	 * 
-	 * <p>
-	 * For example: In a controller, the developer can reference to the DTO class
-	 * and it's properties with <code>attributePath</code> and indicate the target
-	 * JPA entity's attribute with <code>path</code>.
-	 * 
-	 * @return Optional path for another type's attribute
-	 */
-	String attributePath() default "";
+    /**
+     * <b>Optional:</b> Used to indicate the path to the attribute of the type's
+     * parameter type.
+     *
+     * <p>
+     * For example: In a controller, the developer can reference to the DTO class
+     * and it's properties with <code>attributePath</code> and indicate the target
+     * JPA entity's attribute with <code>path</code>.
+     *
+     * @return Optional path for another type's attribute
+     */
+    String attributePath() default "";
 
-	/**
-	 * <b>Path</b> is the notation from which the target attribute can be found on a
-	 * specified root type, like <code>Person.addresses.streetName</code>
-	 * 
-	 * @return Name or path to the required attribute
-	 * 
-	 */
-	String path();
+    /**
+     * <b>Path</b> is the notation from which the target attribute can be found on a
+     * specified root type, like <code>Person.addresses.streetName</code>
+     *
+     * @return Name or path to the required attribute
+     */
+    String path();
 
-	/**
-	 * @return Parameters needed to be supplied by the caller, exposed as input data
-	 *         requirements
-	 */
-	String[] parameters();
+    /**
+     * @return Parameters needed to be supplied by the caller, exposed as input data
+     * requirements
+     */
+    String[] parameters();
 
-	/**
-	 * @return Target attribute type for convertion
-	 */
-	Class<?> targetType() default Object.class;
+    /**
+     * @return Target attribute type for convertion
+     */
+    Class<?> targetType() default Object.class;
 
-	/**
-	 * @return Operation to be used as a query filter
-	 */
-	@SuppressWarnings("rawtypes")
-	Class<? extends FilterOperator> operator();
+    /**
+     * @return Operation to be used as a query filter
+     */
+    Class<? extends FilterOperation<?>> operation();
 
-	/**
-	 * Indicates that the logic of this filter must be negated. Can be parsed by the
-	 * Spring Expression Language
-	 * 
-	 * <p>
-	 * Normal Logic: <b>A &amp; B</b>
-	 * 
-	 * <p>
-	 * Negated Logic: <b>!(A &amp; B)</b>
-	 * 
-	 * @return Indication if resulting clause must have it's result negated
-	 */
-	String negate() default "false";
+    /**
+     * Indicates that the logic of this filter must be negated. Can be parsed by the
+     * Spring Expression Language
+     *
+     * <p>
+     * Normal Logic: <b>A &amp; B</b>
+     *
+     * <p>
+     * Negated Logic: <b>!(A &amp; B)</b>
+     *
+     * @return Indication if resulting clause must have it's result negated
+     */
+    String negate() default "false";
 
-	/**
-	 * @return Indication to try to ignore case while processing creating dynamic
-	 *         filters on text like types, as a {@link String}
-	 */
-	boolean ignoreCase() default false;
+    /**
+     * @return Indication to try to ignore case while processing creating dynamic
+     * filters on text like types, as a {@link String}
+     */
+    boolean ignoreCase() default false;
 
-	/**
-	 * @return Default values for parameters if none is provided by the user. Can be
-	 *         parsed by the Spring Expression Language
-	 */
-	String[] defaultValues() default {};
+    /**
+     * @return Default values for parameters if none is provided by the user. Can be
+     * parsed by the Spring Expression Language
+     */
+    String[] defaultValues() default {};
 
-	/**
-	 * @return Constant values for parameters. Having any value, the corresponding
-	 *         filter value will not be requested from the user. Can be parsed by
-	 *         the Spring Expression Language
-	 */
-	String[] constantValues() default {};
+    /**
+     * @return Constant values for parameters. Having any value, the corresponding
+     * filter value will not be requested from the user. Can be parsed by
+     * the Spring Expression Language
+     */
+    String[] constantValues() default {};
 
-	/**
-	 * @return Optional format pattern to assist data conversion for the
-	 *         corresponding path type. Can be parsed by the Spring Expression
-	 *         Language
-	 */
-	String format() default "";
+    /**
+     * @return Optional format pattern to assist data conversion for the
+     * corresponding path type. Can be parsed by the Spring Expression
+     * Language
+     */
+    String format() default "";
+
+    /**
+     * @return Indicates this filter must always be used and it's value must be provided
+     */
+    boolean required() default false;
 
 }

@@ -20,31 +20,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.annotation;
+package io.github.mportilho.dfr.core.operation.type;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import io.github.mportilho.dfr.core.operation.FilterOperation;
 
 /**
- * Defines a statement of logic clauses
- * 
- * @author Marcelo Portilho
+ * Represents a Ends With operation
  *
+ * @param <T> Return type of the query object created from this dynamic filter
+ *            resolver
+ * @author Marcelo Portilho
  */
-@Documented
-@Retention(RUNTIME)
-public @interface Statement {
-
-	/**
-	 * @return An array of logic clauses
-	 */
-	Filter[] value();
-
-	/**
-	 * @return a boolean indicating if the whole statement must be negated
-	 */
-	String negate() default "false";
+public interface EndsWith<T> extends FilterOperation<T> {
 
 }

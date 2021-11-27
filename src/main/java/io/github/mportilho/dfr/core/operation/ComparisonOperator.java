@@ -20,31 +20,41 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.annotation;
+package io.github.mportilho.dfr.core.operation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import io.github.mportilho.dfr.core.operation.type.*;
 
 /**
- * Defines a statement of logic clauses
- * 
- * @author Marcelo Portilho
+ * Comparison operations used on dynamic filter operator
  *
+ * @author Marcelo Portilho
  */
-@Documented
-@Retention(RUNTIME)
-public @interface Statement {
+public enum ComparisonOperator {
 
-	/**
-	 * @return An array of logic clauses
-	 */
-	Filter[] value();
+    EQ(Equals.class), //
+    NE(NotEquals.class), //
+    LT(Less.class), //
+    LE(LessOrEquals.class), //
+    GT(Greater.class), //
+    GE(GreaterOrEquals.class), //
+    LK(Like.class), //
+    NL(NotLike.class), //
+    SW(StartsWith.class), //
+    EW(EndsWith.class)//
+    ;
 
-	/**
-	 * @return a boolean indicating if the whole statement must be negated
-	 */
-	String negate() default "false";
+    @SuppressWarnings("rawtypes")
+    private final Class<? extends FilterOperation> operator;
+
+    @SuppressWarnings("rawtypes")
+    ComparisonOperator(Class<? extends FilterOperation> operator) {
+        this.operator = operator;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> Class<? extends FilterOperation<T>> getOperator() {
+        return (Class<? extends FilterOperation<T>>) operator;
+    }
 
 }

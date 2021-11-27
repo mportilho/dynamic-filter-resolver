@@ -20,31 +20,24 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.annotation;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+package io.github.mportilho.dfr.core.operation;
 
 /**
- * Defines a statement of logic clauses
- * 
- * @author Marcelo Portilho
+ * Contains a set of {@link FilterOperator} implementations for a specific query
+ * framework.
  *
+ * @param <T> Return type of the query object created from this dynamic filter
+ *            resolver
+ * @author Marcelo Portilho
  */
-@Documented
-@Retention(RUNTIME)
-public @interface Statement {
+public interface FilterOperatorFactory<T> {
 
-	/**
-	 * @return An array of logic clauses
-	 */
-	Filter[] value();
-
-	/**
-	 * @return a boolean indicating if the whole statement must be negated
-	 */
-	String negate() default "false";
+    /**
+     * @param <R>      The current {@link FilterOperator} type implementation
+     * @param operator the {@link FilterOperator} class used to query a specific
+     *                 implementation
+     * @return the implementation of a requested {@link FilterOperator}
+     */
+    <R extends FilterOperation<T>> R createFilter(Class<? extends FilterOperation<T>> operation);
 
 }

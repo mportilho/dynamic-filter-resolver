@@ -20,31 +20,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.annotation;
+package io.github.mportilho.dfr.converters.impl;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
 
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import io.github.mportilho.dfr.utils.DateUtils;
+
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 /**
- * Defines a statement of logic clauses
- * 
- * @author Marcelo Portilho
+ * Converts a {@link Instant} from a {@link String}
  *
+ * @author Marcelo Portilho
  */
-@Documented
-@Retention(RUNTIME)
-public @interface Statement {
+public class StringToInstantConverter extends AbstractCachedFormattedConverter<String, Instant, String> {
 
-	/**
-	 * @return An array of logic clauses
-	 */
-	Filter[] value();
-
-	/**
-	 * @return a boolean indicating if the whole statement must be negated
-	 */
-	String negate() default "false";
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Instant convert(String source, String format) {
+        if (format == null || format.isEmpty()) {
+            return DateUtils.DATETIME_FORMATTER.parse(source, Instant::from);
+        }
+        return cache(format, DateTimeFormatter::ofPattern).parse(source, Instant::from);
+    }
 
 }

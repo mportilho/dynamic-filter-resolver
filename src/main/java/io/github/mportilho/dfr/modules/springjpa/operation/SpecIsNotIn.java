@@ -20,31 +20,38 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.annotation;
+package io.github.mportilho.dfr.modules.springjpa.operation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import io.github.mportilho.dfr.converters.FormattedConversionService;
+import io.github.mportilho.dfr.core.operation.FilterData;
+import io.github.mportilho.dfr.core.operation.type.IsNotIn;
+import org.springframework.data.jpa.domain.Specification;
 
 /**
- * Defines a statement of logic clauses
- * 
- * @author Marcelo Portilho
+ * Implementation of {@link IsNotIn} for the Spring Data JPA's
+ * {@link Specification} interface
  *
+ * @param <T>
+ * @author Marcelo Portilho
  */
-@Documented
-@Retention(RUNTIME)
-public @interface Statement {
+class SpecIsNotIn<T> implements IsNotIn<Specification<T>> {
 
-	/**
-	 * @return An array of logic clauses
-	 */
-	Filter[] value();
+    @SuppressWarnings("rawtypes")
+    private final SpecIsIn isInOperator;
 
-	/**
-	 * @return a boolean indicating if the whole statement must be negated
-	 */
-	String negate() default "false";
+    @SuppressWarnings("rawtypes")
+    public SpecIsNotIn(SpecIsIn isInOperator) {
+        super();
+        this.isInOperator = isInOperator;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public Specification<T> createFilter(FilterData FilterData, FormattedConversionService formattedConversionService) {
+        return Specification.not(isInOperator.createFilter(FilterData, formattedConversionService));
+    }
 
 }

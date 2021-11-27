@@ -20,31 +20,28 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.annotation;
+package io.github.mportilho.dfr.modules.springjpa.webautoconfigure;
+
+import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Defines a statement of logic clauses
- * 
- * @author Marcelo Portilho
+ * Enables autoconfiguration of the
+ * {@link SpecificationDynamicFilterArgumentResolver} for a Spring MVC based
+ * project
  *
+ * @author Marcelo Portilho
  */
 @Documented
 @Retention(RUNTIME)
-public @interface Statement {
-
-	/**
-	 * @return An array of logic clauses
-	 */
-	Filter[] value();
-
-	/**
-	 * @return a boolean indicating if the whole statement must be negated
-	 */
-	String negate() default "false";
+@Target({TYPE})
+@Import({MvcDynamicFilterResolverAutoConfiguration.class})
+public @interface EnableMvcSpecificationFilterResolver {
 
 }

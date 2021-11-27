@@ -20,31 +20,33 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.annotation;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+package io.github.mportilho.dfr.converters;
 
 /**
- * Defines a statement of logic clauses
- * 
- * @author Marcelo Portilho
+ * A converter that converts a value to a target type, optionally using a
+ * provided formatter.
  *
+ * <p>
+ * The converter must be thread-safe
+ *
+ * @param <S> The type of the object to be converter
+ * @param <T> The target type
+ * @param <F> The optional formatter
+ * @author Marcelo Portilho
  */
-@Documented
-@Retention(RUNTIME)
-public @interface Statement {
+public interface FormattedConverter<S, T, F> {
 
-	/**
-	 * @return An array of logic clauses
-	 */
-	Filter[] value();
-
-	/**
-	 * @return a boolean indicating if the whole statement must be negated
-	 */
-	String negate() default "false";
+    /**
+     * Convert the source object of type {@code S} to target type {@code T}.
+     *
+     * @param source the source object to convert, which must be an instance of
+     *               {@code S}
+     * @param format nullable optional format to be used for conversion
+     * @return the converted object, which must be an instance of {@code T}
+     * (potentially {@code null})
+     * @throws IllegalArgumentException if the source cannot be converted to the
+     *                                  desired target type
+     */
+    T convert(S source, F format);
 
 }

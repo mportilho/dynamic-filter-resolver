@@ -20,31 +20,34 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.annotation;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+package io.github.mportilho.dfr.converters;
 
 /**
- * Defines a statement of logic clauses
- * 
- * @author Marcelo Portilho
+ * It's a conversion service that encapsulate additional converting capabilities
+ * to the FilterValueConverter component. For example, it can help
+ * encapsulating the SpringFramework's ConversionService or similar components.
  *
+ * @author Marcelo Portilho
  */
-@Documented
-@Retention(RUNTIME)
-public @interface Statement {
+public interface FormattedConversionService {
 
-	/**
-	 * @return An array of logic clauses
-	 */
-	Filter[] value();
+    /**
+     * Indicates if this conversion service can convert a sourceType to a targetType
+     *
+     * @param sourceType The source's class to be converted from
+     * @param targetType The source's target class to be converted to
+     * @return an indication if there's a converter for the provided types
+     */
+    boolean canConvert(Class<?> sourceType, Class<?> targetType);
 
-	/**
-	 * @return a boolean indicating if the whole statement must be negated
-	 */
-	String negate() default "false";
+    /**
+     * Converts an object to a target type
+     *
+     * @param <T>        The source's target type to be converted to
+     * @param source     The value to be converted
+     * @param targetType The source's target type to be converted to
+     * @return The converted object
+     */
+    <S, T, F> T convert(S source, Class<T> targetType, F format);
 
 }

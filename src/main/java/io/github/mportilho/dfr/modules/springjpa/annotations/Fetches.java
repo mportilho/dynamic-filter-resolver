@@ -20,31 +20,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.annotation;
+package io.github.mportilho.dfr.modules.springjpa.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+
 /**
- * Defines a statement of logic clauses
- * 
- * @author Marcelo Portilho
+ * Aggregates repeatable Fetching annotations
  *
+ * @author Marcelo Portilho
  */
 @Documented
 @Retention(RUNTIME)
-public @interface Statement {
+@Target({PARAMETER, TYPE})
+public @interface Fetches {
 
-	/**
-	 * @return An array of logic clauses
-	 */
-	Filter[] value();
-
-	/**
-	 * @return a boolean indicating if the whole statement must be negated
-	 */
-	String negate() default "false";
+    /**
+     * @return array of repeatable Fetching annotations
+     */
+    io.github.mportilho.dfr.modules.spring.Fetching[] value() default {};
 
 }

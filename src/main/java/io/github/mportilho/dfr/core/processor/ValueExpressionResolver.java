@@ -20,31 +20,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.annotation;
+package io.github.mportilho.dfr.core.processor;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Defines a statement of logic clauses
- * 
- * @author Marcelo Portilho
+ * Resolves a variable representation (or expression language value) to a
+ * dynamic provided value. Useful for configuring default values for the
+ * {@link Filter}'s parameters. It can encapsulate others converters like the
+ * Spring Framework's expression language converter
  *
+ * @author Marcelo Portilho
  */
-@Documented
-@Retention(RUNTIME)
-public @interface Statement {
+public interface ValueExpressionResolver {
 
-	/**
-	 * @return An array of logic clauses
-	 */
-	Filter[] value();
-
-	/**
-	 * @return a boolean indicating if the whole statement must be negated
-	 */
-	String negate() default "false";
+    /**
+     * Resolves an expression to a dynamic value
+     *
+     * @param value The source String value
+     * @return The resolved value from the source
+     */
+    String resolveStringValue(String value);
 
 }
