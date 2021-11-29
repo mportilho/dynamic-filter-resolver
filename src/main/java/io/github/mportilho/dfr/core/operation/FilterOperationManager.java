@@ -23,38 +23,25 @@ SOFTWARE.*/
 package io.github.mportilho.dfr.core.operation;
 
 
-import io.github.mportilho.dfr.core.operation.type.*;
+import io.github.mportilho.dfr.converters.FormattedConversionService;
 
 /**
- * Comparison operations used on dynamic filter operator
+ * Represents a logic operation to be applied
  *
+ * @param <T> Return type of the query object created from this dynamic filter
+ *            resolver
  * @author Marcelo Portilho
  */
-public enum ComparisonOperator {
+public interface FilterOperationManager<T> {
 
-    EQ(Equals.class), //
-    NE(NotEquals.class), //
-    LT(Less.class), //
-    LE(LessOrEquals.class), //
-    GT(Greater.class), //
-    GE(GreaterOrEquals.class), //
-    LK(Like.class), //
-    NL(NotLike.class), //
-    SW(StartsWith.class), //
-    EW(EndsWith.class)//
-    ;
-
-    @SuppressWarnings("rawtypes")
-    private final Class<? extends FilterOperation> operator;
-
-    @SuppressWarnings("rawtypes")
-    ComparisonOperator(Class<? extends FilterOperation> operator) {
-        this.operator = operator;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> Class<? extends FilterOperation<T>> getOperator() {
-        return (Class<? extends FilterOperation<T>>) operator;
-    }
+    /**
+     * Creates a filtering operation for the provided parameter
+     *
+     * @param filterData                 The representation of a query filter
+     * @param formattedConversionService Convert filter values to the target attribute's
+     *                                   type
+     * @return The resulting query logic
+     */
+    <R> R createFilter(FilterData filterData, FormattedConversionService formattedConversionService);
 
 }

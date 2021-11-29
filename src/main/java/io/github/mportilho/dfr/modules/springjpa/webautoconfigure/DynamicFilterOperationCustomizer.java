@@ -22,15 +22,14 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.modules.springjpa.webautoconfigure;
 
-import br.com.bancoamazonia.base.components.dynafilter.annotation.Conjunction;
-import br.com.bancoamazonia.base.components.dynafilter.annotation.Disjunction;
-import br.com.bancoamazonia.base.components.dynafilter.annotation.Filter;
-import br.com.bancoamazonia.base.components.dynafilter.annotation.Statement;
-import br.com.bancoamazonia.base.components.dynafilter.operator.type.Dynamic;
-import br.com.bancoamazonia.base.components.dynafilter.operator.type.IsNotNull;
-import br.com.bancoamazonia.base.components.dynafilter.operator.type.IsNull;
-import br.com.bancoamazonia.base.components.dynafilter.processor.reflection.ReflectionProcessorParameter;
 import com.fasterxml.jackson.annotation.JsonView;
+import io.github.mportilho.dfr.core.annotation.Conjunction;
+import io.github.mportilho.dfr.core.annotation.Disjunction;
+import io.github.mportilho.dfr.core.annotation.Filter;
+import io.github.mportilho.dfr.core.annotation.Statement;
+import io.github.mportilho.dfr.core.operation.type.Dynamic;
+import io.github.mportilho.dfr.core.operation.type.IsNotNull;
+import io.github.mportilho.dfr.core.operation.type.IsNull;
 import io.swagger.v3.core.util.AnnotationsUtils;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.models.Operation;
@@ -53,7 +52,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static br.com.bancoamazonia.base.components.dynafilter.processor.reflection.ReflectionConditionalStatementProcessorImpl.findStatementAnnotations;
+import static io.github.mportilho.dfr.core.processor.ReflectionConditionalStatementProcessor.findStatementAnnotations;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -104,8 +103,8 @@ public class DynamicFilterOperationCustomizer implements OperationCustomizer {
         }
         Class<?> fieldClass = field.getType();
 
-        if (Dynamic.class.equals(filter.operator()) && filter.parameters().length > 1) {
-            throw new IllegalStateException("Dynamic filter operator cannot have two parameters");
+        if (Dynamic.class.equals(filter.operation()) && filter.parameters().length > 1) {
+            throw new IllegalStateException("Dynamic filter operation cannot have two parameters");
         }
 
         Schema schemaFromType = AnnotationsUtils.resolveSchemaFromType(fieldClass, null, getJsonViewFromMethod(methodParameter));
@@ -117,7 +116,7 @@ public class DynamicFilterOperationCustomizer implements OperationCustomizer {
             io.swagger.v3.oas.models.parameters.Parameter parameter = optParameter.orElse(new io.swagger.v3.oas.models.parameters.Parameter());
             parameter.setName(parameterName);
 
-            if (Dynamic.class.equals(filter.operator())) {
+            if (Dynamic.class.equals(filter.operation())) {
                 Schema schema = new Schema<>();
                 schema.type("string");
                 ArraySchema arraySchema = new ArraySchema();
@@ -131,7 +130,7 @@ public class DynamicFilterOperationCustomizer implements OperationCustomizer {
                 boolean schemaExists = optSchema.isPresent();
                 Schema schema = optSchema.orElse(new Schema<>());
 
-                if (IsNull.class.equals(filter.operator()) || IsNotNull.class.equals(filter.operator())) {
+                if (IsNull.class.equals(filter.operation()) || IsNotNull.class.equals(filter.operation())) {
                     schema = new BooleanSchema();
                 } else if (schemaExists) {
                     schema.setType(schemaFromType.getType());
@@ -197,7 +196,7 @@ public class DynamicFilterOperationCustomizer implements OperationCustomizer {
             return Collections.emptyList();
         }
         MultiValuedMap<Annotation, List<Annotation>> statementAnnotations =
-                findStatementAnnotations(new ReflectionProcessorParameter(methodParameter.getParameterType(), methodParameter.getParameterAnnotations()));
+                findStatementAnnotations(methodParameter.getParameterType(), methodParameter.getParameterAnnotations());
         Annotation[] annotations = statementAnnotations.values().stream()
                 .flatMap(Collection::stream)
                 .filter(a -> a.annotationType().equals(Conjunction.class) || a.annotationType().equals(Disjunction.class))
@@ -215,16 +214,13 @@ public class DynamicFilterOperationCustomizer implements OperationCustomizer {
      */
     private static List<Filter> composeSpecsFromParameterConfiguration(Annotation annotation) {
         List<Filter> specsList = new ArrayList<>();
-        if (annotation instanceof Conjunction) {
-            Conjunction conjunction = (Conjunction) annotation;
+        if (annotation instanceof Conjunction conjunction) {
             specsList.addAll(Arrays.asList(conjunction.value()));
             specsList.addAll(Stream.of(conjunction.disjunctions()).flatMap(v -> Stream.of(v.value())).collect(Collectors.toList()));
-        } else if (annotation instanceof Disjunction) {
-            Disjunction disjunction = (Disjunction) annotation;
+        } else if (annotation instanceof Disjunction disjunction) {
             specsList.addAll(Arrays.asList(disjunction.value()));
             specsList.addAll(Stream.of(disjunction.conjunctions()).flatMap(v -> Stream.of(v.value())).collect(Collectors.toList()));
-        } else if (annotation instanceof Statement) {
-            Statement statement = (Statement) annotation;
+        } else if (annotation instanceof Statement statement) {
             specsList.addAll(Arrays.asList(statement.value()));
         }
 //        specsList.removeIf(filter -> isNotEmpty(filter.constantValues()));
@@ -257,28 +253,24 @@ public class DynamicFilterOperationCustomizer implements OperationCustomizer {
             if ("integer".equals(property.getType()) || "number".equals(property.getType())) {
                 property.setMinimum(new BigDecimal(size.min()));
                 property.setMaximum(new BigDecimal(size.max()));
-            } else if (property instanceof StringSchema) {
-                StringSchema sp = (StringSchema) property;
+            } else if (property instanceof StringSchema sp) {
                 sp.minLength(size.min());
                 sp.maxLength(size.max());
-            } else if (property instanceof ArraySchema) {
-                ArraySchema sp = (ArraySchema) property;
+            } else if (property instanceof ArraySchema sp) {
                 sp.setMinItems(size.min());
                 sp.setMaxItems(size.max());
             }
         }
         if (annotationMap.containsKey("javax.validation.constraints.DecimalMin")) {
             DecimalMin min = (DecimalMin) annotationMap.get("javax.validation.constraints.DecimalMin");
-            if (property instanceof NumberSchema) {
-                NumberSchema ap = (NumberSchema) property;
+            if (property instanceof NumberSchema ap) {
                 ap.setMinimum(new BigDecimal(min.value()));
                 ap.setExclusiveMinimum(!min.inclusive());
             }
         }
         if (annotationMap.containsKey("javax.validation.constraints.DecimalMax")) {
             DecimalMax max = (DecimalMax) annotationMap.get("javax.validation.constraints.DecimalMax");
-            if (property instanceof NumberSchema) {
-                NumberSchema ap = (NumberSchema) property;
+            if (property instanceof NumberSchema ap) {
                 ap.setMaximum(new BigDecimal(max.value()));
                 ap.setExclusiveMaximum(!max.inclusive());
             }

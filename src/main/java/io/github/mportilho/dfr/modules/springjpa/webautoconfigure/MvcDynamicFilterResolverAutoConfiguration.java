@@ -22,15 +22,13 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.modules.springjpa.webautoconfigure;
 
-import br.com.bancoamazonia.base.components.dynafilter.filter.DefaultFilterValueConverter;
-import br.com.bancoamazonia.base.components.dynafilter.filter.DynamicFilterResolver;
-import br.com.bancoamazonia.base.components.dynafilter.filter.FilterValueConverter;
-import br.com.bancoamazonia.base.components.dynafilter.processor.reflection.ReflectionConditionalStatementProcessor;
-import br.com.bancoamazonia.base.components.dynafilter.processor.reflection.ReflectionConditionalStatementProcessorImpl;
-import br.com.bancoamazonia.base.components.dynafilter.statement.ValueExpressionResolver;
-import br.com.bancoamazonia.sbs.components.converter.SpringFormattedConversionServiceAdapter;
-import br.com.bancoamazonia.sbs.components.dynafilter.springdatajpa.filter.SpecificationDynamicFilterResolver;
-import br.com.bancoamazonia.sbs.components.dynafilter.springdatajpa.operator.SpecificationFilterOperatorService;
+import io.github.mportilho.dfr.converters.DefaultFormattedConversionService;
+import io.github.mportilho.dfr.converters.FormattedConversionService;
+import io.github.mportilho.dfr.core.processor.ReflectionConditionalStatementProcessor;
+import io.github.mportilho.dfr.core.processor.ValueExpressionResolver;
+import io.github.mportilho.dfr.core.resolver.DynamicFilterResolver;
+import io.github.mportilho.dfr.modules.springjpa.filter.SpecificationDynamicFilterResolver;
+import io.github.mportilho.dfr.modules.springjpa.operation.SpecificationFilterOperationFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.EmbeddedValueResolverAware;
@@ -74,19 +72,18 @@ public class MvcDynamicFilterResolverAutoConfiguration implements EmbeddedValueR
             public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
                 ValueExpressionResolver resolver = stringValueResolver != null ? (stringValueResolver::resolveStringValue) : null;
 
-                FilterValueConverter filterValueConverter;
+                FormattedConversionService formattedConversionService;
                 if (conversionService != null) {
-                    filterValueConverter = new DefaultFilterValueConverter(new SpringFormattedConversionServiceAdapter(conversionService));
+                    formattedConversionService = new SpringFormattedConversionServiceAdapter(conversionService, new DefaultFormattedConversionService());
                 } else {
-                    filterValueConverter = new DefaultFilterValueConverter();
+                    formattedConversionService = new DefaultFormattedConversionService();
                 }
 
                 DynamicFilterResolver<Specification<?>> dynamicFilterResolver = new SpecificationDynamicFilterResolver(
-                        new SpecificationFilterOperatorService(),
-                        filterValueConverter);
+                        new SpecificationFilterOperationFactory(), formattedConversionService);
 
-                ReflectionConditionalStatementProcessor statementProvider = new ReflectionConditionalStatementProcessorImpl(resolver);
-                resolvers.add(new SpecificationDynamicFilterArgumentResolver(statementProvider, dynamicFilterResolver));
+                resolvers.add(new SpecificationDynamicFilterArgumentResolver(
+                        new ReflectionConditionalStatementProcessor(resolver), dynamicFilterResolver));
             }
         };
     }

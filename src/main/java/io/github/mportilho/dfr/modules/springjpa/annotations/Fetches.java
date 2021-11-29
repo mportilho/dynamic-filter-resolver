@@ -22,11 +22,13 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.modules.springjpa.annotations;
 
+import io.github.mportilho.dfr.modules.spring.Fetching;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -38,12 +40,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Documented
 @Retention(RUNTIME)
-@Target({PARAMETER, TYPE})
+@Target({TYPE, ANNOTATION_TYPE})
 public @interface Fetches {
 
     /**
      * @return array of repeatable Fetching annotations
      */
-    io.github.mportilho.dfr.modules.spring.Fetching[] value() default {};
+    Fetching[] value() default {};
 
 }

@@ -20,24 +20,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.operation;
+package io.github.mportilho.dfr.mocks.annotations;
+
+
+import io.github.mportilho.dfr.core.annotation.Disjunction;
+import io.github.mportilho.dfr.core.annotation.Filter;
+import io.github.mportilho.dfr.core.operation.type.Greater;
+import io.github.mportilho.dfr.core.operation.type.GreaterOrEquals;
+import io.github.mportilho.dfr.mocks.interfaces.StatusEnum;
+
+import java.time.LocalDate;
 
 /**
- * Contains a set of {@link FilterOperator} implementations for a specific query
- * framework.
+ * Simulates parameter annotations
  *
- * @param <T> Return type of the query object created from this dynamic filter
- *            resolver
  * @author Marcelo Portilho
  */
-public interface FilterOperatorFactory<T> {
-
-    /**
-     * @param <R>      The current {@link FilterOperator} type implementation
-     * @param operator the {@link FilterOperator} class used to query a specific
-     *                 implementation
-     * @return the implementation of a requested {@link FilterOperator}
-     */
-    <R extends FilterOperation<T>> R createFilter(Class<? extends FilterOperation<T>> operation);
+@Disjunction(value = {
+        @Filter(path = "birthday", parameters = "birthday", operation = GreaterOrEquals.class, constantValues = "12/12/2012", targetType = LocalDate.class),
+        @Filter(path = "height", parameters = "height", operation = Greater.class, constantValues = "170", targetType = StatusEnum.class)})
+public interface MethodArgumentAnnotations {
 
 }

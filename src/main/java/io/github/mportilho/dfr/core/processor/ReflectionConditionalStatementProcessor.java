@@ -27,27 +27,30 @@ import io.github.mportilho.dfr.core.annotation.Disjunction;
 import io.github.mportilho.dfr.core.annotation.Filter;
 import io.github.mportilho.dfr.core.annotation.Statement;
 import io.github.mportilho.dfr.core.operation.FilterData;
-import io.github.mportilho.dfr.core.operation.FilterOperation;
+import io.github.mportilho.dfr.core.operation.FilterOperationManager;
 import io.github.mportilho.dfr.core.operation.type.IsIn;
 import io.github.mportilho.dfr.core.operation.type.IsNotIn;
 import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.map.AbstractReferenceMap;
 import org.apache.commons.collections4.map.ReferenceMap;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Marcelo Portilho
  */
-public class ConditionalStatementReflectionProcessorImpl implements ConditionalStatementReflectionProcessor {
+public class ReflectionConditionalStatementProcessor implements ConditionalStatementProcessor<Class<?>> {
 
-    private static final ReferenceMap<ReflectionProcessorParameter, MultiValuedMap<Annotation, List<Annotation>>> cache = new ReferenceMap<>();
+    private static final Map<ReflectionProcessorParameter, MultiValuedMap<Annotation, List<Annotation>>> cache =
+            new ReferenceMap<>(AbstractReferenceMap.ReferenceStrength.WEAK, AbstractReferenceMap.ReferenceStrength.SOFT);
 
     private final ValueExpressionResolver valueExpressionResolver;
 
-    public ConditionalStatementReflectionProcessorImpl(ValueExpressionResolver valueExpressionResolver) {
+    public ReflectionConditionalStatementProcessor(ValueExpressionResolver valueExpressionResolver) {
         this.valueExpressionResolver = valueExpressionResolver;
     }
 
@@ -58,8 +61,7 @@ public class ConditionalStatementReflectionProcessorImpl implements ConditionalS
     public ConditionalStatement createConditionalStatements(Class<?> type, Annotation[] annotations, Map<String, Object[]> parametersMap) {
         parametersMap = parametersMap != null ? parametersMap : Collections.emptyMap();
         List<ConditionalStatement> statements = new ArrayList<>();
-        MultiValuedMap<Annotation, List<Annotation>> statementAnnotations = cache
-                .computeIfAbsent(new ReflectionProcessorParameter(type, annotations), this::findStatementAnnotationsInternal);
+        MultiValuedMap<Annotation, List<Annotation>> statementAnnotations = findStatementAnnotations(type, annotations);
 
         for (Map.Entry<Annotation, Collection<List<Annotation>>> entry : statementAnnotations.asMap().entrySet()) {
             String stmtId = entry.getKey() instanceof VirtualAnnotationHolder ?
@@ -87,17 +89,17 @@ public class ConditionalStatementReflectionProcessorImpl implements ConditionalS
         return new ConditionalStatement("conjunction_wrapper", LogicType.DISJUNCTION, false, null, statements);
     }
 
-    MultiValuedMap<Annotation, List<Annotation>> findStatementAnnotationsInternal(ReflectionProcessorParameter processorParameter) {
-        return findStatementAnnotations(processorParameter);
-    }
-
-    public static MultiValuedMap<Annotation, List<Annotation>> findStatementAnnotations(ReflectionProcessorParameter processorParameter) {
+    static MultiValuedMap<Annotation, List<Annotation>> findStatementAnnotationsInternal(ReflectionProcessorParameter processorParameter) {
         MultiValuedMap<Annotation, List<Annotation>> statementAnnotations = new ArrayListValuedHashMap<>();
         for (Class<?> anInterface : getAllInterfaces(processorParameter.type())) {
             statementAnnotations.putAll(getAllAnnotations(anInterface));
         }
         statementAnnotations.putAll(getAllAnnotations(processorParameter));
         return statementAnnotations;
+    }
+
+    public static MultiValuedMap<Annotation, List<Annotation>> findStatementAnnotations(Class<?> type, Annotation[] annotations) {
+        return cache.computeIfAbsent(new ReflectionProcessorParameter(type, annotations), ReflectionConditionalStatementProcessor::findStatementAnnotationsInternal);
     }
 
     /**
@@ -166,9 +168,17 @@ public class ConditionalStatementReflectionProcessorImpl implements ConditionalS
 
                 boolean negate = Boolean.parseBoolean(computeSpringExpressionLanguage(filter.negate(), parametersMap));
                 String format = computeSpringExpressionLanguage(filter.format(), parametersMap);
+                Map<String, String> modifiers = Arrays.stream(filter.modifiers())
+                        .map(s -> {
+                            String[] arr = s.split("=");
+                            if (arr.length != 2) {
+                                throw new IllegalArgumentException("The modifiers field format must be like 'Attribute=Value'");
+                            }
+                            return arr;
+                        }).collect(Collectors.toMap(s -> s[0], s -> s[1]));
 
                 FilterData parameter = new FilterData(filter.attributePath(), filter.path(), filter.parameters(), filter.targetType(),
-                        filter.operation(), negate, filter.ignoreCase(), values, format);
+                        filter.operation(), negate, filter.ignoreCase(), values, format, modifiers);
                 parameter = decorateFilterData(parameter, parametersMap);
                 filterParameters.add(parameter);
             } else if (filter.required()) {
@@ -183,7 +193,7 @@ public class ConditionalStatementReflectionProcessorImpl implements ConditionalS
      */
     private Object[] retrieveFilterValues(Filter filter, Map<String, Object[]> parametersMap) {
         String[] parameters = filter.parameters();
-        boolean multiValuedOperation = operatorAcceptsMultipleValues(filter.operation());
+        boolean multiValuedOperation = operationAcceptsMultipleValues(filter.operation());
 
         if (parameters == null || parameters.length == 0) {
             throw new IllegalArgumentException("No parameter configured for filter " + filter.path());
@@ -292,7 +302,7 @@ public class ConditionalStatementReflectionProcessorImpl implements ConditionalS
     }
 
     @SuppressWarnings("rawtypes")
-    public boolean operatorAcceptsMultipleValues(Class<? extends FilterOperation> clazz) {
+    public boolean operationAcceptsMultipleValues(Class<? extends FilterOperationManager> clazz) {
         return IsIn.class == clazz || IsNotIn.class == clazz;
     }
 

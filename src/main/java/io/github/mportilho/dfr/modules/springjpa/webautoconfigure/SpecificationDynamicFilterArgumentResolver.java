@@ -22,15 +22,13 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.modules.springjpa.webautoconfigure;
 
-import br.com.bancoamazonia.base.components.dynafilter.annotation.Conjunction;
-import br.com.bancoamazonia.base.components.dynafilter.annotation.Disjunction;
-import br.com.bancoamazonia.base.components.dynafilter.filter.DynamicFilterResolver;
-import br.com.bancoamazonia.base.components.dynafilter.processor.reflection.ReflectionConditionalStatementProcessor;
-import br.com.bancoamazonia.base.components.dynafilter.statement.ConditionalStatement;
-import br.com.bancoamazonia.base.components.resource.ResourceLoader;
-import br.com.bancoamazonia.sbs.components.dynafilter.springdatajpa.annotation.Fetching;
+import io.github.mportilho.dfr.core.processor.ConditionalStatement;
+import io.github.mportilho.dfr.core.processor.ConditionalStatementProcessor;
+import io.github.mportilho.dfr.core.resolver.DynamicFilterResolver;
+import io.github.mportilho.dfr.modules.spring.Fetching;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -48,8 +46,7 @@ import java.util.Map;
 
 /**
  * Resolves interfaces assignable from {@link Specification} into valid queries.
- * These structures must be annotated with {@link Conjunction} or
- * {@link Disjunction} types.
+ * These structures must be annotated with Conjunction or Disjunction types.
  *
  * @author Marcelo Portilho
  */
@@ -57,12 +54,12 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 
     private static final String FETCHING_CLASS_NAME = Fetching.class.getCanonicalName();
 
-    private final ReflectionConditionalStatementProcessor reflectionConditionalStatementProcessor;
+    private final ConditionalStatementProcessor<Class<?>> conditionalStatementReflectionProcessor;
     private final DynamicFilterResolver<Specification<?>> dynamicFilterResolver;
 
-    public SpecificationDynamicFilterArgumentResolver(ReflectionConditionalStatementProcessor reflectionConditionalStatementProcessor,
+    public SpecificationDynamicFilterArgumentResolver(ConditionalStatementProcessor<Class<?>> conditionalStatementReflectionProcessor,
                                                       DynamicFilterResolver<Specification<?>> dynamicFilterResolver) {
-        this.reflectionConditionalStatementProcessor = reflectionConditionalStatementProcessor;
+        this.conditionalStatementReflectionProcessor = conditionalStatementReflectionProcessor;
         this.dynamicFilterResolver = dynamicFilterResolver;
     }
 
@@ -84,7 +81,7 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
         Map<String, Object[]> providedParameterValuesMap = createProvidedValuesMap(webRequest);
         Map<String, Object> contextMap = createContextMap(parameter);
 
-        ConditionalStatement statement = reflectionConditionalStatementProcessor.createConditionalStatements(
+        ConditionalStatement statement = conditionalStatementReflectionProcessor.createConditionalStatements(
                 parameter.getParameterType(), parameter.getParameterAnnotations(), providedParameterValuesMap);
         return createProxy(dynamicFilterResolver.convertTo(statement, contextMap), parameter.getParameterType());
     }
@@ -111,13 +108,13 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
     }
 
     /**
-     * Creates a context map for the {@link ReflectionConditionalStatementProcessor}
+     * Creates a context map for the {@link ConditionalStatementProcessor}
      */
     private Map<String, Object> createContextMap(MethodParameter parameter) {
         Map<String, Object> contextMap = new HashMap<>();
         List<Annotation> list = new ArrayList<>();
         for (Annotation annotation : parameter.getParameterAnnotations()) {
-            if (annotation.annotationType().equals(Fetching.class)) {
+            if (annotation.annotationType().equals(io.github.mportilho.dfr.modules.spring.Fetching.class)) {
                 list.add(annotation);
             }
         }
@@ -140,9 +137,31 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
             return (T) target;
         }
         return (T) Proxy.newProxyInstance(
-                ResourceLoader.getClassLoader(),
+                getDefaultClassLoader(),
                 new Class[]{targetInterface},
                 (proxy, method, args) -> method.invoke(target, args));
+    }
+
+    public static ClassLoader getDefaultClassLoader() {
+        ClassLoader cl = null;
+        try {
+            cl = Thread.currentThread().getContextClassLoader();
+        } catch (Throwable ex) {
+            // Cannot access thread context ClassLoader - falling back...
+        }
+        if (cl == null) {
+            // No thread context class loader -> use class loader of this class.
+            cl = ClassUtils.class.getClassLoader();
+            if (cl == null) {
+                // getClassLoader() returning null indicates the bootstrap ClassLoader
+                try {
+                    cl = ClassLoader.getSystemClassLoader();
+                } catch (Throwable ex) {
+                    // Cannot access system ClassLoader - oh well, maybe the caller can live with null...
+                }
+            }
+        }
+        return cl;
     }
 
 }

@@ -23,7 +23,7 @@ SOFTWARE.*/
 package io.github.mportilho.dfr.core.operation.type;
 
 
-import io.github.mportilho.dfr.core.operation.FilterOperation;
+import io.github.mportilho.dfr.core.operation.FilterOperationManager;
 
 /**
  * Represents a Is In operation
@@ -32,6 +32,6 @@ import io.github.mportilho.dfr.core.operation.FilterOperation;
  *            resolver
  * @author Marcelo Portilho
  */
-public interface IsIn<T> extends FilterOperation<T> {
+public interface IsIn<T> extends FilterOperationManager<T> {
 
 }

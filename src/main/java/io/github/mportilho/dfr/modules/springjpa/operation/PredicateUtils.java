@@ -59,7 +59,15 @@ class PredicateUtils {
         PropertyPath propertyPath = PropertyPath.from(filterData.path(), root.getJavaType());
         From<?, ?> from = root;
         while (propertyPath.hasNext()) {
-            from = getOrCreateJoin(from, propertyPath.getSegment(), filterData.findStateOrDefault(JoinType.class, JoinType.INNER));
+            String joinTypeString = filterData.findModifier("JoinType");
+            JoinType joinType;
+            if (joinTypeString == null) {
+                joinType = JoinType.LEFT;
+            } else {
+                joinType = JoinType.valueOf(joinTypeString);
+            }
+
+            from = getOrCreateJoin(from, propertyPath.getSegment(), joinType);
             propertyPath = propertyPath.next();
         }
         return from.get(propertyPath.getSegment());

@@ -22,7 +22,7 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.core.annotation;
 
-import io.github.mportilho.dfr.core.operation.FilterOperation;
+import io.github.mportilho.dfr.core.operation.FilterOperationManager;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -74,7 +74,8 @@ public @interface Filter {
     /**
      * @return Operation to be used as a query filter
      */
-    Class<? extends FilterOperation<?>> operation();
+    @SuppressWarnings({"rawtypes"})
+    Class<? extends FilterOperationManager> operation();
 
     /**
      * Indicates that the logic of this filter must be negated. Can be parsed by the
@@ -120,5 +121,15 @@ public @interface Filter {
      * @return Indicates this filter must always be used and it's value must be provided
      */
     boolean required() default false;
+
+    /**
+     * Additional generic modifiers for configuring the filter construction.
+     *
+     * <p>
+     * For Example, in a String Data JPA context, we can use "JoinType=LEFT" (other values are RIGHT and JOIN) to
+     * indicate this attribute must use left join to compose the query.
+     * </p>
+     */
+    String[] modifiers() default {};
 
 }

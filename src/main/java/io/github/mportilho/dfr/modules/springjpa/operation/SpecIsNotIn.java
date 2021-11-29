@@ -37,12 +37,12 @@ import org.springframework.data.jpa.domain.Specification;
 class SpecIsNotIn<T> implements IsNotIn<Specification<T>> {
 
     @SuppressWarnings("rawtypes")
-    private final SpecIsIn isInOperator;
+    private final SpecIsIn isInOperation;
 
     @SuppressWarnings("rawtypes")
-    public SpecIsNotIn(SpecIsIn isInOperator) {
+    public SpecIsNotIn(SpecIsIn isInOperation) {
         super();
-        this.isInOperator = isInOperator;
+        this.isInOperation = isInOperation;
     }
 
     /**
@@ -51,7 +51,7 @@ class SpecIsNotIn<T> implements IsNotIn<Specification<T>> {
     @Override
     @SuppressWarnings("unchecked")
     public Specification<T> createFilter(FilterData FilterData, FormattedConversionService formattedConversionService) {
-        return Specification.not(isInOperator.createFilter(FilterData, formattedConversionService));
+        return Specification.not(isInOperation.createFilter(FilterData, formattedConversionService));
     }
 
 }

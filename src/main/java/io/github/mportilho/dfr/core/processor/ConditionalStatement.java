@@ -59,10 +59,10 @@ public record ConditionalStatement(
     }
 
     /**
-     * @return An indication that this statement has any clause or sub-statement
+     * @return An indication that this statement has no clauses nor sub-statements
      */
-    public boolean hasAnyCondition() {
-        return !clauses.isEmpty() || !(oppositeStatements != null && oppositeStatements.isEmpty());
+    public boolean hasNoCondition() {
+        return clauses != null && oppositeStatements != null && clauses.isEmpty() && oppositeStatements.isEmpty();
     }
 
     /**

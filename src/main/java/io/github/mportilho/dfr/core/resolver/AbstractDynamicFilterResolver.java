@@ -88,7 +88,7 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
      */
     @Override
     public <R extends T> R convertTo(ConditionalStatement conditionalStatement, Map<String, Object> context) {
-        if (conditionalStatement == null || !conditionalStatement.hasAnyCondition()) {
+        if (conditionalStatement == null || conditionalStatement.hasNoCondition()) {
             return responseDecorator(emptyPredicate(context), context);
         }
         return responseDecorator(convertRecursively(conditionalStatement, context), context);
@@ -106,14 +106,16 @@ public abstract class AbstractDynamicFilterResolver<T> implements DynamicFilterR
      * @return The query object created from this dynamic filter resolver
      */
     private <R extends T> R convertRecursively(ConditionalStatement conditionalStatement, Map<String, Object> context) {
-        if (conditionalStatement == null || !conditionalStatement.hasAnyCondition()) {
+        if (conditionalStatement == null || conditionalStatement.hasNoCondition()) {
             return null;
         }
         R predicate = createPredicateFromStatement(conditionalStatement, context);
 
         List<R> subStatementPredicates = new ArrayList<>();
-        for (ConditionalStatement subStatement : conditionalStatement.oppositeStatements()) {
-            subStatementPredicates.add(convertRecursively(subStatement, context));
+        if (conditionalStatement.oppositeStatements() != null) {
+            for (ConditionalStatement subStatement : conditionalStatement.oppositeStatements()) {
+                subStatementPredicates.add(convertRecursively(subStatement, context));
+            }
         }
         return composePredicatesFromSubStatements(conditionalStatement.logicType(), predicate, subStatementPredicates, context);
     }

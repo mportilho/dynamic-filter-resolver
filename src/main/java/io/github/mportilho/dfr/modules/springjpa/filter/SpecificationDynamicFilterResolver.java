@@ -24,10 +24,12 @@ package io.github.mportilho.dfr.modules.springjpa.filter;
 
 import io.github.mportilho.dfr.converters.FormattedConversionService;
 import io.github.mportilho.dfr.core.operation.FilterData;
-import io.github.mportilho.dfr.core.operation.FilterOperation;
+import io.github.mportilho.dfr.core.operation.FilterOperationFactory;
+import io.github.mportilho.dfr.core.operation.FilterOperationManager;
 import io.github.mportilho.dfr.core.processor.ConditionalStatement;
 import io.github.mportilho.dfr.core.processor.LogicType;
 import io.github.mportilho.dfr.core.resolver.AbstractDynamicFilterResolver;
+import io.github.mportilho.dfr.modules.spring.Fetching;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.mapping.PropertyPath;
 
@@ -43,12 +45,12 @@ import java.util.Map;
  */
 public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterResolver<Specification<?>> {
 
-    private static final String FETCHING_CLASS_NAME = io.github.mportilho.dfr.modules.spring.Fetching.class.getCanonicalName();
+    private final FilterOperationFactory<Specification<?>> filterOperationFactory;
+    private final FormattedConversionService formattedConversionService;
 
-    private FormattedConversionService formattedConversionService;
-
-    public SpecificationDynamicFilterResolver(FilterOperationService<Specification<?>> filterOperatorService,
+    public SpecificationDynamicFilterResolver(FilterOperationFactory<Specification<?>> filterOperationFactory,
                                               FormattedConversionService formattedConversionService) {
+        this.filterOperationFactory = filterOperationFactory;
         this.formattedConversionService = formattedConversionService;
     }
 
@@ -69,11 +71,11 @@ public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterRes
     public <R extends Specification<?>> R createPredicateFromStatement(
             ConditionalStatement conditionalStatement, Map<String, Object> context) {
         Specification rootSpec = null;
-        FilterOperationService<Specification> operatorService = getFilterOperationService();
 
         for (FilterData clause : conditionalStatement.clauses()) {
-            FilterOperation<Specification> operator = operatorService.getOperatorFor(clause.getOperator());
-            Specification spec = operator.createFilter(clause, formattedConversionService);
+            FilterOperationManager<?> operationManager = filterOperationFactory.createFilterManager(clause.operation());
+            Specification<?> spec = operationManager.createFilter(clause, formattedConversionService);
+
             if (spec != null) {
                 spec = clause.negate() ? Specification.not(spec) : spec;
                 if (rootSpec == null) {
@@ -113,14 +115,14 @@ public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterRes
         if (context == null || context.isEmpty()) {
             return response;
         }
-        io.github.mportilho.dfr.modules.spring.Fetching[] fetches = (io.github.mportilho.dfr.modules.spring.Fetching[]) context.get(FETCHING_CLASS_NAME);
+        Fetching[] fetches = (Fetching[]) context.get(Fetching.class.getCanonicalName());
         if (fetches == null || fetches.length == 0) {
             return response;
         }
 
         Specification<?> decoratedSpec = (root, query, criteriaBuilder) -> {
             query.distinct(true);
-            for (io.github.mportilho.dfr.modules.spring.Fetching fetching : fetches) {
+            for (Fetching fetching : fetches) {
                 for (String attributePath : fetching.value()) {
                     From<?, ?> from = root;
                     PropertyPath propertyPath = PropertyPath.from(attributePath, root.getJavaType());

@@ -1,16 +1,20 @@
 package io.github.mportilho.dfr.core.operation;
 
+import java.util.Map;
+
 //TODO include doc
+
 public record FilterData(
         String attributePath,
         String path,
         String[] parameters,
         Class<?> targetType,
-        Class<? extends FilterOperation<?>> operator,
+        @SuppressWarnings("rawtypes") Class<? extends FilterOperationManager> operation,
         boolean negate,
         boolean ignoreCase,
         Object[] values,
-        String format
+        String format,
+        Map<String, String> modifiers
 ) {
 
     /**
@@ -22,6 +26,13 @@ public record FilterData(
             return null;
         }
         return values[0];
+    }
+
+    public String findModifier(String name) {
+        if (modifiers != null) {
+            return modifiers.get(name);
+        }
+        return null;
     }
 
 }
