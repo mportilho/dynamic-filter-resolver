@@ -26,6 +26,7 @@ import io.github.mportilho.dfr.core.operation.FilterData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * It's the representation of a set of logic clauses and a optional set of
@@ -40,6 +41,11 @@ public record ConditionalStatement(
         List<FilterData> clauses,
         List<ConditionalStatement> oppositeStatements
 ) {
+
+    public ConditionalStatement {
+        Objects.requireNonNull(clauses, "Clause list cannot be null");
+        Objects.requireNonNull(oppositeStatements, "Opposite statement list cannot be null");
+    }
 
     public List<ConditionalStatement> findStatementsById(String id) {
         List<ConditionalStatement> statementList = new ArrayList<>();

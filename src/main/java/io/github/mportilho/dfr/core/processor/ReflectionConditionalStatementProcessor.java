@@ -86,7 +86,7 @@ public class ReflectionConditionalStatementProcessor implements ConditionalState
         } else if (statements.size() == 1) {
             return statements.get(0);
         }
-        return new ConditionalStatement("conjunction_wrapper", LogicType.DISJUNCTION, false, null, statements);
+        return new ConditionalStatement("conjunction_wrapper", LogicType.DISJUNCTION, false, Collections.emptyList(), statements);
     }
 
     static MultiValuedMap<Annotation, List<Annotation>> findStatementAnnotationsInternal(ReflectionProcessorParameter processorParameter) {
@@ -133,7 +133,7 @@ public class ReflectionConditionalStatementProcessor implements ConditionalState
                             stmtId + "_subStatements_" + i++,
                             logicType.opposite(),
                             Boolean.parseBoolean(computeSpringExpressionLanguage(stmt.negate(), parametersMap)),
-                            params, null));
+                            params, Collections.emptyList()));
                 }
             }
 

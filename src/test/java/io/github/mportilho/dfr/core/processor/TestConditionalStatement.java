@@ -28,27 +28,18 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TestConditionalStatement {
 
     @Test
     public void testNullClauses() {
-        ConditionalStatement condition;
+        assertThatThrownBy(() -> new ConditionalStatement("", LogicType.CONJUNCTION, false, null, Collections.emptyList()))
+                .isInstanceOf(NullPointerException.class).hasMessage("Clause list cannot be null");
 
-        condition = new ConditionalStatement("", LogicType.DISJUNCTION, false, null, null);
-        assertThat(condition.logicType()).isEqualByComparingTo(LogicType.DISJUNCTION);
-        assertThat(condition.isConjunction()).isFalse();
-        assertThat(condition.negate()).isFalse();
-        assertThat(condition.clauses()).isNull();
-        assertThat(condition.oppositeStatements()).isNull();
-
-        condition = new ConditionalStatement("", LogicType.CONJUNCTION, true, null, null);
-        assertThat(condition.logicType()).isEqualByComparingTo(LogicType.CONJUNCTION);
-        assertThat(condition.isConjunction()).isTrue();
-        assertThat(condition.negate()).isTrue();
-        assertThat(condition.clauses()).isNull();
-        assertThat(condition.oppositeStatements()).isNull();
+        assertThatThrownBy(() -> new ConditionalStatement("", LogicType.CONJUNCTION, false, Collections.emptyList(), null))
+                .isInstanceOf(NullPointerException.class).hasMessage("Opposite statement list cannot be null");
     }
 
     @Test
@@ -56,13 +47,13 @@ public class TestConditionalStatement {
         List<FilterData> clauses = new ArrayList<>();
         clauses.add(new FilterData("name", "name", new String[]{"name"}, String.class, NotEquals.class, false, false,
                 new String[]{"Blanka"}, null, null));
-        ConditionalStatement condition = new ConditionalStatement("", LogicType.CONJUNCTION, false, clauses, null);
+        ConditionalStatement condition = new ConditionalStatement("", LogicType.CONJUNCTION, false, clauses, Collections.emptyList());
 
         assertThat(condition.logicType()).isEqualByComparingTo(LogicType.CONJUNCTION);
         assertThat(condition.isConjunction()).isTrue();
         assertThat(condition.negate()).isFalse();
         assertThat(condition.clauses()).isNotNull().isNotEmpty().hasSize(1).flatExtracting("values").contains("Blanka");
-        assertThat(condition.oppositeStatements()).isNull();
+        assertThat(condition.oppositeStatements()).isEmpty();
     }
 
 }

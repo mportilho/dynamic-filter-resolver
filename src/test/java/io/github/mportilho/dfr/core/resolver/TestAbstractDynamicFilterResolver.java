@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class TestAbstractDynamicFilterResolver {
@@ -38,13 +39,7 @@ public class TestAbstractDynamicFilterResolver {
     @Test
     public void testNullParameters() {
         DynamicFilterResolver<List<?>> resolver = new GenericDynamicFilterResolver();
-        ConditionalStatement condition = new ConditionalStatement("", LogicType.CONJUNCTION, false, null, null);
-
-        assertThat(condition.logicType()).isEqualByComparingTo(LogicType.CONJUNCTION);
-        assertThat(condition.clauses()).isNull();
-        assertThat(condition.oppositeStatements()).isNull();
-
-        List<String> list = resolver.convertTo(condition, null);
+        List<String> list = resolver.convertTo(null, null);
         assertThat(list).isEmpty();
     }
 
@@ -52,11 +47,11 @@ public class TestAbstractDynamicFilterResolver {
     public void testNoClause() {
         DynamicFilterResolver<List<?>> resolver = new GenericDynamicFilterResolver();
         List<FilterData> clauses = new ArrayList<>();
-        ConditionalStatement condition = new ConditionalStatement("", LogicType.CONJUNCTION, false, clauses, null);
+        ConditionalStatement condition = new ConditionalStatement("", LogicType.CONJUNCTION, false, clauses, Collections.emptyList());
 
         assertThat(condition.logicType()).isEqualByComparingTo(LogicType.CONJUNCTION);
         assertThat(condition.clauses()).isNotNull().isEmpty();
-        assertThat(condition.oppositeStatements()).isNull();
+        assertThat(condition.oppositeStatements()).isEmpty();
 
         List<String> list = resolver.convertTo(condition, null);
         assertThat(list).isEmpty();
@@ -68,11 +63,11 @@ public class TestAbstractDynamicFilterResolver {
         List<FilterData> clauses = new ArrayList<>();
         clauses.add(new FilterData("name", "name", new String[]{"name"}, String.class, NotEquals.class, false, false,
                 new String[]{"Blanka"}, null, null));
-        ConditionalStatement condition = new ConditionalStatement("", LogicType.CONJUNCTION, false, clauses, null);
+        ConditionalStatement condition = new ConditionalStatement("", LogicType.CONJUNCTION, false, clauses, Collections.emptyList());
 
         assertThat(condition.logicType()).isEqualByComparingTo(LogicType.CONJUNCTION);
         assertThat(condition.clauses()).isNotNull().isNotEmpty().hasSize(1);
-        assertThat(condition.oppositeStatements()).isNull();
+        assertThat(condition.oppositeStatements()).isEmpty();
 
         List<String> list = resolver.convertTo(condition, null);
         assertThat(list).isNotEmpty().hasSize(1);
@@ -86,11 +81,11 @@ public class TestAbstractDynamicFilterResolver {
                 new String[]{"Blanka"}, null, null));
         clauses.add(new FilterData("title", "title", new String[]{"title"}, String.class, NotEquals.class, false, false,
                 new String[]{"fighter"}, null, null));
-        ConditionalStatement condition = new ConditionalStatement("", LogicType.CONJUNCTION, false, clauses, null);
+        ConditionalStatement condition = new ConditionalStatement("", LogicType.CONJUNCTION, false, clauses, Collections.emptyList());
 
         assertThat(condition.logicType()).isEqualByComparingTo(LogicType.CONJUNCTION);
         assertThat(condition.clauses()).isNotNull().isNotEmpty().hasSize(2);
-        assertThat(condition.oppositeStatements()).isNull();
+        assertThat(condition.oppositeStatements()).isEmpty();
 
         List<String> list = resolver.convertTo(condition, null);
         assertThat(list).isNotEmpty().hasSize(2).containsExactly("Blanka", "fighter");
@@ -105,12 +100,12 @@ public class TestAbstractDynamicFilterResolver {
                 new String[]{"foo"}, null, null));
         subClauses1.add(new FilterData("title", "title", new String[]{"title"}, String.class, NotEquals.class, false, false,
                 new String[]{"bah"}, null, null));
-        ConditionalStatement subCondition1 = new ConditionalStatement("", LogicType.DISJUNCTION, false, subClauses1, null);
+        ConditionalStatement subCondition1 = new ConditionalStatement("", LogicType.DISJUNCTION, false, subClauses1, Collections.emptyList());
 
         List<FilterData> subClauses2 = new ArrayList<>();
         subClauses2.add(new FilterData("weight", "weight", new String[]{"weight"}, String.class, NotEquals.class, false, false,
                 new String[]{"80"}, null, null));
-        ConditionalStatement subCondition2 = new ConditionalStatement("", LogicType.DISJUNCTION, false, subClauses2, null);
+        ConditionalStatement subCondition2 = new ConditionalStatement("", LogicType.DISJUNCTION, false, subClauses2, Collections.emptyList());
 
         List<FilterData> clauses = new ArrayList<>();
         clauses.add(new FilterData("height", "height", new String[]{"height"}, String.class, NotEquals.class, false, false,
