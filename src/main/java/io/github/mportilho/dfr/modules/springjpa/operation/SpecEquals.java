@@ -46,7 +46,7 @@ class SpecEquals<T> implements Equals<Specification<T>> {
     public Specification<T> createFilter(FilterData filterData, FormattedConversionService formattedConversionService) {
         return (root, query, criteriaBuilder) -> {
             Expression expression = PredicateUtils.computeAttributePath(filterData, root);
-            Object value = formattedConversionService.convert(filterData.findValue(), expression.getJavaType(), filterData.format());
+            Object value = formattedConversionService.convert(filterData.findOneValue(), expression.getJavaType(), filterData.format());
 
             if (filterData.ignoreCase() && expression.getJavaType().equals(String.class)) {
                 expression = criteriaBuilder.upper(expression);

@@ -27,20 +27,22 @@ import io.github.mportilho.dfr.utils.DateUtils;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  * Converts a {@link Instant} from a {@link String}
  *
  * @author Marcelo Portilho
  */
-public class StringToInstantConverter extends AbstractCachedFormattedConverter<String, Instant, String> {
+public class StringToInstantConverter extends AbstractCachedStringFormattedConverter<String, Instant> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Instant convert(String source, String format) {
-        if (format == null || format.isEmpty()) {
+        Objects.requireNonNull(source);
+        if (isNullOrBlank(format)) {
             return DateUtils.DATETIME_FORMATTER.parse(source, Instant::from);
         }
         return cache(format, DateTimeFormatter::ofPattern).parse(source, Instant::from);

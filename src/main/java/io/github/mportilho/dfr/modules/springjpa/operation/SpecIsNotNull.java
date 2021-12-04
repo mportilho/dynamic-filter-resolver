@@ -44,7 +44,7 @@ class SpecIsNotNull<T> implements IsNotNull<Specification<T>> {
     @Override
     public Specification<T> createFilter(FilterData FilterData, FormattedConversionService formattedConversionService) {
         return (root, query, criteriaBuilder) -> {
-            Object rawValue = FilterData.findValue();
+            Object rawValue = FilterData.findOneValue();
             if (rawValue == null) {
                 throw new IllegalArgumentException("A boolean value must be provided to resolve the 'IsNotNull' operation");
             }

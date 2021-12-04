@@ -44,7 +44,7 @@ class SpecIsNull<T> implements IsNull<Specification<T>> {
     @Override
     public Specification<T> createFilter(FilterData filterData, FormattedConversionService formattedConversionService) {
         return (root, query, criteriaBuilder) -> {
-            Object rawValue = filterData.findValue();
+            Object rawValue = filterData.findOneValue();
             if (rawValue == null) {
                 throw new IllegalArgumentException("A boolean value must be provided to resolve the 'IsNull' operation");
             }

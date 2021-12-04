@@ -31,7 +31,10 @@ package io.github.mportilho.dfr.core.processor;
  *
  * @author Marcelo Portilho
  */
-public interface ValueExpressionResolver {
+@FunctionalInterface
+public interface ValueExpressionResolver<V> {
+
+    ValueExpressionResolver<?> EMPTY_RESOLVER = (v) -> v;
 
     /**
      * Resolves an expression to a dynamic value
@@ -39,6 +42,6 @@ public interface ValueExpressionResolver {
      * @param value The source String value
      * @return The resolved value from the source
      */
-    String resolveStringValue(String value);
+    V resolveValue(String value);
 
 }

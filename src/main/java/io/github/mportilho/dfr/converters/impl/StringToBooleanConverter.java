@@ -23,49 +23,31 @@ SOFTWARE.*/
 package io.github.mportilho.dfr.converters.impl;
 
 
-import io.github.mportilho.dfr.converters.FormattedConverter;
-
 import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Converts a {@link String} to a {@link Boolean}
  *
  * @author Marcelo Portilho
  */
-public class StringToBooleanConverter implements FormattedConverter<String, Boolean, String> {
-
-    private static final Set<String> TRUE_VALUES = new HashSet<>(4);
-    private static final Set<String> FALSE_VALUES = new HashSet<>(4);
-
-    static {
-        TRUE_VALUES.add("true");
-        TRUE_VALUES.add("on");
-        TRUE_VALUES.add("yes");
-        TRUE_VALUES.add("1");
-
-        FALSE_VALUES.add("false");
-        FALSE_VALUES.add("off");
-        FALSE_VALUES.add("no");
-        FALSE_VALUES.add("0");
-    }
+public class StringToBooleanConverter extends AbstractCachedStringFormattedConverter<String, Boolean> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Boolean convert(String source, String format) {
-        if (source == null || source.trim().isEmpty()) {
-            return null;
-        }
-        String value = source.toLowerCase();
-        if (TRUE_VALUES.contains(value)) {
+        Objects.requireNonNull(source);
+        if (!isNullOrBlank(format)
+                && cache(format, f -> new HashSet<>(List.of(f.split(",", 1000)))).contains(source)) {
             return Boolean.TRUE;
-        } else if (FALSE_VALUES.contains(value)) {
-            return Boolean.FALSE;
-        } else {
-            throw new IllegalArgumentException(String.format("Invalid boolean value '%s'", source));
         }
+        return switch (source.toLowerCase()) {
+            case "true", "on", "yes", "1" -> Boolean.TRUE;
+            default -> Boolean.FALSE;
+        };
     }
 
 }

@@ -46,7 +46,7 @@ class SpecStartsWith<T> implements StartsWith<Specification<T>> {
     public Specification<T> createFilter(FilterData filterData, FormattedConversionService formattedConversionService) {
         return (root, query, criteriaBuilder) -> {
             Path<String> path = PredicateUtils.computeAttributePath(filterData, root);
-            String value = formattedConversionService.convert(filterData.findValue(), path.getJavaType(), filterData.format());
+            String value = formattedConversionService.convert(filterData.findOneValue(), path.getJavaType(), filterData.format());
 
             Expression<String> expression;
             if (filterData.ignoreCase()) {

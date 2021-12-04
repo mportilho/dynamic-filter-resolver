@@ -83,7 +83,7 @@ public class MvcDynamicFilterResolverAutoConfiguration implements EmbeddedValueR
                         new SpecificationFilterOperationFactory(), formattedConversionService);
 
                 resolvers.add(new SpecificationDynamicFilterArgumentResolver(
-                        new ReflectionConditionalStatementProcessor(resolver), dynamicFilterResolver));
+                        new ReflectionConditionalStatementProcessor(resolver, formattedConversionService), dynamicFilterResolver));
             }
         };
     }

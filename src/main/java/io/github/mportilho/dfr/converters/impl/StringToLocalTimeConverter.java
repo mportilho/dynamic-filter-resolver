@@ -27,20 +27,22 @@ import io.github.mportilho.dfr.utils.DateUtils;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  * Converts a {@link LocalTime} from a {@link String}
  *
  * @author Marcelo Portilho
  */
-public class StringToLocalTimeConverter extends AbstractCachedFormattedConverter<String, LocalTime, String> {
+public class StringToLocalTimeConverter extends AbstractCachedStringFormattedConverter<String, LocalTime> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public LocalTime convert(String source, String format) {
-        if (format == null || format.isEmpty()) {
+        Objects.requireNonNull(source);
+        if (isNullOrBlank(format)) {
             return DateUtils.TIME_FORMATTER.parse(source, LocalTime::from);
         }
         return cache(format, DateTimeFormatter::ofPattern).parse(source, LocalTime::from);

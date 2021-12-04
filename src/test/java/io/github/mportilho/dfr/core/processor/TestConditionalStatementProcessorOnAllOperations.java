@@ -34,7 +34,7 @@ public class TestConditionalStatementProcessorOnAllOperations {
 
     @Test
     public void testComparisonOperations() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(ComparisonOperations.class, null);
         FilterData param;
 
@@ -52,7 +52,7 @@ public class TestConditionalStatementProcessorOnAllOperations {
 
     @Test
     public void testStringComparisonOperations() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(StringComparisonOperations.class, null);
 
         assertThat(statement).isNotNull();
@@ -64,7 +64,7 @@ public class TestConditionalStatementProcessorOnAllOperations {
 
     @Test
     public void testOtherComparisonOperations() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(OtherComparisonOperations.class, null);
         FilterData param;
 
@@ -81,12 +81,12 @@ public class TestConditionalStatementProcessorOnAllOperations {
         assertThat(param.values()).isNotEmpty().hasSize(1).contains("true");
 
         param = statement.clauses().stream().filter(p -> IsIn.class.equals(p.operation())).findAny().orElse(null);
-        assertThat(param.values()).isNotEmpty().hasSize(1);
-        assertThat((Object[]) param.values()[0]).containsExactlyInAnyOrder("170", "180", "190");
+        assertThat(param.values()).isNotEmpty().hasSize(3);
+        assertThat((Object[]) param.values()).containsExactlyInAnyOrder("170", "180", "190");
 
         param = statement.clauses().stream().filter(p -> IsNotIn.class.equals(p.operation())).findAny().orElse(null);
-        assertThat(param.values()).isNotEmpty().hasSize(1);
-        assertThat((Object[]) param.values()[0]).containsExactlyInAnyOrder("1010", "1020", "1030");
+        assertThat(param.values()).isNotEmpty().hasSize(3);
+        assertThat((Object[]) param.values()).containsExactlyInAnyOrder("1010", "1020", "1030");
     }
 
 }

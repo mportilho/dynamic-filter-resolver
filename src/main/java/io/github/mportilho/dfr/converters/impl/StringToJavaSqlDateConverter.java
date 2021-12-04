@@ -28,20 +28,22 @@ import io.github.mportilho.dfr.utils.DateUtils;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  * Converts a {@link Date} from a {@link String}
  *
  * @author Marcelo Portilho
  */
-public class StringToJavaSqlDateConverter extends AbstractCachedFormattedConverter<String, Date, String> {
+public class StringToJavaSqlDateConverter extends AbstractCachedStringFormattedConverter<String, Date> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Date convert(String source, String format) {
-        if (format == null || format.isEmpty()) {
+        Objects.requireNonNull(source);
+        if (isNullOrBlank(format)) {
             LocalDate localDate = DateUtils.DATE_FORMATTER.parse(source, LocalDate::from);
             return Date.valueOf(localDate);
         }

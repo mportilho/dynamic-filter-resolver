@@ -34,6 +34,7 @@ package io.github.mportilho.dfr.converters;
  * @param <F> The optional formatter
  * @author Marcelo Portilho
  */
+@FunctionalInterface
 public interface FormattedConverter<S, T, F> {
 
     /**
@@ -48,5 +49,9 @@ public interface FormattedConverter<S, T, F> {
      *                                  desired target type
      */
     T convert(S source, F format);
+
+    default boolean isNullOrBlank(String value) {
+        return value == null || value.isBlank();
+    }
 
 }

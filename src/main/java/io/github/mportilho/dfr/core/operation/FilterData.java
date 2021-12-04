@@ -21,9 +21,12 @@ public record FilterData(
      * @return the parameter's value if there's one provided from the first array
      * position. Returns null if none is found.
      */
-    public Object findValue() {
+    public Object findOneValue() {
         if (values == null || values.length == 0) {
             return null;
+        }
+        if (values.length > 1) {
+            throw new IllegalStateException("Multiple values found while fetching a single one");
         }
         return values[0];
     }

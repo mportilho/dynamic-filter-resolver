@@ -46,7 +46,7 @@ class SpecNotEquals<T> implements NotEquals<Specification<T>> {
     public Specification<T> createFilter(FilterData FilterData, FormattedConversionService formattedConversionService) {
         return (root, query, criteriaBuilder) -> {
             Expression expression = PredicateUtils.computeAttributePath(FilterData, root);
-            Object value = formattedConversionService.convert(FilterData.findValue(), expression.getJavaType(), FilterData.format());
+            Object value = formattedConversionService.convert(FilterData.findOneValue(), expression.getJavaType(), FilterData.format());
 
             if (FilterData.ignoreCase() && expression.getJavaType().equals(String.class)) {
                 expression = criteriaBuilder.upper(expression);

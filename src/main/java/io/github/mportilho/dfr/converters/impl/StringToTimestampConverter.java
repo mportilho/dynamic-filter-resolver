@@ -28,20 +28,22 @@ import io.github.mportilho.dfr.utils.DateUtils;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  * Converts a {@link Timestamp} from a {@link String}
  *
  * @author Marcelo Portilho
  */
-public class StringToTimestampConverter extends AbstractCachedFormattedConverter<String, Timestamp, String> {
+public class StringToTimestampConverter extends AbstractCachedStringFormattedConverter<String, Timestamp> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Timestamp convert(String source, String format) {
-        if (format == null || format.isEmpty()) {
+        Objects.requireNonNull(source);
+        if (isNullOrBlank(format)) {
             LocalDateTime dateTime = DateUtils.DATETIME_FORMATTER.parse(source, LocalDateTime::from);
             return Timestamp.valueOf(dateTime);
         }

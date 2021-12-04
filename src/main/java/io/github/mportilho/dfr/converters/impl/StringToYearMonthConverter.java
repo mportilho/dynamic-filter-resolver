@@ -27,20 +27,22 @@ import io.github.mportilho.dfr.utils.DateUtils;
 
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  * Converts a {@link YearMonth} from a {@link String}
  *
  * @author Marcelo Portilho
  */
-public class StringToYearMonthConverter extends AbstractCachedFormattedConverter<String, YearMonth, String> {
+public class StringToYearMonthConverter extends AbstractCachedStringFormattedConverter<String, YearMonth> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public YearMonth convert(String source, String format) {
-        if (format == null || format.isEmpty()) {
+        Objects.requireNonNull(source);
+        if (isNullOrBlank(format)) {
             return DateUtils.MONTH_YEAR_FORMATTER.parse(source, YearMonth::from);
         }
         return cache(format, DateTimeFormatter::ofPattern).parse(source, YearMonth::from);

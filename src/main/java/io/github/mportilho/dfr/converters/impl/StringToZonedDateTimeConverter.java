@@ -27,20 +27,22 @@ import io.github.mportilho.dfr.utils.DateUtils;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  * Converts a {@link ZonedDateTime} from a {@link String}
  *
  * @author Marcelo Portilho
  */
-public class StringToZonedDateTimeConverter extends AbstractCachedFormattedConverter<String, ZonedDateTime, String> {
+public class StringToZonedDateTimeConverter extends AbstractCachedStringFormattedConverter<String, ZonedDateTime> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public ZonedDateTime convert(String source, String format) {
-        if (format == null || format.isEmpty()) {
+        Objects.requireNonNull(source);
+        if (isNullOrBlank(format)) {
             return DateUtils.DATETIME_FORMATTER.parse(source, ZonedDateTime::from);
         }
         return cache(format, DateTimeFormatter::ofPattern).parse(source, ZonedDateTime::from);

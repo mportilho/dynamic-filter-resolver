@@ -30,25 +30,27 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Converts a {@link Date} from a {@link String}
  *
  * @author Marcelo Portilho
  */
-public class StringToJavaUtilDateConverter extends AbstractCachedFormattedConverter<String, Date, String> {
+public class StringToJavaUtilDateConverter extends AbstractCachedStringFormattedConverter<String, Date> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Date convert(String source, String format) {
-        if (format == null || format.isEmpty()) {
-            LocalDateTime localDateTime = DateUtils.DATETIME_FORMATTER_PADDING_TIME.parse(source, LocalDateTime::from);
-            Instant instant = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
-            return Date.from(instant);
+        Objects.requireNonNull(source);
+        LocalDateTime localDateTime;
+        if (isNullOrBlank(format)) {
+            localDateTime = DateUtils.DATETIME_FORMATTER_PADDING_TIME.parse(source, LocalDateTime::from);
+        } else {
+            localDateTime = cache(format, DateTimeFormatter::ofPattern).parse(source, LocalDateTime::from);
         }
-        LocalDateTime localDateTime = cache(format, DateTimeFormatter::ofPattern).parse(source, LocalDateTime::from);
         Instant instant = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
         return Date.from(instant);
     }

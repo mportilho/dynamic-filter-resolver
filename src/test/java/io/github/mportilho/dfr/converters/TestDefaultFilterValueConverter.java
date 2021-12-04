@@ -31,6 +31,20 @@ import java.time.*;
 
 public class TestDefaultFilterValueConverter {
 
+    static class NotConfiguredForConversionClass {
+
+    }
+
+    @Test
+    public void testCanConvert() {
+        FormattedConversionService filterValueConverter = new DefaultFormattedConversionService();
+        assertThat(filterValueConverter.canConvert(String.class, LocalDate.class)).isTrue();
+        assertThat(filterValueConverter.canConvert(NotConfiguredForConversionClass.class, LocalDate.class)).isFalse();
+        assertThat(filterValueConverter.canConvert(LocalDate.class, NotConfiguredForConversionClass.class)).isFalse();
+        assertThat(filterValueConverter.canConvert(null, NotConfiguredForConversionClass.class)).isFalse();
+        assertThat(filterValueConverter.canConvert(LocalDate.class, null)).isFalse();
+    }
+
     @Test
     public void testDefaultFormattedConversionService() {
         FormattedConversionService filterValueConverter = new DefaultFormattedConversionService();

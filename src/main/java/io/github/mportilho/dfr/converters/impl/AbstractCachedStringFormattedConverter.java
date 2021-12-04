@@ -34,12 +34,11 @@ import java.util.function.Function;
  *
  * @param <S> The type of the object to be converter
  * @param <T> The target type
- * @param <F> The optional formatter
  * @author Marcelo Portilho
  */
-abstract class AbstractCachedFormattedConverter<S, T, F> implements FormattedConverter<S, T, F> {
+abstract class AbstractCachedStringFormattedConverter<S, T> implements FormattedConverter<S, T, String> {
 
-    private final Map<F, Object> cache = new WeakHashMap<>();
+    private Map<String, Object> cache;
 
     /**
      * Caches the instance responsible for formatting an specific pattern
@@ -50,7 +49,10 @@ abstract class AbstractCachedFormattedConverter<S, T, F> implements FormattedCon
      * @return The newly created or cached formatter instance
      */
     @SuppressWarnings("unchecked")
-    protected <U> U cache(F format, Function<F, U> supplier) {
+    protected <U> U cache(String format, Function<String, U> supplier) {
+        if (cache == null) {
+            cache = new WeakHashMap<>();
+        }
         return (U) cache.computeIfAbsent(format, supplier);
     }
 

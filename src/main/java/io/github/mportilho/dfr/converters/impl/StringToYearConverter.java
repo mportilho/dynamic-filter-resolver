@@ -24,20 +24,22 @@ package io.github.mportilho.dfr.converters.impl;
 
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  * Converts a {@link Year} from a {@link String}
  *
  * @author Marcelo Portilho
  */
-public class StringToYearConverter extends AbstractCachedFormattedConverter<String, Year, String> {
+public class StringToYearConverter extends AbstractCachedStringFormattedConverter<String, Year> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Year convert(String source, String format) {
-        if (format == null || format.isEmpty()) {
+        Objects.requireNonNull(source);
+        if (isNullOrBlank(format)) {
             return Year.parse(source);
         }
         return cache(format, DateTimeFormatter::ofPattern).parse(source, Year::from);

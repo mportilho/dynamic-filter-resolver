@@ -27,20 +27,22 @@ import io.github.mportilho.dfr.utils.DateUtils;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  * Converts an {@link OffsetDateTime} from a {@link String}
  *
  * @author Marcelo Portilho
  */
-public class StringToOffsetDateTimeConverter extends AbstractCachedFormattedConverter<String, OffsetDateTime, String> {
+public class StringToOffsetDateTimeConverter extends AbstractCachedStringFormattedConverter<String, OffsetDateTime> {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public OffsetDateTime convert(String source, String format) {
-        if (format == null || format.isEmpty()) {
+        Objects.requireNonNull(source);
+        if (isNullOrBlank(format)) {
             return DateUtils.DATETIME_FORMATTER.parse(source, OffsetDateTime::from);
         }
         return cache(format, DateTimeFormatter::ofPattern).parse(source, OffsetDateTime::from);

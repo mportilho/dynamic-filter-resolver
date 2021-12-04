@@ -22,6 +22,7 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.core.processor;
 
+import io.github.mportilho.dfr.converters.DefaultFormattedConversionService;
 import io.github.mportilho.dfr.core.operation.FilterData;
 import io.github.mportilho.dfr.core.operation.type.Equals;
 import io.github.mportilho.dfr.mocks.annotations.AnnotationContainerInterface;
@@ -37,7 +38,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testOneExtendedInterfaceWithOneDefaultParameter() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(NoDelete.class, Collections.emptyMap());
 
         assertThat(statement).isNotNull();
@@ -58,7 +59,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testOneExtendedInterfaceWithOneRequiredFilterWithoutProvidedValue() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         assertThatThrownBy(() -> provider.createConditionalStatements(RequiredStatusValueInterface.class, Collections.emptyMap()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("No value was found for required filter status");
@@ -66,7 +67,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testOneExtendedInterfaceWithOneRequiredFilter() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(RequiredStatusValueInterface.class,
                 Collections.singletonMap("status", new String[]{"OK"}));
 
@@ -88,7 +89,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testOneExtendedInterfaceWithOneDefaultParameterNegatingPredicate() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(NoDeleteNegatingPredicate.class, Collections.emptyMap());
 
         assertThat(statement).isNotNull();
@@ -109,7 +110,9 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testOneExtendedInterfaceWithOneDefaultParameterWithStringValueResolver() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(str -> str + "1");
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(
+                str -> str + "1",
+                new DefaultFormattedConversionService());
         ConditionalStatement statement = provider.createConditionalStatements(NoDelete.class, Collections.emptyMap());
 
         assertThat(statement).isNotNull();
@@ -130,7 +133,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testOneExtendedInterfaceWithTwoDefaultParameters() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(NoDeleteAndStatusOk.class, Collections.emptyMap());
         FilterData filterParameter;
 
@@ -161,7 +164,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testOneComposedExtendedInterfaceWithOneDefaultParametersEach() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(NoDeleteExtendedStatusOK.class, Collections.emptyMap());
         FilterData filterParameter;
 
@@ -208,7 +211,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testAnnotatedInterfaceAndAnnotatedParameter() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
 
         ConditionalStatement statement = provider.createConditionalStatements(AnnotationContainerInterface.class,
                 MethodArgumentAnnotations.class.getAnnotations(), Collections.emptyMap());
@@ -264,7 +267,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testWithRequiredValuesProvided() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement;
 
         statement = provider.createConditionalStatements(RequiringValues.class, Collections.singletonMap("delete", new String[]{"true"}));
@@ -288,14 +291,14 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testWithRequiredValuesNotProvided() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(RequiringValues.class, Collections.emptyMap());
         assertThat(statement).isNull();
     }
 
     @Test
     public void testWithSomeRequiredValuesProvided() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(RequiringSomeValues.class, Collections.emptyMap());
         assertThat(statement).isNotNull();
         assertThat(statement.logicType()).isNotNull().isEqualByComparingTo(LogicType.CONJUNCTION);
@@ -307,7 +310,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testWithSomeMoreRequiredValuesProvided() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(RequiringSomeMoreValues.class, Collections.emptyMap());
 
         assertThat(statement).isNotNull();
@@ -328,7 +331,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testWithSomeMoreRequiredValuesAndSomeDefaultsProvided() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(RequiringSomeValuesAndSomeDefaults.class, Collections.emptyMap());
 
         assertThat(statement).isNotNull();
@@ -359,7 +362,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testRequiredValuesWithDefaultDataProvided() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement;
 
         statement = provider.createConditionalStatements(RequiringValuesDefaultData.class, Collections.emptyMap());
@@ -385,7 +388,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testWithConjunctionAnnotationFullyProvided() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(FullyRequiringConjunction.class, Collections.emptyMap());
 
         assertThat(statement).isNotNull();
@@ -418,7 +421,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testWithConjunctionAnnotationFullyProvidedNegatingAll() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(FullyRequiringConjunctionNegatingAll.class, Collections.emptyMap());
 
         assertThat(statement).isNotNull();
@@ -449,7 +452,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testWithDisjunctionAnnotationFullyProvided() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(FullyRequiringDisjunction.class, Collections.emptyMap());
         assertThat(statement).isNotNull();
         assertThat(statement.logicType()).isNotNull().isEqualByComparingTo(LogicType.DISJUNCTION);
@@ -479,7 +482,7 @@ public class TestReflectionConditionalStatementProcessor {
 
     @Test
     public void testWithDisjunctionAnnotationFullyProvidedNegatingAll() {
-        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor(null);
+        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
         ConditionalStatement statement = provider.createConditionalStatements(FullyRequiringDisjunctionNegatingAll.class, Collections.emptyMap());
         assertThat(statement).isNotNull();
         assertThat(statement.logicType()).isNotNull().isEqualByComparingTo(LogicType.DISJUNCTION);
