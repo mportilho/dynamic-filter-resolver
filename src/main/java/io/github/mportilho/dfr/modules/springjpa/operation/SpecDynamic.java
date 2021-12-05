@@ -25,7 +25,6 @@ package io.github.mportilho.dfr.modules.springjpa.operation;
 import io.github.mportilho.dfr.converters.FormattedConversionService;
 import io.github.mportilho.dfr.core.operation.ComparisonOperation;
 import io.github.mportilho.dfr.core.operation.FilterData;
-import io.github.mportilho.dfr.core.operation.FilterOperationManager;
 import io.github.mportilho.dfr.core.operation.type.Dynamic;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -40,10 +39,10 @@ import java.util.Objects;
  */
 class SpecDynamic<T> implements Dynamic<Specification<T>> {
 
-    private final SpecificationFilterOperationFactory operationFactory;
+    private final SpecificationFilterOperationService filterOperationService;
 
-    public SpecDynamic(SpecificationFilterOperationFactory operationFactory) {
-        this.operationFactory = Objects.requireNonNull(operationFactory, "A filter operation service is required");
+    public SpecDynamic(SpecificationFilterOperationService filterOperationService) {
+        this.filterOperationService = Objects.requireNonNull(filterOperationService, "A filter operation service is required");
     }
 
     @Override
@@ -75,8 +74,7 @@ class SpecDynamic<T> implements Dynamic<Specification<T>> {
                 filterData.parameters(), filterData.targetType(), filterData.operation(), filterData.negate(),
                 filterData.ignoreCase(), new Object[]{value}, filterData.format(), filterData.modifiers());
 
-        FilterOperationManager<Specification<?>> filterOperationManager = operationFactory.createFilterManager(comparisonOperation.getOperation());
-        return filterOperationManager.createFilter(newFilter, formattedConversionService);
+        return filterOperationService.createFilter(newFilter);
     }
 
     private static ComparisonOperation convertComparisonOperation(Object value) {

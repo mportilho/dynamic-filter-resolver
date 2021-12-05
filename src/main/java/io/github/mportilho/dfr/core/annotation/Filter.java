@@ -22,7 +22,7 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.core.annotation;
 
-import io.github.mportilho.dfr.core.operation.FilterOperationManager;
+import io.github.mportilho.dfr.core.operation.FilterOperationFactory;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -75,7 +75,7 @@ public @interface Filter {
      * @return Operation to be used as a query filter
      */
     @SuppressWarnings({"rawtypes"})
-    Class<? extends FilterOperationManager> operation();
+    Class<? extends FilterOperationFactory> operation();
 
     /**
      * Indicates that the logic of this filter must be negated. Can be parsed by the

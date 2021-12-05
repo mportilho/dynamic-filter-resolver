@@ -23,7 +23,7 @@ SOFTWARE.*/
 package io.github.mportilho.dfr.core.operation.type;
 
 
-import io.github.mportilho.dfr.core.operation.FilterOperationManager;
+import io.github.mportilho.dfr.core.operation.FilterOperationFactory;
 
 /**
  * Represents a Between operation
@@ -32,6 +32,6 @@ import io.github.mportilho.dfr.core.operation.FilterOperationManager;
  *            resolver
  * @author Marcelo Portilho
  */
-public interface Between<T> extends FilterOperationManager<T> {
+public interface Between<T> extends FilterOperationFactory<T> {
 
 }

@@ -24,6 +24,7 @@ package io.github.mportilho.dfr.modules.springjpa.webautoconfigure;
 
 import io.github.mportilho.dfr.core.processor.ConditionalStatement;
 import io.github.mportilho.dfr.core.processor.ConditionalStatementProcessor;
+import io.github.mportilho.dfr.core.processor.impl.ReflectionParameter;
 import io.github.mportilho.dfr.core.resolver.DynamicFilterResolver;
 import io.github.mportilho.dfr.modules.spring.Fetching;
 import org.springframework.core.MethodParameter;
@@ -54,12 +55,13 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
 
     private static final String FETCHING_CLASS_NAME = Fetching.class.getCanonicalName();
 
-    private final ConditionalStatementProcessor<Class<?>> conditionalStatementReflectionProcessor;
+    private final ConditionalStatementProcessor<ReflectionParameter> conditionalStatementProcessor;
     private final DynamicFilterResolver<Specification<?>> dynamicFilterResolver;
 
-    public SpecificationDynamicFilterArgumentResolver(ConditionalStatementProcessor<Class<?>> conditionalStatementReflectionProcessor,
-                                                      DynamicFilterResolver<Specification<?>> dynamicFilterResolver) {
-        this.conditionalStatementReflectionProcessor = conditionalStatementReflectionProcessor;
+    public SpecificationDynamicFilterArgumentResolver(
+            ConditionalStatementProcessor<ReflectionParameter> conditionalStatementProcessor,
+            DynamicFilterResolver<Specification<?>> dynamicFilterResolver) {
+        this.conditionalStatementProcessor = conditionalStatementProcessor;
         this.dynamicFilterResolver = dynamicFilterResolver;
     }
 
@@ -81,8 +83,9 @@ public class SpecificationDynamicFilterArgumentResolver implements HandlerMethod
         Map<String, Object[]> providedParameterValuesMap = createProvidedValuesMap(webRequest);
         Map<String, Object> contextMap = createContextMap(parameter);
 
-        ConditionalStatement statement = conditionalStatementReflectionProcessor.createConditionalStatements(
-                parameter.getParameterType(), parameter.getParameterAnnotations(), providedParameterValuesMap);
+        ConditionalStatement statement = conditionalStatementProcessor.createConditionalStatements(
+                new ReflectionParameter(parameter.getParameterType(), parameter.getParameterAnnotations()),
+                providedParameterValuesMap);
         return createProxy(dynamicFilterResolver.convertTo(statement, contextMap), parameter.getParameterType());
     }
 

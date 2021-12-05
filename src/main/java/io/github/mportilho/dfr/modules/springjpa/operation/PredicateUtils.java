@@ -58,7 +58,8 @@ class PredicateUtils {
     public static <T> Path<T> computeAttributePath(FilterData filterData, Root<?> root) {
         PropertyPath propertyPath = PropertyPath.from(filterData.path(), root.getJavaType());
         From<?, ?> from = root;
-        while (propertyPath.hasNext()) {
+
+        while (propertyPath != null && propertyPath.hasNext()) {
             String joinTypeString = filterData.findModifier("JoinType");
             JoinType joinType;
             if (joinTypeString == null) {
@@ -69,6 +70,9 @@ class PredicateUtils {
 
             from = getOrCreateJoin(from, propertyPath.getSegment(), joinType);
             propertyPath = propertyPath.next();
+        }
+        if (propertyPath == null) {
+            throw new IllegalStateException(String.format("No path '%s' found no type '%s'", filterData.path(), root.getJavaType().getCanonicalName()));
         }
         return from.get(propertyPath.getSegment());
     }

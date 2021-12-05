@@ -22,26 +22,16 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.core.operation;
 
-
-import io.github.mportilho.dfr.converters.FormattedConversionService;
-
 /**
- * Represents a logic operation to be applied
+ * Contains a set of {@link FilterOperator} implementations for a specific query
+ * framework.
  *
  * @param <T> Return type of the query object created from this dynamic filter
  *            resolver
  * @author Marcelo Portilho
  */
-public interface FilterOperationManager<T> {
+public interface FilterOperationService<T> {
 
-    /**
-     * Creates a filtering operation for the provided parameter
-     *
-     * @param filterData                 The representation of a query filter
-     * @param formattedConversionService Convert filter values to the target attribute's
-     *                                   type
-     * @return The resulting query logic
-     */
-    <R> R createFilter(FilterData filterData, FormattedConversionService formattedConversionService);
+    <R> R createFilter(FilterData filterData);
 
 }

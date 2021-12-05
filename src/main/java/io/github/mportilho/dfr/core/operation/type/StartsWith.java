@@ -23,7 +23,7 @@ SOFTWARE.*/
 package io.github.mportilho.dfr.core.operation.type;
 
 
-import io.github.mportilho.dfr.core.operation.FilterOperationManager;
+import io.github.mportilho.dfr.core.operation.FilterOperationFactory;
 
 /**
  * Represents a StartsWith operation
@@ -32,6 +32,6 @@ import io.github.mportilho.dfr.core.operation.FilterOperationManager;
  *            resolver
  * @author Marcelo Portilho
  */
-public interface StartsWith<T> extends FilterOperationManager<T> {
+public interface StartsWith<T> extends FilterOperationFactory<T> {
 
 }

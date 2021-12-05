@@ -45,16 +45,16 @@ public enum ComparisonOperation {
     ;
 
     @SuppressWarnings("rawtypes")
-    private final Class<? extends FilterOperationManager> operation;
+    private final Class<? extends FilterOperationFactory> operation;
 
     @SuppressWarnings("rawtypes")
-    ComparisonOperation(Class<? extends FilterOperationManager> operation) {
+    ComparisonOperation(Class<? extends FilterOperationFactory> operation) {
         this.operation = operation;
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Class<? extends FilterOperationManager<T>> getOperation() {
-        return (Class<? extends FilterOperationManager<T>>) operation;
+    public <T> Class<? extends FilterOperationFactory<T>> getOperation() {
+        return (Class<? extends FilterOperationFactory<T>>) operation;
     }
 
 }

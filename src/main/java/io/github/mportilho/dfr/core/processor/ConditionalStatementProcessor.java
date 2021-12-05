@@ -2,7 +2,6 @@ package io.github.mportilho.dfr.core.processor;
 
 import io.github.mportilho.dfr.core.operation.FilterData;
 
-import java.lang.annotation.Annotation;
 import java.util.Map;
 
 /**
@@ -17,10 +16,10 @@ import java.util.Map;
  */
 public interface ConditionalStatementProcessor<T> {
 
-    ConditionalStatement createConditionalStatements(T target, Annotation[] annotations, Map<String, Object[]> parametersMap);
+    ConditionalStatement createConditionalStatements(T parameter, Map<String, Object[]> parametersMap);
 
-    default ConditionalStatement createConditionalStatements(T target, Map<String, Object[]> parametersMap) {
-        return createConditionalStatements(target, null, parametersMap);
+    default ConditionalStatement createConditionalStatements(T parameter) {
+        return createConditionalStatements(parameter, null);
     }
 
     /**

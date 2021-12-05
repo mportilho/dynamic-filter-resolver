@@ -24,6 +24,8 @@ package io.github.mportilho.dfr.core.processor;
 
 import io.github.mportilho.dfr.core.operation.FilterData;
 import io.github.mportilho.dfr.core.operation.type.*;
+import io.github.mportilho.dfr.core.processor.impl.ReflectionConditionalStatementProcessor;
+import io.github.mportilho.dfr.core.processor.impl.ReflectionParameter;
 import io.github.mportilho.dfr.mocks.interfaces.queries.ComparisonOperations;
 import io.github.mportilho.dfr.mocks.interfaces.queries.OtherComparisonOperations;
 import io.github.mportilho.dfr.mocks.interfaces.queries.StringComparisonOperations;
@@ -35,7 +37,7 @@ public class TestConditionalStatementProcessorOnAllOperations {
     @Test
     public void testComparisonOperations() {
         ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
-        ConditionalStatement statement = provider.createConditionalStatements(ComparisonOperations.class, null);
+        ConditionalStatement statement = provider.createConditionalStatements(new ReflectionParameter(ComparisonOperations.class, null));
         FilterData param;
 
         assertThat(statement).isNotNull();
@@ -53,7 +55,7 @@ public class TestConditionalStatementProcessorOnAllOperations {
     @Test
     public void testStringComparisonOperations() {
         ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
-        ConditionalStatement statement = provider.createConditionalStatements(StringComparisonOperations.class, null);
+        ConditionalStatement statement = provider.createConditionalStatements(new ReflectionParameter(StringComparisonOperations.class, null));
 
         assertThat(statement).isNotNull();
         assertThat(statement.logicType()).isEqualByComparingTo(LogicType.DISJUNCTION);
@@ -65,7 +67,7 @@ public class TestConditionalStatementProcessorOnAllOperations {
     @Test
     public void testOtherComparisonOperations() {
         ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
-        ConditionalStatement statement = provider.createConditionalStatements(OtherComparisonOperations.class, null);
+        ConditionalStatement statement = provider.createConditionalStatements(new ReflectionParameter(OtherComparisonOperations.class, null));
         FilterData param;
 
         assertThat(statement).isNotNull();
@@ -74,19 +76,19 @@ public class TestConditionalStatementProcessorOnAllOperations {
         assertThat(statement.clauses()).isNotNull().isNotEmpty().hasSize(4);
         assertThat(statement.oppositeStatements()).isEmpty();
 
-        param = statement.clauses().stream().filter(p -> IsNull.class.equals(p.operation())).findAny().orElse(null);
+        param = statement.clauses().stream().filter(p -> IsNull.class.equals(p.operation())).findAny().orElseThrow();
         assertThat(param.values()).isNotEmpty().hasSize(1).contains("true");
 
-        param = statement.clauses().stream().filter(p -> IsNotNull.class.equals(p.operation())).findAny().orElse(null);
+        param = statement.clauses().stream().filter(p -> IsNotNull.class.equals(p.operation())).findAny().orElseThrow();
         assertThat(param.values()).isNotEmpty().hasSize(1).contains("true");
 
-        param = statement.clauses().stream().filter(p -> IsIn.class.equals(p.operation())).findAny().orElse(null);
-        assertThat(param.values()).isNotEmpty().hasSize(3);
-        assertThat((Object[]) param.values()).containsExactlyInAnyOrder("170", "180", "190");
+        param = statement.clauses().stream().filter(p -> IsIn.class.equals(p.operation())).findAny().orElseThrow();
+        assertThat(param.values()).isNotEmpty().hasSize(1);
+        assertThat((Object[]) param.values()[0]).isNotEmpty().hasSize(3).containsExactlyInAnyOrder("170", "180", "190");
 
-        param = statement.clauses().stream().filter(p -> IsNotIn.class.equals(p.operation())).findAny().orElse(null);
-        assertThat(param.values()).isNotEmpty().hasSize(3);
-        assertThat((Object[]) param.values()).containsExactlyInAnyOrder("1010", "1020", "1030");
+        param = statement.clauses().stream().filter(p -> IsNotIn.class.equals(p.operation())).findAny().orElseThrow();
+        assertThat(param.values()).isNotEmpty().hasSize(1);
+        assertThat((Object[]) param.values()[0]).isNotEmpty().hasSize(3).containsExactlyInAnyOrder("1010", "1020", "1030");
     }
 
 }

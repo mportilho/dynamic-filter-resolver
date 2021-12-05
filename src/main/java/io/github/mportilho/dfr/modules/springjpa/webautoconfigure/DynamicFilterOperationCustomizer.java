@@ -30,6 +30,7 @@ import io.github.mportilho.dfr.core.annotation.Statement;
 import io.github.mportilho.dfr.core.operation.type.Dynamic;
 import io.github.mportilho.dfr.core.operation.type.IsNotNull;
 import io.github.mportilho.dfr.core.operation.type.IsNull;
+import io.github.mportilho.dfr.core.processor.impl.ReflectionParameter;
 import io.swagger.v3.core.util.AnnotationsUtils;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.models.Operation;
@@ -52,7 +53,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.github.mportilho.dfr.core.processor.ReflectionConditionalStatementProcessor.findStatementAnnotations;
+import static io.github.mportilho.dfr.core.processor.impl.ReflectionConditionalStatementProcessor.findStatementAnnotations;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -196,7 +197,7 @@ public class DynamicFilterOperationCustomizer implements OperationCustomizer {
             return Collections.emptyList();
         }
         MultiValuedMap<Annotation, List<Annotation>> statementAnnotations =
-                findStatementAnnotations(methodParameter.getParameterType(), methodParameter.getParameterAnnotations());
+                findStatementAnnotations(new ReflectionParameter(methodParameter.getParameterType(), methodParameter.getParameterAnnotations()));
         Annotation[] annotations = statementAnnotations.values().stream()
                 .flatMap(Collection::stream)
                 .filter(a -> a.annotationType().equals(Conjunction.class) || a.annotationType().equals(Disjunction.class))

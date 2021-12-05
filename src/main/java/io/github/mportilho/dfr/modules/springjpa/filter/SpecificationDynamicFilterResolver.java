@@ -22,10 +22,8 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.modules.springjpa.filter;
 
-import io.github.mportilho.dfr.converters.FormattedConversionService;
 import io.github.mportilho.dfr.core.operation.FilterData;
-import io.github.mportilho.dfr.core.operation.FilterOperationFactory;
-import io.github.mportilho.dfr.core.operation.FilterOperationManager;
+import io.github.mportilho.dfr.core.operation.FilterOperationService;
 import io.github.mportilho.dfr.core.processor.ConditionalStatement;
 import io.github.mportilho.dfr.core.processor.LogicType;
 import io.github.mportilho.dfr.core.resolver.AbstractDynamicFilterResolver;
@@ -45,13 +43,10 @@ import java.util.Map;
  */
 public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterResolver<Specification<?>> {
 
-    private final FilterOperationFactory<Specification<?>> filterOperationFactory;
-    private final FormattedConversionService formattedConversionService;
+    private final FilterOperationService<Specification<?>> filterOperationService;
 
-    public SpecificationDynamicFilterResolver(FilterOperationFactory<Specification<?>> filterOperationFactory,
-                                              FormattedConversionService formattedConversionService) {
-        this.filterOperationFactory = filterOperationFactory;
-        this.formattedConversionService = formattedConversionService;
+    public SpecificationDynamicFilterResolver(FilterOperationService<Specification<?>> filterOperationService) {
+        this.filterOperationService = filterOperationService;
     }
 
     /**
@@ -73,8 +68,7 @@ public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterRes
         Specification rootSpec = null;
 
         for (FilterData clause : conditionalStatement.clauses()) {
-            FilterOperationManager<?> operationManager = filterOperationFactory.createFilterManager(clause.operation());
-            Specification<?> spec = operationManager.createFilter(clause, formattedConversionService);
+            Specification<?> spec = filterOperationService.createFilter(clause);
 
             if (spec != null) {
                 spec = clause.negate() ? Specification.not(spec) : spec;
@@ -99,7 +93,7 @@ public class SpecificationDynamicFilterResolver extends AbstractDynamicFilterRes
         for (Specification subPredicate : subStatementPredicates) {
             if (currentPredicate == null) {
                 currentPredicate = subPredicate;
-            } else { // The sub-statements have opposite logic type of its wrapper statement
+            } else { // sub-statements have opposite logic type of its wrapper statement
                 currentPredicate = logicType.isConjunction() ? currentPredicate.or(subPredicate) : currentPredicate.and(subPredicate);
             }
         }

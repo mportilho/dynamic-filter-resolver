@@ -23,7 +23,7 @@ SOFTWARE.*/
 package io.github.mportilho.dfr.core.operation.type;
 
 
-import io.github.mportilho.dfr.core.operation.FilterOperationManager;
+import io.github.mportilho.dfr.core.operation.FilterOperationFactory;
 
 /**
  * Represents a Is Null operation
@@ -32,6 +32,6 @@ import io.github.mportilho.dfr.core.operation.FilterOperationManager;
  *            resolver
  * @author Marcelo Portilho
  */
-public interface IsNull<T> extends FilterOperationManager<T> {
+public interface IsNull<T> extends FilterOperationFactory<T> {
 
 }

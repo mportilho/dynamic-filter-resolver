@@ -22,13 +22,17 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.modules.springjpa.operation;
 
+import io.github.mportilho.dfr.converters.FormattedConversionService;
+import io.github.mportilho.dfr.core.operation.FilterData;
 import io.github.mportilho.dfr.core.operation.FilterOperationFactory;
-import io.github.mportilho.dfr.core.operation.FilterOperationManager;
+import io.github.mportilho.dfr.core.operation.FilterOperationService;
 import io.github.mportilho.dfr.core.operation.type.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Provides instances of filter operations for the {@link Specification}'s
@@ -36,14 +40,20 @@ import java.util.Map;
  *
  * @author Marcelo Portilho
  */
-public class SpecificationFilterOperationFactory implements FilterOperationFactory<Specification<?>> {
+public class SpecificationFilterOperationService implements FilterOperationService<Specification<?>> {
+
+    private final FormattedConversionService formattedConversionService;
+    @SuppressWarnings("rawtypes")
+    private final Map<Class<? extends FilterOperationFactory>, FilterOperationFactory> operationMap;
+
+    public SpecificationFilterOperationService(FormattedConversionService formattedConversionService) {
+        this.operationMap = new HashMap<>();
+        this.formattedConversionService = formattedConversionService;
+        createOperationFactories();
+    }
 
     @SuppressWarnings("rawtypes")
-    private final Map<Class<? extends FilterOperationManager>, FilterOperationManager> operationMap;
-
-    @SuppressWarnings("rawtypes")
-    public SpecificationFilterOperationFactory() {
-        operationMap = new HashMap<>();
+    private void createOperationFactories() {
         operationMap.put(Between.class, new SpecBetween());
         operationMap.put(Dynamic.class, new SpecDynamic(this));
         operationMap.put(EndsWith.class, new SpecEndsWith());
@@ -63,8 +73,14 @@ public class SpecificationFilterOperationFactory implements FilterOperationFacto
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public FilterOperationManager<Specification<?>> createFilterManager(Class<? extends FilterOperationManager> operation) {
-        return operationMap.get(operation);
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public <R> R createFilter(FilterData filterData) {
+        requireNonNull(filterData);
+        FilterOperationFactory filterOperationFactory = operationMap.get(requireNonNull(filterData.operation()));
+        if (filterOperationFactory == null) {
+            throw new IllegalStateException(String.format("No operation factory found for operation '%s'",
+                    filterData.operation().getSimpleName()));
+        }
+        return (R) filterOperationFactory.createFilter(filterData, formattedConversionService);
     }
 }

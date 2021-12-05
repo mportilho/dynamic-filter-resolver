@@ -9,7 +9,7 @@ public record FilterData(
         String path,
         String[] parameters,
         Class<?> targetType,
-        @SuppressWarnings("rawtypes") Class<? extends FilterOperationManager> operation,
+        @SuppressWarnings("rawtypes") Class<? extends FilterOperationFactory> operation,
         boolean negate,
         boolean ignoreCase,
         Object[] values,

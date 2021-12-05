@@ -24,11 +24,11 @@ package io.github.mportilho.dfr.modules.springjpa.webautoconfigure;
 
 import io.github.mportilho.dfr.converters.DefaultFormattedConversionService;
 import io.github.mportilho.dfr.converters.FormattedConversionService;
-import io.github.mportilho.dfr.core.processor.ReflectionConditionalStatementProcessor;
 import io.github.mportilho.dfr.core.processor.ValueExpressionResolver;
+import io.github.mportilho.dfr.core.processor.impl.ReflectionConditionalStatementProcessor;
 import io.github.mportilho.dfr.core.resolver.DynamicFilterResolver;
 import io.github.mportilho.dfr.modules.springjpa.filter.SpecificationDynamicFilterResolver;
-import io.github.mportilho.dfr.modules.springjpa.operation.SpecificationFilterOperationFactory;
+import io.github.mportilho.dfr.modules.springjpa.operation.SpecificationFilterOperationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.EmbeddedValueResolverAware;
@@ -70,7 +70,7 @@ public class MvcDynamicFilterResolverAutoConfiguration implements EmbeddedValueR
 
             @Override
             public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-                ValueExpressionResolver resolver = stringValueResolver != null ? (stringValueResolver::resolveStringValue) : null;
+                ValueExpressionResolver<?> resolver = stringValueResolver != null ? (stringValueResolver::resolveStringValue) : null;
 
                 FormattedConversionService formattedConversionService;
                 if (conversionService != null) {
@@ -80,10 +80,9 @@ public class MvcDynamicFilterResolverAutoConfiguration implements EmbeddedValueR
                 }
 
                 DynamicFilterResolver<Specification<?>> dynamicFilterResolver = new SpecificationDynamicFilterResolver(
-                        new SpecificationFilterOperationFactory(), formattedConversionService);
-
-                resolvers.add(new SpecificationDynamicFilterArgumentResolver(
-                        new ReflectionConditionalStatementProcessor(resolver, formattedConversionService), dynamicFilterResolver));
+                        new SpecificationFilterOperationService(formattedConversionService));
+                ReflectionConditionalStatementProcessor processor = new ReflectionConditionalStatementProcessor(resolver);
+                resolvers.add(new SpecificationDynamicFilterArgumentResolver(processor, dynamicFilterResolver));
             }
         };
     }

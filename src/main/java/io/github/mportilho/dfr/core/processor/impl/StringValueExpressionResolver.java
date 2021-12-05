@@ -1,4 +1,6 @@
-package io.github.mportilho.dfr.core.processor;
+package io.github.mportilho.dfr.core.processor.impl;
+
+import io.github.mportilho.dfr.core.processor.ValueExpressionResolver;
 
 import java.util.Collections;
 import java.util.Map;

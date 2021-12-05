@@ -22,7 +22,7 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.core.operation.type;
 
-import io.github.mportilho.dfr.core.operation.FilterOperationManager;
+import io.github.mportilho.dfr.core.operation.FilterOperationFactory;
 
 
 /**
@@ -33,6 +33,6 @@ import io.github.mportilho.dfr.core.operation.FilterOperationManager;
  *            resolver
  * @author Marcelo Portilho
  */
-public interface Dynamic<T> extends FilterOperationManager<T> {
+public interface Dynamic<T> extends FilterOperationFactory<T> {
 
 }
