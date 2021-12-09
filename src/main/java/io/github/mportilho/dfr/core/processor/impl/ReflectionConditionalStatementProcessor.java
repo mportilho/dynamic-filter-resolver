@@ -109,11 +109,7 @@ public class ReflectionConditionalStatementProcessor implements ConditionalState
     }
 
     /**
-     * @param annotation    Annotation from which filter configuration will
-     *                      be extracted
-     * @param parametersMap Map containing provided values for filter
-     *                      operations
-     * @return A new {@link ConditionalStatement}
+     *
      */
     private ConditionalStatement createConditionalStatementFromAnnotation(String stmtId, Annotation annotation,
                                                                           Map<String, Object[]> parametersMap) {
@@ -129,7 +125,7 @@ public class ReflectionConditionalStatementProcessor implements ConditionalState
             Statement[] statements = conjunction != null ? conjunction.disjunctions() : disjunction.conjunctions();
 
             String strNegate = conjunction != null ? conjunction.negate() : disjunction.negate();
-            boolean negate = Boolean.parseBoolean(computeValue(strNegate, parametersMap).toString());
+            boolean negate = computeNegatingParameter(strNegate, parametersMap);
 
             List<FilterData> clauses = createFilterData(filters, parametersMap);
             List<ConditionalStatement> oppositeConditionals = new ArrayList<>();
@@ -140,11 +136,10 @@ public class ReflectionConditionalStatementProcessor implements ConditionalState
                     oppositeConditionals.add(new ConditionalStatement(
                             stmtId + "_subStatements_" + i++,
                             logicType.opposite(),
-                            Boolean.parseBoolean(computeValue(stmt.negate(), parametersMap).toString()),
+                            computeNegatingParameter(stmt.negate(), parametersMap),
                             params, Collections.emptyList()));
                 }
             }
-
             if (clauses.isEmpty() && oppositeConditionals.size() == 1) {
                 statement = oppositeConditionals.get(0);
             } else if (!clauses.isEmpty() || !oppositeConditionals.isEmpty()) {
@@ -155,9 +150,23 @@ public class ReflectionConditionalStatementProcessor implements ConditionalState
     }
 
     /**
-     * @param filters       Data for creating {@link FilterData}
-     * @param parametersMap Map containing provided values for filter operations
-     * @return A new list of {@link FilterData}
+     *
+     */
+    private Boolean computeNegatingParameter(String strNegate, Map<String, Object[]> parametersMap) {
+        if ("true".equalsIgnoreCase(strNegate)) {
+            return Boolean.TRUE;
+        } else if ("false".equalsIgnoreCase(strNegate)) {
+            return Boolean.FALSE;
+        }
+        Object negateParamResponse = computeValue(strNegate, "false", parametersMap);
+        if (negateParamResponse != null) {
+            return Boolean.parseBoolean(negateParamResponse.toString());
+        }
+        return Boolean.FALSE;
+    }
+
+    /**
+     *
      */
     private List<FilterData> createFilterData(Filter[] filters, Map<String, Object[]> parametersMap) {
         if (filters == null || filters.length == 0) {
@@ -170,16 +179,25 @@ public class ReflectionConditionalStatementProcessor implements ConditionalState
 
         List<FilterData> filterParameters = new ArrayList<>();
         for (Filter filter : filters) {
-            Object[] values = computeFilter(filter, parametersMap);
-            if (values == null) {
+            List<Object[]> values = computeFilter(filter, parametersMap);
+            if (values.isEmpty()) {
                 if (filter.required()) {
-                    throw new IllegalArgumentException(String.format("No value was found for required filter for path '%s'", filter.path()));
+                    throw new IllegalArgumentException(String.format("No value was found for required filter of path '%s'", filter.path()));
                 }
                 continue;
             }
+            boolean negate = computeNegatingParameter(filter.negate(), parametersMap);
 
-            boolean negate = Boolean.parseBoolean(computeValue(filter.negate(), parametersMap).toString());
-            String format = computeValue(filter.format(), parametersMap).toString();
+            String format = filter.format();
+            Object[] formatParamValueArray = computeValue(null, format, parametersMap);
+            if (formatParamValueArray != null) {
+                if (formatParamValueArray.length > 1) {
+                    throw new IllegalArgumentException("Attribute 'format' have more than one value for path " + filter.path());
+                } else if (formatParamValueArray.length == 1) {
+                    format = formatParamValueArray[0].toString();
+                }
+            }
+
             Map<String, String> modifiers = createModifierMap(filter.modifiers());
 
             FilterData parameter = new FilterData(filter.attributePath(), filter.path(), filter.parameters(), filter.targetType(),
@@ -234,60 +252,91 @@ public class ReflectionConditionalStatementProcessor implements ConditionalState
     /**
      *
      */
-    private Object[] computeFilter(Filter filter, Map<String, Object[]> parametersMap) {
+    private List<Object[]> computeFilter(Filter filter, Map<String, Object[]> parametersMap) {
         if (filter.constantValues().length > 0) {
-            Object[] constantsValue = computeValues(filter.constantValues(), parametersMap);
-            if (filter.constantValues().length == filter.parameters().length) {
-                return constantsValue;
-            }
-            return new Object[]{constantsValue};
+            return computeValues(null, filter.constantValues(), parametersMap);
         }
-        String[] parameters = filter.parameters();
-        Object[] values = new Object[parameters.length];
+        return computeValues(filter.parameters(), filter.defaultValues(), parametersMap);
+    }
+
+    /**
+     *
+     */
+    private Object[] computeValue(String parameter, Object defaultValue, Map<String, Object[]> parametersMap) {
+        if (parameter != null && !parameter.isBlank()) {
+            return parametersMap.get(parameter);
+        } else {
+            Object[] values = null;
+            if (defaultValue instanceof Object[] arr) {
+                values = Arrays.stream(arr)
+                        .mapMulti((obj, mapper) -> {
+                            if (obj instanceof String str) {
+                                Object[] resolvedValue = valueExpressionResolver.resolveValue(str);
+                                mapper.accept(resolvedValue != null ? resolvedValue : str);
+                            } else {
+                                mapper.accept(obj);
+                            }
+                        }).toArray();
+            } else if (defaultValue instanceof String strValue && !strValue.isBlank()) {
+                Object[] resolvedValue = valueExpressionResolver.resolveValue(strValue);
+                values = resolvedValue != null ? resolvedValue : new Object[]{strValue};
+            }
+            return values != null ? values : new Object[]{defaultValue};
+        }
+    }
+
+    /**
+     *
+     */
+    private List<Object[]> computeValues(String[] parameters, Object[] defaultValues, Map<String, Object[]> parametersMap) {
+        if (parameters == null || parameters.length == 0) {
+            return List.<Object[]>of(computeValue(null, defaultValues, parametersMap));
+        }
+
+        List<Object[]> valueList = new ArrayList<>();
         for (int i = 0; i < parameters.length; i++) {
-            Object value = Void.class;
-            if (parametersMap.containsKey(parameters[i])) {
-                value = parametersMap.get(parameters[i]);
-            } else if (filter.defaultValues().length > 0) {
-                if (filter.defaultValues().length == parameters.length) {
-                    value = computeValue(filter.defaultValues()[i], parametersMap);
-                } else {
-                    value = computeValues(filter.defaultValues(), parametersMap);
-                }
-            }
-            values[i] = value;
+            Object defaultValue = defaultValues != null && defaultValues.length > 0 ? defaultValues[i] : null;
+            valueList.add(computeValue(parameters[i], defaultValue, parametersMap));
         }
-        if (Arrays.stream(values).allMatch(v -> v != null && v.equals(Void.class))) {
-            return null;
-        }
-        for (int i = 0; i < values.length; i++) {
-            if (values[i] != null && values[i].equals(Void.class)) {
-                values[i] = null;
-            }
-        }
-        return values;
+        return valueList;
+
+//        if (!isEmpty(parameters) && !isEmpty(defaultValues) && parameters.length == 1 && defaultValues.length == 1) {
+//            values = computeValue(parameters[0], defaultValues[0], parametersMap);
+//        } else if (!isEmpty(parameters) && isEmpty(defaultValues) && parameters.length == 1) {
+//            values = computeValue(parameters[0], null, parametersMap);
+//        } else if (isEmpty(parameters) && !isEmpty(defaultValues) && defaultValues.length == 1) {
+//            values = computeValue(null, defaultValues[0], parametersMap);
+//        } else if (!isEmpty(parameters) && parameters.length == 1 && !isEmpty(defaultValues) && defaultValues.length > 1) {
+//            values = computeValue(parameters[0], null, parametersMap);
+//            values = values == null ? new Object[]{defaultValues} : values;
+//        } else if (!isEmpty(parameters)) {
+//            List<Object[]> list = new ArrayList<>(parameters.length);
+//            for (int i = 0; i < parameters.length; i++) {
+//                Object defaultValue = defaultValues.length > 0 ? defaultValues[i] : null;
+//                list.add(computeValue(parameters[i], defaultValue, parametersMap));
+//            }
+//            if (list.stream().allMatch(Objects::isNull)) {
+//                return null;
+//            }
+//        }
+//        return list.toArray();
     }
 
     /**
      *
      */
-    private Object computeValue(String strValue, Map<String, Object[]> parametersMap) {
-        if (strValue.isBlank()) {
-            return strValue;
+    private Object[] convertToArray(Object obj) {
+        if (obj instanceof Object[] arr) {
+            return arr;
         }
-        return parametersMap.containsKey(strValue) ? parametersMap.get(strValue) : valueExpressionResolver.resolveValue(strValue);
+        return new Object[]{obj};
     }
 
     /**
      *
      */
-    private Object[] computeValues(String[] strValues, Map<String, Object[]> parametersMap) {
-        if (strValues.length == 0) {
-            return strValues;
-        }
-        return Arrays.stream(strValues)
-                .map(v -> parametersMap.containsKey(v) ? parametersMap.get(v) : valueExpressionResolver.resolveValue(v))
-                .toArray();
+    private boolean isEmpty(Object[] objects) {
+        return objects == null || objects.length == 0;
     }
 
     /**

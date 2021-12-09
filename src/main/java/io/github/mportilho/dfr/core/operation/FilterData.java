@@ -1,5 +1,6 @@
 package io.github.mportilho.dfr.core.operation;
 
+import java.util.List;
 import java.util.Map;
 
 //TODO include doc
@@ -12,7 +13,7 @@ public record FilterData(
         @SuppressWarnings("rawtypes") Class<? extends FilterOperationFactory> operation,
         boolean negate,
         boolean ignoreCase,
-        Object[] values,
+        List<Object[]> values,
         String format,
         Map<String, String> modifiers
 ) {
@@ -22,13 +23,12 @@ public record FilterData(
      * position. Returns null if none is found.
      */
     public Object findOneValue() {
-        if (values == null || values.length == 0) {
+        if (values == null || values.isEmpty() || (values.size() == 1 && values.get(0) == null)) {
             return null;
-        }
-        if (values.length > 1) {
+        } else if (values.size() > 1 || (values.get(0) != null && values.get(0).length > 1)) {
             throw new IllegalStateException("Multiple values found while fetching a single one");
         }
-        return values[0];
+        return values.get(0)[0];
     }
 
     public String findModifier(String name) {

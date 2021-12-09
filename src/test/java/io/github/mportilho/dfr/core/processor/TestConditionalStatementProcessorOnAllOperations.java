@@ -32,6 +32,8 @@ import io.github.mportilho.dfr.mocks.interfaces.queries.StringComparisonOperatio
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.Arrays;
+
 public class TestConditionalStatementProcessorOnAllOperations {
 
     @Test
@@ -49,7 +51,10 @@ public class TestConditionalStatementProcessorOnAllOperations {
         param = statement.clauses().stream().filter(p -> Between.class.equals(p.operation())).findAny().orElse(null);
         assertThat(param).isNotNull();
         assertThat(param.parameters()).isNotEmpty().hasSize(2).containsExactlyInAnyOrder("startDate", "endDate");
-        assertThat(param.values()).isNotEmpty().hasSize(2).containsExactlyInAnyOrder("01/01/1980", "01/01/2000");
+        assertThat(param.values()).isNotEmpty().hasSize(2).containsExactlyInAnyOrder(Arrays.asList(
+                new String[]{"01/01/1980"},
+                new String[]{"01/01/2000"}
+        ).toArray());
     }
 
     @Test

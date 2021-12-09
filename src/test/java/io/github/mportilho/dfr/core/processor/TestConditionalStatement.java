@@ -34,6 +34,14 @@ import java.util.List;
 public class TestConditionalStatement {
 
     @Test
+    public void testLogicTypeEnum() {
+        assertThat(LogicType.CONJUNCTION.opposite()).isEqualByComparingTo(LogicType.DISJUNCTION);
+        assertThat(LogicType.DISJUNCTION.opposite()).isEqualByComparingTo(LogicType.CONJUNCTION);
+        assertThat(LogicType.CONJUNCTION.isConjunction()).isTrue();
+        assertThat(LogicType.DISJUNCTION.isConjunction()).isFalse();
+    }
+
+    @Test
     public void testNullClauses() {
         assertThatThrownBy(() -> new ConditionalStatement("", LogicType.CONJUNCTION, false, null, Collections.emptyList()))
                 .isInstanceOf(NullPointerException.class).hasMessage("Clause list cannot be null");

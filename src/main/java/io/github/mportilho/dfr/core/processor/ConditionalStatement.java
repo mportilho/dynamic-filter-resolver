@@ -27,6 +27,7 @@ import io.github.mportilho.dfr.core.operation.FilterData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * It's the representation of a set of logic clauses and a optional set of
@@ -45,6 +46,10 @@ public record ConditionalStatement(
     public ConditionalStatement {
         Objects.requireNonNull(clauses, "Clause list cannot be null");
         Objects.requireNonNull(oppositeStatements, "Opposite statement list cannot be null");
+    }
+
+    public Optional<FilterData> findClauseByPath(String path) {
+        return clauses.stream().filter(c -> path.equals(c.path())).findFirst();
     }
 
     public List<ConditionalStatement> findStatementsById(String id) {

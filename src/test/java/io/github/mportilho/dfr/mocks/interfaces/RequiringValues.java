@@ -27,7 +27,7 @@ import io.github.mportilho.dfr.core.annotation.Filter;
 import io.github.mportilho.dfr.core.operation.type.Equals;
 
 @Conjunction(value = {
-        @Filter(path = "deleted", parameters = "delete", operation = Equals.class, targetType = Boolean.class)
+        @Filter(path = "deleted", parameters = "delete", operation = Equals.class, targetType = Boolean.class, required = true)
 })
 public interface RequiringValues {
 
