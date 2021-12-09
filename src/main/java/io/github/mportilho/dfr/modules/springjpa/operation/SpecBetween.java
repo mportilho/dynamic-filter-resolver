@@ -52,14 +52,14 @@ class SpecBetween<T> implements Between<Specification<T>> {
             if (filterData.values() == null) {
                 lowerValue = null;
                 upperValue = null;
-            } else if (filterData.values().length == 1 || filterData.values().length > 2) {
+            } else if (filterData.values().size() != 2) {
                 throw new IllegalStateException(
-                        "Wrong number of arguments for between operation. Needs 2 arguments, have " + filterData.values().length);
+                        "'Between' type operations need 2 arguments on path " + filterData.path());
             } else {
-                lowerValue = (Comparable) filterData.values()[0];
+                lowerValue = (Comparable) filterData.findOneValueOnIndex(0);
                 lowerValue = formattedConversionService.convert(lowerValue, expression.getJavaType(), filterData.format());
 
-                upperValue = (Comparable) filterData.values()[1];
+                upperValue = (Comparable) filterData.findOneValueOnIndex(1);
                 upperValue = formattedConversionService.convert(upperValue, expression.getJavaType(), filterData.format());
 
                 if (filterData.ignoreCase() && expression.getJavaType().equals(String.class)) {

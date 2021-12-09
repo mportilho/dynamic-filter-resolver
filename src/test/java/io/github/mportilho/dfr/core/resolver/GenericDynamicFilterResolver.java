@@ -43,12 +43,11 @@ public class GenericDynamicFilterResolver extends AbstractDynamicFilterResolver<
         if (conditionalStatement.clauses() == null) {
             return (R) Collections.emptyList();
         }
-        List<String> list = new ArrayList<>();
+        List<Object[]> list = new ArrayList<>();
         for (FilterData filterData : conditionalStatement.clauses()) {
-            Object[] v = filterData.values();
-            if (v != null && v.length > 0) {
-                String s = v[0].toString();
-                list.add(s);
+            List<Object[]> v = filterData.values();
+            if (!v.isEmpty()) {
+                list.add(v.get(0));
             }
         }
         return (R) list;

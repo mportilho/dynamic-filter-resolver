@@ -53,8 +53,8 @@ public class TestConditionalStatement {
     @Test
     public void testOneClause() {
         List<FilterData> clauses = new ArrayList<>();
-        clauses.add(new FilterData("name", "name", new String[]{"name"}, String.class, NotEquals.class, false, false,
-                new String[]{"Blanka"}, null, null));
+        clauses.add(new FilterData("name", "name", new String[]{"name"}, String.class, NotEquals.class,
+                false, false, List.<Object[]>of(new String[]{"Blanka"}), null, null));
         ConditionalStatement condition = new ConditionalStatement("", LogicType.CONJUNCTION, false, clauses, Collections.emptyList());
 
         assertThat(condition.logicType()).isEqualByComparingTo(LogicType.CONJUNCTION);

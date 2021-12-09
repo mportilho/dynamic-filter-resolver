@@ -25,13 +25,10 @@ public interface ConditionalStatementProcessor<T> {
     /**
      * Creates a decorated filter data
      *
-     * @param <V>           Map value type
      * @param filterData    The filter parameter to be decorated
      * @param parametersMap Map containing provided values for filter operations
      * @return The decorated filter parameter
      */
-    default <V> FilterData decorateFilterData(FilterData filterData, Map<String, V[]> parametersMap) {
-        return filterData;
-    }
+    FilterData decorateFilterData(FilterData filterData, Map<String, Object[]> parametersMap);
 
 }

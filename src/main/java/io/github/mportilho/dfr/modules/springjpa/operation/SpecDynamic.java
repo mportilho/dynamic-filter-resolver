@@ -28,6 +28,7 @@ import io.github.mportilho.dfr.core.operation.FilterData;
 import io.github.mportilho.dfr.core.operation.type.Dynamic;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -48,7 +49,7 @@ class SpecDynamic<T> implements Dynamic<Specification<T>> {
     @Override
     @SuppressWarnings({"unchecked"})
     public Specification<T> createFilter(FilterData filterData, FormattedConversionService formattedConversionService) {
-        Object[] rawValues = filterData.values();
+        Object[] rawValues = filterData.values().get(0);
 
         if (rawValues != null && rawValues.length == 1 && rawValues[0] instanceof Object[] && ((Object[]) rawValues[0]).length == 2) {
             rawValues = (Object[]) rawValues[0];
@@ -72,7 +73,7 @@ class SpecDynamic<T> implements Dynamic<Specification<T>> {
 
         FilterData newFilter = new FilterData(filterData.attributePath(), filterData.path(),
                 filterData.parameters(), filterData.targetType(), filterData.operation(), filterData.negate(),
-                filterData.ignoreCase(), new Object[]{value}, filterData.format(), filterData.modifiers());
+                filterData.ignoreCase(), List.<Object[]>of(new Object[]{value}), filterData.format(), filterData.modifiers());
 
         return filterOperationService.createFilter(newFilter);
     }

@@ -47,7 +47,7 @@ class SpecIsIn<T> implements IsIn<Specification<T>> {
     public Specification<T> createFilter(FilterData filterData, FormattedConversionService formattedConversionService) {
         return (root, query, criteriaBuilder) -> {
             Expression expression = PredicateUtils.computeAttributePath(filterData, root);
-            Object[] rawValues = extractArrayFromParameter(filterData.values());
+            Object[] rawValues = extractArrayFromParameter(filterData.values().get(0));
             Predicate predicate = null;
             boolean ignoreCase = filterData.ignoreCase() && expression.getJavaType().equals(String.class);
 

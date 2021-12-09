@@ -29,8 +29,8 @@ import io.github.mportilho.dfr.core.annotation.Statement;
 import io.github.mportilho.dfr.core.operation.FilterData;
 import io.github.mportilho.dfr.core.operation.type.IsIn;
 import io.github.mportilho.dfr.core.operation.type.IsNotIn;
+import io.github.mportilho.dfr.core.processor.AbstractConditionalStatementProcessor;
 import io.github.mportilho.dfr.core.processor.ConditionalStatement;
-import io.github.mportilho.dfr.core.processor.ConditionalStatementProcessor;
 import io.github.mportilho.dfr.core.processor.LogicType;
 import io.github.mportilho.dfr.core.processor.ValueExpressionResolver;
 import org.apache.commons.collections4.MultiValuedMap;
@@ -45,19 +45,17 @@ import java.util.stream.Collectors;
 /**
  * @author Marcelo Portilho
  */
-public class ReflectionConditionalStatementProcessor implements ConditionalStatementProcessor<ReflectionParameter> {
+public class ReflectionConditionalStatementProcessor extends AbstractConditionalStatementProcessor<ReflectionParameter> {
 
     private static final Map<ReflectionParameter, MultiValuedMap<Annotation, List<Annotation>>> cache =
             new ReferenceMap<>(AbstractReferenceMap.ReferenceStrength.WEAK, AbstractReferenceMap.ReferenceStrength.SOFT);
 
-    private final ValueExpressionResolver<?> valueExpressionResolver;
-
     public ReflectionConditionalStatementProcessor() {
-        this.valueExpressionResolver = ValueExpressionResolver.EMPTY_RESOLVER;
+        super();
     }
 
     public ReflectionConditionalStatementProcessor(ValueExpressionResolver<?> valueExpressionResolver) {
-        this.valueExpressionResolver = valueExpressionResolver != null ? valueExpressionResolver : ValueExpressionResolver.EMPTY_RESOLVER;
+        super(valueExpressionResolver);
     }
 
     /**
@@ -158,7 +156,7 @@ public class ReflectionConditionalStatementProcessor implements ConditionalState
         } else if ("false".equalsIgnoreCase(strNegate)) {
             return Boolean.FALSE;
         }
-        Object negateParamResponse = computeValue(strNegate, "false", parametersMap);
+        Object negateParamResponse = computeValue(null, strNegate, parametersMap);
         if (negateParamResponse != null) {
             return Boolean.parseBoolean(negateParamResponse.toString());
         }
@@ -255,88 +253,10 @@ public class ReflectionConditionalStatementProcessor implements ConditionalState
     private List<Object[]> computeFilter(Filter filter, Map<String, Object[]> parametersMap) {
         if (filter.constantValues().length > 0) {
             return computeValues(null, filter.constantValues(), parametersMap);
+        } else if (IsIn.class.equals(filter.operation()) || IsNotIn.class.equals(filter.operation())) {
+            computeValues(filter.parameters(), new Object[]{filter.defaultValues()}, parametersMap);
         }
         return computeValues(filter.parameters(), filter.defaultValues(), parametersMap);
-    }
-
-    /**
-     *
-     */
-    private Object[] computeValue(String parameter, Object defaultValue, Map<String, Object[]> parametersMap) {
-        if (parameter != null && !parameter.isBlank()) {
-            return parametersMap.get(parameter);
-        } else {
-            Object[] values = null;
-            if (defaultValue instanceof Object[] arr) {
-                values = Arrays.stream(arr)
-                        .mapMulti((obj, mapper) -> {
-                            if (obj instanceof String str) {
-                                Object[] resolvedValue = valueExpressionResolver.resolveValue(str);
-                                mapper.accept(resolvedValue != null ? resolvedValue : str);
-                            } else {
-                                mapper.accept(obj);
-                            }
-                        }).toArray();
-            } else if (defaultValue instanceof String strValue && !strValue.isBlank()) {
-                Object[] resolvedValue = valueExpressionResolver.resolveValue(strValue);
-                values = resolvedValue != null ? resolvedValue : new Object[]{strValue};
-            }
-            return values != null ? values : new Object[]{defaultValue};
-        }
-    }
-
-    /**
-     *
-     */
-    private List<Object[]> computeValues(String[] parameters, Object[] defaultValues, Map<String, Object[]> parametersMap) {
-        if (parameters == null || parameters.length == 0) {
-            return List.<Object[]>of(computeValue(null, defaultValues, parametersMap));
-        }
-
-        List<Object[]> valueList = new ArrayList<>();
-        for (int i = 0; i < parameters.length; i++) {
-            Object defaultValue = defaultValues != null && defaultValues.length > 0 ? defaultValues[i] : null;
-            valueList.add(computeValue(parameters[i], defaultValue, parametersMap));
-        }
-        return valueList;
-
-//        if (!isEmpty(parameters) && !isEmpty(defaultValues) && parameters.length == 1 && defaultValues.length == 1) {
-//            values = computeValue(parameters[0], defaultValues[0], parametersMap);
-//        } else if (!isEmpty(parameters) && isEmpty(defaultValues) && parameters.length == 1) {
-//            values = computeValue(parameters[0], null, parametersMap);
-//        } else if (isEmpty(parameters) && !isEmpty(defaultValues) && defaultValues.length == 1) {
-//            values = computeValue(null, defaultValues[0], parametersMap);
-//        } else if (!isEmpty(parameters) && parameters.length == 1 && !isEmpty(defaultValues) && defaultValues.length > 1) {
-//            values = computeValue(parameters[0], null, parametersMap);
-//            values = values == null ? new Object[]{defaultValues} : values;
-//        } else if (!isEmpty(parameters)) {
-//            List<Object[]> list = new ArrayList<>(parameters.length);
-//            for (int i = 0; i < parameters.length; i++) {
-//                Object defaultValue = defaultValues.length > 0 ? defaultValues[i] : null;
-//                list.add(computeValue(parameters[i], defaultValue, parametersMap));
-//            }
-//            if (list.stream().allMatch(Objects::isNull)) {
-//                return null;
-//            }
-//        }
-//        return list.toArray();
-    }
-
-    /**
-     *
-     */
-    private Object[] convertToArray(Object obj) {
-        if (obj instanceof Object[] arr) {
-            return arr;
-        }
-        return new Object[]{obj};
-    }
-
-    /**
-     *
-     */
-    private boolean isEmpty(Object[] objects) {
-        return objects == null || objects.length == 0;
     }
 
     /**

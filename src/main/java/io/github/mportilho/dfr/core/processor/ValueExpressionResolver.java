@@ -34,14 +34,12 @@ package io.github.mportilho.dfr.core.processor;
 @FunctionalInterface
 public interface ValueExpressionResolver<V> {
 
-    ValueExpressionResolver<?> EMPTY_RESOLVER = v -> null;
-
     /**
      * Resolves an expression to a dynamic value
      *
      * @param value The source String value
      * @return The resolved value from the source or null if no value was found
      */
-    V[] resolveValue(String value);
+    V resolveValue(String value);
 
 }
