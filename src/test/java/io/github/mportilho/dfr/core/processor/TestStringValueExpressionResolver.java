@@ -1,6 +1,6 @@
 package io.github.mportilho.dfr.core.processor;
 
-import io.github.mportilho.dfr.core.processor.impl.StringValueExpressionResolver;
+import io.github.mportilho.dfr.core.processor.expressionresolver.StringValueExpressionResolver;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 

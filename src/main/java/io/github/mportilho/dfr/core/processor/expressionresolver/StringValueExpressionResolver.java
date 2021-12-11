@@ -1,4 +1,4 @@
-package io.github.mportilho.dfr.core.processor.impl;
+package io.github.mportilho.dfr.core.processor.expressionresolver;
 
 import io.github.mportilho.dfr.core.processor.ValueExpressionResolver;
 

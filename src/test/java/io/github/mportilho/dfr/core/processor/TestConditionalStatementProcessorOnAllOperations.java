@@ -39,7 +39,7 @@
 //    @Test
 //    public void testComparisonOperations() {
 //        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
-//        ConditionalStatement statement = provider.createConditionalStatements(new ReflectionParameter(ComparisonOperations.class, null));
+//        ConditionalStatement statement = provider.createStatements(new ReflectionParameter(ComparisonOperations.class, null));
 //        FilterData param;
 //
 //        assertThat(statement).isNotNull();
@@ -60,7 +60,7 @@
 //    @Test
 //    public void testStringComparisonOperations() {
 //        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
-//        ConditionalStatement statement = provider.createConditionalStatements(new ReflectionParameter(StringComparisonOperations.class, null));
+//        ConditionalStatement statement = provider.createStatements(new ReflectionParameter(StringComparisonOperations.class, null));
 //
 //        assertThat(statement).isNotNull();
 //        assertThat(statement.logicType()).isEqualByComparingTo(LogicType.DISJUNCTION);
@@ -72,7 +72,7 @@
 //    @Test
 //    public void testOtherComparisonOperations() {
 //        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
-//        ConditionalStatement statement = provider.createConditionalStatements(new ReflectionParameter(OtherComparisonOperations.class, null));
+//        ConditionalStatement statement = provider.createStatements(new ReflectionParameter(OtherComparisonOperations.class, null));
 //        FilterData param;
 //
 //        assertThat(statement).isNotNull();

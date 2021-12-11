@@ -1,8 +1,8 @@
 package io.github.mportilho.dfr.core.processor;
 
-import io.github.mportilho.dfr.core.processor.impl.ReflectionConditionalStatementProcessor;
-import io.github.mportilho.dfr.core.processor.impl.ReflectionParameter;
-import io.github.mportilho.dfr.core.processor.impl.StringValueExpressionResolver;
+import io.github.mportilho.dfr.core.processor.annotation.AnnotationConditionalStatementProcessor;
+import io.github.mportilho.dfr.core.processor.annotation.AnnotationProcessorParameter;
+import io.github.mportilho.dfr.core.processor.expressionresolver.StringValueExpressionResolver;
 import io.github.mportilho.dfr.mocks.ObjectValueExpressionResolver;
 import io.github.mportilho.dfr.mocks.interfaces.SearchGames;
 import org.assertj.core.api.Assertions;
@@ -23,11 +23,11 @@ public class TestValueExpressionResolver_OnStatementProcessor {
                 "${ON_SALE}", "false",
                 "${SPECIAL_CLIENT}", "true");
         StringValueExpressionResolver resolver = new StringValueExpressionResolver(valueExpressionResolverDataMap);
-        ConditionalStatementProcessor<ReflectionParameter> processor = new ReflectionConditionalStatementProcessor(resolver);
+        ConditionalStatementProcessor<AnnotationProcessorParameter> processor = new AnnotationConditionalStatementProcessor(resolver);
 
         Assertions.assertThatThrownBy(() ->
-                        processor.createConditionalStatements(new ReflectionParameter(SearchGames.class, null), Map.of()))
-                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("of path 'genre'");
+                        processor.createStatements(new AnnotationProcessorParameter(SearchGames.class, null), Map.of()))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Parameter 'genre' required");
         ;
 
     }
@@ -37,7 +37,7 @@ public class TestValueExpressionResolver_OnStatementProcessor {
         ObjectValueExpressionResolver resolver;
         Map<String, Object> valueExpressionResolverDataMap;
         Map<String, Object[]> userParameters;
-        ConditionalStatementProcessor<ReflectionParameter> processor;
+        ConditionalStatementProcessor<AnnotationProcessorParameter> processor;
         ConditionalStatement statement;
 
         valueExpressionResolverDataMap = Map.of(
@@ -46,7 +46,7 @@ public class TestValueExpressionResolver_OnStatementProcessor {
                 "${MIN_DATE}", LocalDate.of(2020, 1, 1),
                 "${MAX_DATE}", LocalDate.of(2020, 12, 31));
         resolver = new ObjectValueExpressionResolver(valueExpressionResolverDataMap);
-        processor = new ReflectionConditionalStatementProcessor(resolver);
+        processor = new AnnotationConditionalStatementProcessor(resolver);
 
         userParameters = Map.of(
                 "genre", new String[]{"rpg"},
@@ -55,7 +55,7 @@ public class TestValueExpressionResolver_OnStatementProcessor {
                 "tags", new String[]{"most_bought", "popular", "awarded"});
 
 
-        statement = processor.createConditionalStatements(new ReflectionParameter(SearchGames.class, null), userParameters);
+        statement = processor.createStatements(new AnnotationProcessorParameter(SearchGames.class, null), userParameters);
         assertThat(statement).isNotNull();
         assertThat(statement.logicType()).isNotNull().isEqualByComparingTo(LogicType.CONJUNCTION);
         assertThat(statement.negate()).isFalse();

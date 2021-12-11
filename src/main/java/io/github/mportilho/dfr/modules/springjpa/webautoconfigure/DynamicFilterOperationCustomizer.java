@@ -30,14 +30,14 @@ import io.github.mportilho.dfr.core.annotation.Statement;
 import io.github.mportilho.dfr.core.operation.type.Dynamic;
 import io.github.mportilho.dfr.core.operation.type.IsNotNull;
 import io.github.mportilho.dfr.core.operation.type.IsNull;
-import io.github.mportilho.dfr.core.processor.impl.ReflectionParameter;
+import io.github.mportilho.dfr.core.processor.annotation.AnnotationProcessorParameter;
+import io.github.mportilho.dfr.core.processor.annotation.ConditionalAnnotationUtils;
 import io.swagger.v3.core.util.AnnotationsUtils;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MultiValuedMap;
-import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.jpa.domain.Specification;
@@ -53,7 +53,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.github.mportilho.dfr.core.processor.impl.ReflectionConditionalStatementProcessor.findStatementAnnotations;
+import static io.github.mportilho.dfr.core.processor.annotation.ConditionalAnnotationUtils.findStatementAnnotations;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -96,7 +96,7 @@ public class DynamicFilterOperationCustomizer implements OperationCustomizer {
 
         Field field;
         try {
-            field = getPropertyField(parameterizedClassType, filter.path());
+            field = ConditionalAnnotationUtils.findFilterField(parameterizedClassType, filter.path());
         } catch (IllegalStateException e) {
             String location = CollectionUtils.isNotEmpty(operation.getTags()) ? operation.getTags().get(0) + "." : "";
             location += operation.getOperationId();
@@ -144,7 +144,7 @@ public class DynamicFilterOperationCustomizer implements OperationCustomizer {
                 if (filter.defaultValues() != null && filter.defaultValues().length == 1) {
                     schema.setDefault(filter.defaultValues()[0]);
                 }
-                applyBeanValidatorAnnotations(schema, field.getAnnotations());
+                applyValidations(schema, field.getAnnotations());
             }
 
             parameter.required(filter.required());
@@ -197,17 +197,13 @@ public class DynamicFilterOperationCustomizer implements OperationCustomizer {
             return Collections.emptyList();
         }
         MultiValuedMap<Annotation, List<Annotation>> statementAnnotations =
-                findStatementAnnotations(new ReflectionParameter(methodParameter.getParameterType(), methodParameter.getParameterAnnotations()));
-        Annotation[] annotations = statementAnnotations.values().stream()
+                findStatementAnnotations(new AnnotationProcessorParameter(methodParameter.getParameterType(), methodParameter.getParameterAnnotations()));
+        return statementAnnotations.values().stream()
                 .flatMap(Collection::stream)
                 .filter(a -> a.annotationType().equals(Conjunction.class) || a.annotationType().equals(Disjunction.class))
-                .toArray(Annotation[]::new);
-
-        List<Filter> specs = new ArrayList<>();
-        for (Annotation annotation : annotations) {
-            specs.addAll(composeSpecsFromParameterConfiguration(annotation));
-        }
-        return specs;
+                .map(DynamicFilterOperationCustomizer::composeSpecsFromParameterConfiguration)
+                .flatMap(Collection::stream)
+                .toList();
     }
 
     /**
@@ -232,7 +228,7 @@ public class DynamicFilterOperationCustomizer implements OperationCustomizer {
      * Applies Bean Validation's requirements on the request parameter based on the
      * annotated attribute located on the {@link Filter#path()}
      */
-    private static void applyBeanValidatorAnnotations(Schema<?> property, Annotation[] annotations) {
+    private static void applyValidations(Schema<?> property, Annotation[] annotations) {
         Map<String, Annotation> annotationMap = new HashMap<>();
         for (Annotation anno : annotations) {
             annotationMap.put(anno.annotationType().getName(), anno);
@@ -281,41 +277,6 @@ public class DynamicFilterOperationCustomizer implements OperationCustomizer {
             if (property instanceof StringSchema) {
                 property.setPattern(pattern.regexp());
             }
-        }
-    }
-
-    /**
-     * Gets the {@link Field}'s representation on the specific type
-     */
-    private static Field getPropertyField(Class<?> clazz, String fieldName) {
-        final String[] fieldNames = fieldName.split("\\.", -1);
-        // if using dot notation to navigate for classes
-        if (fieldNames.length > 1) {
-            final String firstProperty = fieldNames[0];
-            final String otherProperties = StringUtils.join(fieldNames, '.', 1, fieldNames.length);
-            final Field firstPropertyType = getPropertyField(clazz, firstProperty);
-
-            Class<?> actualClass = null;
-            if (!Object.class.equals(firstPropertyType.getType())) {
-                if (Collection.class.isAssignableFrom(firstPropertyType.getType())) {
-                    actualClass = (Class<?>) ((ParameterizedType) firstPropertyType.getGenericType()).getActualTypeArguments()[0];
-                } else {
-                    actualClass = firstPropertyType.getType();
-                }
-            }
-
-            if (actualClass != null) {
-                return getPropertyField(actualClass, otherProperties);
-            }
-        }
-
-        try {
-            return clazz.getDeclaredField(fieldName);
-        } catch (final NoSuchFieldException e) {
-            if (!clazz.getSuperclass().equals(Object.class)) {
-                return getPropertyField(clazz.getSuperclass(), fieldName);
-            }
-            throw new IllegalStateException(String.format("Field '%s' does not exist in type '%s'", fieldName, clazz.getCanonicalName()));
         }
     }
 

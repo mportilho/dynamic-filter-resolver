@@ -16,10 +16,10 @@ import java.util.Map;
  */
 public interface ConditionalStatementProcessor<T> {
 
-    ConditionalStatement createConditionalStatements(T parameter, Map<String, Object[]> parametersMap);
+    ConditionalStatement createStatements(T parameter, Map<String, Object[]> parametersMap);
 
-    default ConditionalStatement createConditionalStatements(T parameter) {
-        return createConditionalStatements(parameter, null);
+    default ConditionalStatement createStatements(T parameter) {
+        return createStatements(parameter, null);
     }
 
     /**

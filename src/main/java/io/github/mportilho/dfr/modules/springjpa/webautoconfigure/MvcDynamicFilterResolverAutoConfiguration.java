@@ -25,7 +25,7 @@ package io.github.mportilho.dfr.modules.springjpa.webautoconfigure;
 import io.github.mportilho.dfr.converters.DefaultFormattedConversionService;
 import io.github.mportilho.dfr.converters.FormattedConversionService;
 import io.github.mportilho.dfr.core.processor.ValueExpressionResolver;
-import io.github.mportilho.dfr.core.processor.impl.ReflectionConditionalStatementProcessor;
+import io.github.mportilho.dfr.core.processor.annotation.AnnotationConditionalStatementProcessor;
 import io.github.mportilho.dfr.core.resolver.DynamicFilterResolver;
 import io.github.mportilho.dfr.modules.springjpa.filter.SpecificationDynamicFilterResolver;
 import io.github.mportilho.dfr.modules.springjpa.operation.SpecificationFilterOperationService;
@@ -81,7 +81,7 @@ public class MvcDynamicFilterResolverAutoConfiguration implements EmbeddedValueR
 
                 DynamicFilterResolver<Specification<?>> dynamicFilterResolver = new SpecificationDynamicFilterResolver(
                         new SpecificationFilterOperationService(formattedConversionService));
-                ReflectionConditionalStatementProcessor processor = new ReflectionConditionalStatementProcessor(resolver);
+                AnnotationConditionalStatementProcessor processor = new AnnotationConditionalStatementProcessor(resolver);
                 resolvers.add(new SpecificationDynamicFilterArgumentResolver(processor, dynamicFilterResolver));
             }
         };
