@@ -27,7 +27,7 @@ import io.github.mportilho.dfr.converters.FormattedConversionService;
 import io.github.mportilho.dfr.core.processor.ValueExpressionResolver;
 import io.github.mportilho.dfr.core.processor.annotation.AnnotationConditionalStatementProcessor;
 import io.github.mportilho.dfr.core.resolver.DynamicFilterResolver;
-import io.github.mportilho.dfr.modules.springjpa.filter.SpecificationDynamicFilterResolver;
+import io.github.mportilho.dfr.modules.springjpa.resolver.SpecificationDynamicFilterResolver;
 import io.github.mportilho.dfr.modules.springjpa.operation.SpecificationFilterOperationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

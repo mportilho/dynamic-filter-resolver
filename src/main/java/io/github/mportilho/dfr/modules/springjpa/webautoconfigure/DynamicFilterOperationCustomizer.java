@@ -23,10 +23,10 @@ SOFTWARE.*/
 package io.github.mportilho.dfr.modules.springjpa.webautoconfigure;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import io.github.mportilho.dfr.core.annotation.Conjunction;
-import io.github.mportilho.dfr.core.annotation.Disjunction;
-import io.github.mportilho.dfr.core.annotation.Filter;
-import io.github.mportilho.dfr.core.annotation.Statement;
+import io.github.mportilho.dfr.core.processor.annotation.Conjunction;
+import io.github.mportilho.dfr.core.processor.annotation.Disjunction;
+import io.github.mportilho.dfr.core.processor.annotation.Filter;
+import io.github.mportilho.dfr.core.processor.annotation.Statement;
 import io.github.mportilho.dfr.core.operation.type.Dynamic;
 import io.github.mportilho.dfr.core.operation.type.IsNotNull;
 import io.github.mportilho.dfr.core.operation.type.IsNull;

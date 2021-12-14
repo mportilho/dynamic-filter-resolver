@@ -29,6 +29,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
+import java.util.Arrays;
 
 /**
  * Implementation of {@link IsIn} for the Spring Data JPA's
@@ -46,45 +47,22 @@ class SpecIsIn<T> implements IsIn<Specification<T>> {
     @SuppressWarnings({"rawtypes", "unchecked"})
     public Specification<T> createFilter(FilterData filterData, FormattedConversionService formattedConversionService) {
         return (root, query, criteriaBuilder) -> {
-            Expression expression = PredicateUtils.computeAttributePath(filterData, root);
-            Object[] rawValues = extractArrayFromParameter(filterData.values().get(0));
+            Expression expressionTemp = PredicateUtils.computeAttributePath(filterData, root);
+            Object[] rawValues = filterData.values().get(0);
+
             Predicate predicate = null;
-            boolean ignoreCase = filterData.ignoreCase() && expression.getJavaType().equals(String.class);
+            boolean ignoreCase = filterData.ignoreCase() && expressionTemp.getJavaType().equals(String.class);
 
             if (rawValues != null) {
-                if (ignoreCase) {
-                    expression = criteriaBuilder.upper(expression);
-                }
-
-                int size = rawValues.length;
-                Object[] value = new Object[size];
-                for (int i = 0; i < size; i++) {
-                    Object currVal = formattedConversionService.convert(rawValues[i], expression.getJavaType(), filterData.format());
-                    if (ignoreCase) {
-                        currVal = currVal != null ? currVal.toString().toUpperCase() : null;
-                    }
-                    value[i] = currVal;
-                }
-                predicate = expression.in(value);
+                Expression expression = ignoreCase ? criteriaBuilder.upper(expressionTemp) : expressionTemp;
+                Object[] arr = Arrays.stream(rawValues).map(v -> {
+                    Object valueTemp = formattedConversionService.convert(v, expression.getJavaType(), filterData.format());
+                    return ignoreCase && valueTemp != null ? valueTemp.toString().toUpperCase() : valueTemp;
+                }).toArray();
+                predicate = expression.in(arr);
             }
             return predicate;
         };
-    }
-
-    /**
-     * Normalize array parameter for 'IN' operation
-     */
-    private Object[] extractArrayFromParameter(Object[] paramValues) {
-        if (paramValues == null || paramValues.length == 0) {
-            return null;
-        } else if (paramValues.getClass().isArray()) {
-            if (paramValues.length == 1 && paramValues[0].getClass().isArray()) {
-                return (Object[]) paramValues[0];
-            }
-            return paramValues;
-        } else {
-            throw new IllegalArgumentException("Expecting parameter value to be an array");
-        }
     }
 
 }

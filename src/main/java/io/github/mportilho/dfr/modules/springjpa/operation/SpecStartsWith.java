@@ -43,6 +43,7 @@ class SpecStartsWith<T> implements StartsWith<Specification<T>> {
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings({"unchecked"})
     public Specification<T> createFilter(FilterData filterData, FormattedConversionService formattedConversionService) {
         return (root, query, criteriaBuilder) -> {
             Path<String> path = PredicateUtils.computeAttributePath(filterData, root);

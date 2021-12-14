@@ -49,18 +49,14 @@ class SpecBetween<T> implements Between<Specification<T>> {
             Comparable lowerValue;
             Comparable upperValue;
 
-            if (filterData.values() == null) {
+            if (filterData.values().isEmpty()) {
                 lowerValue = null;
                 upperValue = null;
-            } else if (filterData.values().size() != 2) {
-                throw new IllegalStateException(
-                        "'Between' type operations need 2 arguments on path " + filterData.path());
             } else {
-                lowerValue = (Comparable) filterData.findOneValueOnIndex(0);
-                lowerValue = formattedConversionService.convert(lowerValue, expression.getJavaType(), filterData.format());
-
-                upperValue = (Comparable) filterData.findOneValueOnIndex(1);
-                upperValue = formattedConversionService.convert(upperValue, expression.getJavaType(), filterData.format());
+                lowerValue = formattedConversionService.convert(filterData.findOneValueOnIndex(0),
+                        expression.getJavaType(), filterData.format());
+                upperValue = formattedConversionService.convert(filterData.findOneValueOnIndex(1),
+                        expression.getJavaType(), filterData.format());
 
                 if (filterData.ignoreCase() && expression.getJavaType().equals(String.class)) {
                     expression = criteriaBuilder.upper((Expression) expression);
@@ -68,7 +64,6 @@ class SpecBetween<T> implements Between<Specification<T>> {
                     upperValue = upperValue != null ? upperValue.toString().toUpperCase() : null;
                 }
             }
-
             return criteriaBuilder.between(expression, lowerValue, upperValue);
         };
     }

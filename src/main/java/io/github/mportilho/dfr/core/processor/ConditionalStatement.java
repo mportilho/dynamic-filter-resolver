@@ -24,7 +24,6 @@ package io.github.mportilho.dfr.core.processor;
 
 import io.github.mportilho.dfr.core.operation.FilterData;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -52,22 +51,35 @@ public record ConditionalStatement(
         return clauses.stream().filter(c -> path.equals(c.path())).findFirst();
     }
 
-    public List<ConditionalStatement> findStatementsById(String id) {
-        List<ConditionalStatement> statementList = new ArrayList<>();
-        findStatementsById(id, this, statementList);
-        return statementList;
+    public Optional<ConditionalStatement> findStatementsById(String id) {
+        return findStatementsById(id, this);
     }
 
-    private void findStatementsById(String id, ConditionalStatement stmt, List<ConditionalStatement> statementList) {
+    private Optional<ConditionalStatement> findStatementsById(String id, ConditionalStatement stmt) {
         if (stmt.id.equals(id)) {
-            statementList.add(stmt);
+            return Optional.of(stmt);
         }
         if (stmt.oppositeStatements != null) {
             for (ConditionalStatement subStatement : stmt.oppositeStatements) {
-                findStatementsById(id, subStatement, statementList);
+                Optional<ConditionalStatement> optStatement = findStatementsById(id, subStatement);
+                if (optStatement.isPresent()) {
+                    return optStatement;
+                }
             }
         }
+        return Optional.empty();
     }
+
+//    private void findStatementsById(String id, ConditionalStatement stmt, List<ConditionalStatement> statementList) {
+//        if (stmt.id.equals(id)) {
+//            statementList.add(stmt);
+//        }
+//        if (stmt.oppositeStatements != null) {
+//            for (ConditionalStatement subStatement : stmt.oppositeStatements) {
+//                findStatementsById(id, subStatement, statementList);
+//            }
+//        }
+//    }
 
     /**
      * @return An indication that this statement has no clauses nor sub-statements

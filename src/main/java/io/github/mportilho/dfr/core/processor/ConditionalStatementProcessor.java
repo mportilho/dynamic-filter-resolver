@@ -10,25 +10,25 @@ import java.util.Map;
  *
  * <p>
  * Validations of any kind about the required values must not be made here, to
- * provide more flexibility to {@link FilterOperator} implementations
+ * provide more flexibility to filter operation implementations
  *
  * @author Marcelo Portilho
  */
 public interface ConditionalStatementProcessor<T> {
 
-    ConditionalStatement createStatements(T parameter, Map<String, Object[]> parametersMap);
+    ConditionalStatement createStatements(T parameter, Map<String, Object[]> userParameters);
 
-    default ConditionalStatement createStatements(T parameter) {
-        return createStatements(parameter, null);
+    default ConditionalStatement createStatements(T userParameters) {
+        return createStatements(userParameters, null);
     }
 
     /**
      * Creates a decorated filter data
      *
-     * @param filterData    The filter parameter to be decorated
-     * @param parametersMap Map containing provided values for filter operations
+     * @param filterData     The filter parameter to be decorated
+     * @param userParameters Map containing provided values for filter operations
      * @return The decorated filter parameter
      */
-    FilterData decorateFilterData(FilterData filterData, Map<String, Object[]> parametersMap);
+    FilterData decorateFilterData(FilterData filterData, Map<String, Object[]> userParameters);
 
 }

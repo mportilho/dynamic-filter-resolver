@@ -32,21 +32,22 @@ public record FilterData(
         if (values == null || values.isEmpty() || (values.size() == 1 && values.get(0) == null)) {
             return null;
         } else if (values.size() > 1 || (values.get(0) != null && values.get(0).length > 1)) {
-            throw new IllegalStateException("Multiple values found while fetching a single one");
+            throw new IllegalStateException(String.format("Multiple values found while fetching a single one for path [%s]", path));
         }
         return values.get(0)[0];
     }
 
     public Object findOneValueOnIndex(int i) {
-        if (values == null || values.isEmpty()) {
+        if (values.isEmpty()) {
             return null;
-        } else if (i > values.size()) {
-            throw new ArrayIndexOutOfBoundsException("Accessing nonexistent value list index %s on path " + path);
+        } else if (i >= values.size()) {
+            throw new ArrayIndexOutOfBoundsException(
+                    String.format("Accessing nonexistent value index [%s] for path [%s]", i, path));
         }
         Object[] objects = values.get(i);
         if (objects != null && objects.length > 0) {
             if (objects.length > 1) {
-                throw new IllegalStateException("Multiple values found while fetching a single one");
+                throw new IllegalStateException(String.format("Multiple values found while fetching a single one for path [%s]", path));
             }
             return objects[0];
         }

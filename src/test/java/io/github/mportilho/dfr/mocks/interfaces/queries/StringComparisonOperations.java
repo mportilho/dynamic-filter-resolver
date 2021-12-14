@@ -23,8 +23,8 @@ SOFTWARE.*/
 package io.github.mportilho.dfr.mocks.interfaces.queries;
 
 
-import io.github.mportilho.dfr.core.annotation.Disjunction;
-import io.github.mportilho.dfr.core.annotation.Filter;
+import io.github.mportilho.dfr.core.processor.annotation.Disjunction;
+import io.github.mportilho.dfr.core.processor.annotation.Filter;
 import io.github.mportilho.dfr.core.operation.type.*;
 
 @Disjunction(value = {

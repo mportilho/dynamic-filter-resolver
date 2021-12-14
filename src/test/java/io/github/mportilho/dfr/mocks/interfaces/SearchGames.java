@@ -1,7 +1,7 @@
 package io.github.mportilho.dfr.mocks.interfaces;
 
-import io.github.mportilho.dfr.core.annotation.Conjunction;
-import io.github.mportilho.dfr.core.annotation.Filter;
+import io.github.mportilho.dfr.core.processor.annotation.Conjunction;
+import io.github.mportilho.dfr.core.processor.annotation.Filter;
 import io.github.mportilho.dfr.core.operation.type.Between;
 import io.github.mportilho.dfr.core.operation.type.Equals;
 import io.github.mportilho.dfr.core.operation.type.IsIn;

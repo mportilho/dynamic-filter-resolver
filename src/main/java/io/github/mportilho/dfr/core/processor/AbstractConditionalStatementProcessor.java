@@ -47,17 +47,25 @@ public abstract class AbstractConditionalStatementProcessor<T> implements Condit
                 return Arrays.stream(arr)
                         .mapMulti((obj, mapper) -> {
                             if (obj instanceof String str) {
-                                Object resolvedValue = valueExpressionResolver.resolveValue(str);
+                                Object resolvedValue = applyExpressionResolver(str);
                                 mapper.accept(resolvedValue != null ? resolvedValue : str);
                             } else {
                                 mapper.accept(obj);
                             }
                         }).toArray();
             } else if (defaultValue instanceof String strValue && !strValue.isBlank()) {
-                Object resolvedValue = valueExpressionResolver.resolveValue(strValue);
+                Object resolvedValue = applyExpressionResolver(strValue);
                 return resolvedValue != null ? new Object[]{resolvedValue} : new Object[]{strValue};
             }
             return null;
+        }
+    }
+
+    private Object applyExpressionResolver(String value) {
+        try {
+            return valueExpressionResolver.resolveValue(value);
+        } catch (Exception e) {
+            throw new IllegalStateException("Expression Resolver Provided threw an error", e);
         }
     }
 

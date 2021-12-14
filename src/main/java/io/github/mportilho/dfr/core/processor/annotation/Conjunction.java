@@ -20,31 +20,49 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.*/
 
-package io.github.mportilho.dfr.core.annotation;
+package io.github.mportilho.dfr.core.processor.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Defines a statement of logic clauses
- * 
- * @author Marcelo Portilho
+ * Defines a set of clauses and logic statements using 'AND' as the main logic
+ * operation.
  *
+ * @author Marcelo Portilho
  */
 @Documented
 @Retention(RUNTIME)
-public @interface Statement {
+@Target({PARAMETER, TYPE})
+public @interface Conjunction {
 
-	/**
-	 * @return An array of logic clauses
-	 */
-	Filter[] value();
+    /**
+     * @return An array of clauses joined by AND logic operation
+     */
+    Filter[] value() default {};
 
-	/**
-	 * @return a boolean indicating if the whole statement must be negated
-	 */
-	String negate() default "false";
+    /**
+     * Defines a set of statements where clauses of each statement are joined by OR
+     * operation. At the end, the statements are joined by the AND operation,
+     * following this logic:
+     *
+     * <p>
+     * (<code>clause1</code> <b>AND</b> <code>clause2</code>) <b>AND</b>
+     * [disjunction1(<code>clause3</code> <b>OR</b> <code>clause4</code>) <b>AND</b>
+     * disjunction2(<code>clause5</code> <b>OR</b> <code>clause6</code>) ]
+     *
+     * @return An array of statements joined by AND operation
+     */
+    Statement[] disjunctions() default {};
+
+    /**
+     * @return Indicates that the whole conjunction result is negated
+     */
+    String negate() default "false";
 
 }

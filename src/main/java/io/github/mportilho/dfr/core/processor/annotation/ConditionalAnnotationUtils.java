@@ -1,7 +1,5 @@
 package io.github.mportilho.dfr.core.processor.annotation;
 
-import io.github.mportilho.dfr.core.annotation.Conjunction;
-import io.github.mportilho.dfr.core.annotation.Disjunction;
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.map.AbstractReferenceMap;
 import org.apache.commons.collections4.map.ReferenceMap;

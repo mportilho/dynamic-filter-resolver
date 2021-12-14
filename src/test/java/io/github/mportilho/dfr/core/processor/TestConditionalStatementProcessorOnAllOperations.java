@@ -1,41 +1,39 @@
-///*MIT License
-//
-//Copyright (c) 2021 Marcelo Portilho
-//
-//Permission is hereby granted, free of charge, to any person obtaining a copy
-//of this software and associated documentation files (the "Software"), to deal
-//in the Software without restriction, including without limitation the rights
-//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//copies of the Software, and to permit persons to whom the Software is
-//furnished to do so, subject to the following conditions:
-//
-//The above copyright notice and this permission notice shall be included in all
-//copies or substantial portions of the Software.
-//
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-//SOFTWARE.*/
-//
-//package io.github.mportilho.dfr.core.processor;
-//
-//import io.github.mportilho.dfr.core.operation.FilterData;
-//import io.github.mportilho.dfr.core.operation.type.*;
-//import io.github.mportilho.dfr.core.processor.impl.ReflectionConditionalStatementProcessor;
-//import io.github.mportilho.dfr.core.processor.impl.ReflectionParameter;
-//import io.github.mportilho.dfr.mocks.interfaces.queries.ComparisonOperations;
-//import io.github.mportilho.dfr.mocks.interfaces.queries.OtherComparisonOperations;
-//import io.github.mportilho.dfr.mocks.interfaces.queries.StringComparisonOperations;
-//import org.junit.jupiter.api.Test;
-//import static org.assertj.core.api.Assertions.*;
-//
-//import java.util.Arrays;
-//
-//public class TestConditionalStatementProcessorOnAllOperations {
-//
+/*MIT License
+
+Copyright (c) 2021 Marcelo Portilho
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.*/
+
+package io.github.mportilho.dfr.core.processor;
+
+import io.github.mportilho.dfr.core.operation.FilterData;
+import io.github.mportilho.dfr.core.operation.type.*;
+import io.github.mportilho.dfr.mocks.interfaces.queries.ComparisonOperations;
+import io.github.mportilho.dfr.mocks.interfaces.queries.OtherComparisonOperations;
+import io.github.mportilho.dfr.mocks.interfaces.queries.StringComparisonOperations;
+import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.*;
+
+import java.util.Arrays;
+
+public class TestConditionalStatementProcessorOnAllOperations {
+
 //    @Test
 //    public void testComparisonOperations() {
 //        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
@@ -56,7 +54,7 @@
 //                new String[]{"01/01/2000"}
 //        ).toArray());
 //    }
-//
+
 //    @Test
 //    public void testStringComparisonOperations() {
 //        ReflectionConditionalStatementProcessor provider = new ReflectionConditionalStatementProcessor();
@@ -95,5 +93,5 @@
 //        assertThat(param.values()).isNotEmpty().hasSize(1);
 //        assertThat((Object[]) param.values()[0]).isNotEmpty().hasSize(3).containsExactlyInAnyOrder("1010", "1020", "1030");
 //    }
-//
-//}
+
+}

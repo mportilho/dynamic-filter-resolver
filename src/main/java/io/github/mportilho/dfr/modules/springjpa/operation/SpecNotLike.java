@@ -43,6 +43,7 @@ class SpecNotLike<T> implements NotLike<Specification<T>> {
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings({"unchecked"})
     public Specification<T> createFilter(FilterData filterData, FormattedConversionService formattedConversionService) {
         return (root, query, criteriaBuilder) -> {
             Path<String> path = PredicateUtils.computeAttributePath(filterData, root);
@@ -56,7 +57,6 @@ class SpecNotLike<T> implements NotLike<Specification<T>> {
                 expression = path;
                 value = value != null ? "%" + value + "%" : null;
             }
-
             return criteriaBuilder.notLike(expression, value);
         };
     }

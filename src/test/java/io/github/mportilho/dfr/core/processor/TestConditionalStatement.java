@@ -24,6 +24,7 @@ package io.github.mportilho.dfr.core.processor;
 
 import io.github.mportilho.dfr.core.operation.FilterData;
 import io.github.mportilho.dfr.core.operation.type.NotEquals;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
 
@@ -55,13 +56,18 @@ public class TestConditionalStatement {
         List<FilterData> clauses = new ArrayList<>();
         clauses.add(new FilterData("name", "name", new String[]{"name"}, String.class, NotEquals.class,
                 false, false, List.<Object[]>of(new String[]{"Blanka"}), null, null));
-        ConditionalStatement condition = new ConditionalStatement("", LogicType.CONJUNCTION, false, clauses, Collections.emptyList());
+        ConditionalStatement condition = new ConditionalStatement("nameQuery", LogicType.CONJUNCTION, false, clauses, Collections.emptyList());
 
         assertThat(condition.logicType()).isEqualByComparingTo(LogicType.CONJUNCTION);
         assertThat(condition.isConjunction()).isTrue();
         assertThat(condition.negate()).isFalse();
-        assertThat(condition.clauses()).isNotNull().isNotEmpty().hasSize(1).flatExtracting("values").contains("Blanka");
         assertThat(condition.oppositeStatements()).isEmpty();
+        assertThat(condition.clauses()).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(condition.findClauseByPath("name"))
+                .isNotEmpty()
+                .get().extracting("values").asInstanceOf(InstanceOfAssertFactories.list(Object[].class))
+                .containsExactly(new String[]{"Blanka"});
+
     }
 
 }

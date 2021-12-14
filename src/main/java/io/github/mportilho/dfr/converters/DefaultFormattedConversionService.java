@@ -8,6 +8,7 @@ import java.time.*;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class DefaultFormattedConversionService implements FormattedConversionService {
 
@@ -25,7 +26,18 @@ public class DefaultFormattedConversionService implements FormattedConversionSer
     @Override
     @SuppressWarnings("unchecked")
     public <S, T, F> T convert(S source, Class<T> targetType, F format) {
+        Objects.requireNonNull(targetType, "Target Type must be provided");
+        if (source == null) {
+            return null;
+        }
         FormattedConverter<S, T, F> converter = (FormattedConverter<S, T, F>) formattedConverters.get(new ConvertMapping(source.getClass(), targetType));
+        if (converter == null) {
+            if (targetType.isInstance(source)) {
+                return (T) source;
+            }
+            throw new IllegalStateException(String.format("No converter found for source type [%s] and target type [%s]",
+                    source.getClass().getCanonicalName(), targetType.getCanonicalName()));
+        }
         return converter.convert(source, format);
     }
 

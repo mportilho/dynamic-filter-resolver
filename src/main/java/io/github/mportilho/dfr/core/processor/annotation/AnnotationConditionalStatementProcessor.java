@@ -22,10 +22,6 @@ SOFTWARE.*/
 
 package io.github.mportilho.dfr.core.processor.annotation;
 
-import io.github.mportilho.dfr.core.annotation.Conjunction;
-import io.github.mportilho.dfr.core.annotation.Disjunction;
-import io.github.mportilho.dfr.core.annotation.Filter;
-import io.github.mportilho.dfr.core.annotation.Statement;
 import io.github.mportilho.dfr.core.operation.FilterData;
 import io.github.mportilho.dfr.core.operation.type.IsIn;
 import io.github.mportilho.dfr.core.operation.type.IsNotIn;
@@ -58,8 +54,8 @@ public class AnnotationConditionalStatementProcessor extends AbstractConditional
      * {@inheritDoc}
      */
     @Override
-    public ConditionalStatement createStatements(AnnotationProcessorParameter parameter, Map<String, Object[]> filterParameters) {
-        Map<String, Object[]> parametersMap = filterParameters != null ? filterParameters : Collections.emptyMap();
+    public ConditionalStatement createStatements(AnnotationProcessorParameter parameter, Map<String, Object[]> userParameters) {
+        Map<String, Object[]> parametersMap = userParameters != null ? userParameters : Collections.emptyMap();
         List<ConditionalStatement> statements = new ArrayList<>();
         MultiValuedMap<Annotation, List<Annotation>> statementAnnotations = findStatementAnnotations(parameter);
 
@@ -75,7 +71,7 @@ public class AnnotationConditionalStatementProcessor extends AbstractConditional
         } else if (statements.size() == 1) {
             return statements.get(0);
         }
-        return new ConditionalStatement("conjunction_wrapper", LogicType.DISJUNCTION, false, Collections.emptyList(), statements);
+        return new ConditionalStatement("conditional_wrapper", LogicType.DISJUNCTION, false, Collections.emptyList(), statements);
     }
 
     /**
@@ -91,7 +87,7 @@ public class AnnotationConditionalStatementProcessor extends AbstractConditional
     /**
      *
      */
-    private ConditionalStatement createStatements(String stmtId, Annotation annotation, Map<String, Object[]> parametersMap) {
+    private ConditionalStatement createStatements(String stmtId, Annotation annotation, Map<String, Object[]> userParameters) {
         if (annotation == null) {
             return null;
         }
@@ -104,18 +100,18 @@ public class AnnotationConditionalStatementProcessor extends AbstractConditional
             Statement[] statements = conjunction != null ? conjunction.disjunctions() : disjunction.conjunctions();
 
             String strNegate = conjunction != null ? conjunction.negate() : disjunction.negate();
-            boolean negate = computeNegatingParameter(strNegate, parametersMap);
+            boolean negate = computeNegatingParameter(stmtId, strNegate, userParameters);
 
-            List<FilterData> clauses = createFilterData(filters, parametersMap);
+            List<FilterData> clauses = createFilterData(filters, userParameters);
             List<ConditionalStatement> oppositeConditionals = new ArrayList<>();
             int i = 0;
             for (Statement stmt : statements) {
-                List<FilterData> params = createFilterData(stmt.value(), parametersMap);
+                List<FilterData> params = createFilterData(stmt.value(), userParameters);
                 if (!params.isEmpty()) {
+                    String subStmtName = stmtId + "_subStatements_" + i++;
                     oppositeConditionals.add(new ConditionalStatement(
-                            stmtId + "_subStatements_" + i++,
-                            logicType.opposite(),
-                            computeNegatingParameter(stmt.negate(), parametersMap),
+                            subStmtName, logicType.opposite(),
+                            computeNegatingParameter(subStmtName, stmt.negate(), userParameters),
                             params, Collections.emptyList()));
                 }
             }
@@ -131,23 +127,7 @@ public class AnnotationConditionalStatementProcessor extends AbstractConditional
     /**
      *
      */
-    private Boolean computeNegatingParameter(String strNegate, Map<String, Object[]> parametersMap) {
-        if ("true".equalsIgnoreCase(strNegate)) {
-            return Boolean.TRUE;
-        } else if ("false".equalsIgnoreCase(strNegate)) {
-            return Boolean.FALSE;
-        }
-        Object negateParamResponse = computeValue(null, strNegate, parametersMap);
-        if (negateParamResponse != null) {
-            return Boolean.parseBoolean(negateParamResponse.toString());
-        }
-        return Boolean.FALSE;
-    }
-
-    /**
-     *
-     */
-    private List<FilterData> createFilterData(Filter[] filters, Map<String, Object[]> parametersMap) {
+    private List<FilterData> createFilterData(Filter[] filters, Map<String, Object[]> userParameters) {
         if (filters == null || filters.length == 0) {
             return Collections.emptyList();
         }
@@ -157,7 +137,7 @@ public class AnnotationConditionalStatementProcessor extends AbstractConditional
 
         List<FilterData> filterParameters = new ArrayList<>();
         for (Filter filter : filters) {
-            List<Object[]> values = computeFilter(filter, parametersMap);
+            List<Object[]> values = computeFilter(filter, userParameters);
 
             if (values.isEmpty()) {
                 if (filter.required()) {
@@ -168,28 +148,16 @@ public class AnnotationConditionalStatementProcessor extends AbstractConditional
                 continue;
             }
 
-            boolean negate = computeNegatingParameter(filter.negate(), parametersMap);
-            String format = computeFormatParameter(filter, parametersMap);
+            boolean negate = computeNegatingParameter(filter.path(), filter.negate(), userParameters);
+            String format = computeFormatParameter(filter, userParameters);
             Map<String, String> modifiers = computeModifiersMap(filter.modifiers());
 
             FilterData parameter = new FilterData(filter.attributePath(), filter.path(), filter.parameters(), filter.targetType(),
                     filter.operation(), negate, filter.ignoreCase(), values, format, modifiers);
-            parameter = decorateFilterData(parameter, parametersMap);
+            parameter = decorateFilterData(parameter, userParameters);
             filterParameters.add(parameter);
         }
         return filterParameters;
-    }
-
-    /**
-     *
-     */
-    private List<Object[]> computeFilter(Filter filter, Map<String, Object[]> parametersMap) {
-        if (filter.constantValues().length > 0) {
-            return computeValues(null, filter.constantValues(), parametersMap);
-        } else if (IsIn.class.equals(filter.operation()) || IsNotIn.class.equals(filter.operation())) {
-            computeValues(filter.parameters(), new Object[]{filter.defaultValues()}, parametersMap);
-        }
-        return computeValues(filter.parameters(), filter.defaultValues(), parametersMap);
     }
 
     /**
@@ -219,6 +187,42 @@ public class AnnotationConditionalStatementProcessor extends AbstractConditional
     /**
      *
      */
+    private List<Object[]> computeFilter(Filter filter, Map<String, Object[]> userParameters) {
+        if (filter.constantValues().length > 0) {
+            return computeValues(null, filter.constantValues(), userParameters);
+        } else if (IsIn.class.equals(filter.operation()) || IsNotIn.class.equals(filter.operation())) {
+            computeValues(filter.parameters(), new Object[]{filter.defaultValues()}, userParameters);
+        }
+        return computeValues(filter.parameters(), filter.defaultValues(), userParameters);
+    }
+
+    /**
+     *
+     */
+    private Boolean computeNegatingParameter(String elementName, String strNegate, Map<String, Object[]> userParameters) {
+        if ("true".equalsIgnoreCase(strNegate)) {
+            return Boolean.TRUE;
+        } else if ("false".equalsIgnoreCase(strNegate)) {
+            return Boolean.FALSE;
+        }
+
+        Object[] negateParamResponse = computeValue(null, strNegate, userParameters);
+        if (negateParamResponse != null && negateParamResponse.length > 0) {
+            Object responseValue = negateParamResponse[0];
+            if (responseValue instanceof Object[] arr && arr.length > 1) {
+                throw new IllegalStateException("Attribute 'negate' parsing produced more than one value for element " + elementName);
+            } else if (responseValue instanceof Object[] arr && arr.length == 1) {
+                return Boolean.parseBoolean(arr[0].toString());
+            } else if (responseValue != null) {
+                return Boolean.parseBoolean(responseValue.toString());
+            }
+        }
+        return Boolean.FALSE;
+    }
+
+    /**
+     *
+     */
     private Map<String, String> computeModifiersMap(String[] modifiers) {
         if (modifiers.length == 0) {
             return Collections.emptyMap();
@@ -236,13 +240,16 @@ public class AnnotationConditionalStatementProcessor extends AbstractConditional
     /**
      *
      */
-    private String computeFormatParameter(Filter filter, Map<String, Object[]> parametersMap) {
-        Object[] formatParamValueArray = computeValue(null, filter.format(), parametersMap);
-        if (formatParamValueArray != null) {
-            if (formatParamValueArray.length > 1) {
-                throw new IllegalStateException("Attribute 'format' have more than one value for path " + filter.path());
-            } else if (formatParamValueArray.length == 1) {
-                return formatParamValueArray[0].toString();
+    private String computeFormatParameter(Filter filter, Map<String, Object[]> userParameters) {
+        Object[] formatParamValueArray = computeValue(null, filter.format(), userParameters);
+        if (formatParamValueArray != null && formatParamValueArray.length > 0) {
+            Object formatValue = formatParamValueArray[0];
+            if (formatValue instanceof Object[] arr && arr.length > 1) {
+                throw new IllegalStateException("Attribute 'format' parsing produced more than one value for path " + filter.path());
+            } else if (formatValue instanceof Object[] arr && arr.length == 1) {
+                return arr[0].toString();
+            } else if (formatValue != null) {
+                return formatValue.toString();
             }
         }
         return filter.format();
