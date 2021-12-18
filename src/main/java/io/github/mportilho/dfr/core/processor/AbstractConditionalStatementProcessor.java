@@ -65,7 +65,7 @@ public abstract class AbstractConditionalStatementProcessor<T> implements Condit
         try {
             return valueExpressionResolver.resolveValue(value);
         } catch (Exception e) {
-            throw new IllegalStateException("Expression Resolver Provided threw an error", e);
+            throw new IllegalStateException("Provided expression resolver threw an error", e);
         }
     }
 

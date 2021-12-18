@@ -78,7 +78,7 @@ public class ConditionalAnnotationUtils {
      */
     protected static List<Class<?>> extractProcessableInterfaces(Class<?> clazz) {
         if (clazz == null) {
-            return null;
+            return Collections.emptyList();
         }
         List<Class<?>> interfacesFound = new ArrayList<>();
         interfacesFound.add(clazz);

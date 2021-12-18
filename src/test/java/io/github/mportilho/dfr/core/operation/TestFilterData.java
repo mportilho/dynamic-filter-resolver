@@ -47,7 +47,7 @@ public class TestFilterData {
 
         assertThat(fdMultipleValues.values()).isNotEmpty().contains(new Integer[]{1, 2, 3});
         assertThatThrownBy(fdMultipleValues::findOneValue).isInstanceOf(IllegalStateException.class)
-                .hasMessage("Multiple values found while fetching a single one");
+                .hasMessage("Multiple values found while fetching a single one for path [p]");
         assertThat(fdMultipleValues.findModifier("teste")).isNull();
         assertThat(fdMultipleValues.findModifier("a")).isEqualTo("1");
         assertThat(fdMultipleValues.findModifier("b")).isEqualTo("2");
@@ -57,7 +57,7 @@ public class TestFilterData {
     public void test_DataFilter_ForBetweenOperation() {
         FilterData fdValuesOnBetweenOps = new FilterData("", "p",
                 new String[]{"date1", "date2"}, null,
-                Between.class, false, false, List.<Object[]>of
+                Between.class, false, false, List.of
                 (
                         new Object[]{LocalDate.of(2000, 1, 1)},
                         new Object[]{LocalDate.of(2020, 12, 31)}
@@ -70,7 +70,7 @@ public class TestFilterData {
         assertThat(fdValuesOnBetweenOps.findOneValueOnIndex(0)).isEqualTo(LocalDate.of(2000, 1, 1));
         assertThat(fdValuesOnBetweenOps.findOneValueOnIndex(1)).isEqualTo(LocalDate.of(2020, 12, 31));
         assertThatThrownBy(fdValuesOnBetweenOps::findOneValue).isInstanceOf(IllegalStateException.class)
-                .hasMessage("Multiple values found while fetching a single one");
+                .hasMessage("Multiple values found while fetching a single one for path [p]");
         assertThat(fdValuesOnBetweenOps.findModifier("teste")).isNull();
     }
 
@@ -91,9 +91,9 @@ public class TestFilterData {
         assertThat(fdMultiDataArray.findOneValueOnIndex(0)).isEqualTo(new Object[]{1, 2, 3});
         assertThat(fdMultiDataArray.findOneValueOnIndex(1)).isEqualTo(new Object[]{5, 6, 7});
         assertThatThrownBy(() -> fdMultiDataArray.findOneValueOnIndex(2)).isInstanceOf(IllegalStateException.class)
-                .hasMessage("Multiple values found while fetching a single one");
+                .hasMessage("Multiple values found while fetching a single one for path [p]");
         assertThatThrownBy(() -> fdMultiDataArray.findOneValueOnIndex(3)).isInstanceOf(IndexOutOfBoundsException.class)
-                .hasMessage("Accessing nonexistent index on field 'values' for path 'p'");
+                .hasMessage("Accessing nonexistent value index [3] for path [p]");
     }
 
 }
