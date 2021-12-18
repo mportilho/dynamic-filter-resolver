@@ -3,6 +3,7 @@ package io.github.mportilho.dfr.converters;
 
 import io.github.mportilho.dfr.converters.impl.*;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.Date;
@@ -60,6 +61,10 @@ public class DefaultFormattedConversionService implements FormattedConversionSer
         formattedConverters.put(new ConvertMapping(String.class, java.sql.Date.class), new StringToJavaSqlDateConverter());
         formattedConverters.put(new ConvertMapping(String.class, Timestamp.class), new StringToTimestampConverter());
         formattedConverters.put(new ConvertMapping(String.class, Boolean.class), new StringToBooleanConverter());
+        formattedConverters.put(new ConvertMapping(String.class, BigDecimal.class), new StringToBigDecimalConverter());
+
+        formattedConverters.put(new ConvertMapping(BigDecimal.class, String.class), new BigDecimalToStringConverter());
+
         return formattedConverters;
     }
 

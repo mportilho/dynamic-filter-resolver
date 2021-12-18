@@ -28,8 +28,11 @@ import io.github.mportilho.dfr.core.operation.FilterData;
 import io.github.mportilho.dfr.core.operation.type.Dynamic;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * The implementation of {@link Dynamic} operation for Spring Data JPA's
@@ -41,21 +44,20 @@ import java.util.Objects;
 class SpecDynamic<T> implements Dynamic<Specification<T>> {
 
     private final SpecificationFilterOperationService filterOperationService;
+    private final Set<String> comparisonOperationNames;
 
     public SpecDynamic(SpecificationFilterOperationService filterOperationService) {
-        this.filterOperationService = Objects.requireNonNull(filterOperationService, "A filter operation service is required");
+        this.filterOperationService = Objects.requireNonNull(filterOperationService, "Filter Operation Service required");
+        this.comparisonOperationNames = Arrays.stream(ComparisonOperation.values()).map(Enum::name)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     @Override
     @SuppressWarnings({"unchecked"})
     public Specification<T> createFilter(FilterData filterData, FormattedConversionService formattedConversionService) {
         Object[] rawValues = filterData.values().get(0);
-
-        if (rawValues != null && rawValues.length == 1 && rawValues[0] instanceof Object[] && ((Object[]) rawValues[0]).length == 2) {
-            rawValues = (Object[]) rawValues[0];
-        } else if (rawValues == null || rawValues.length != 2) {
-            throw new IllegalArgumentException(
-                    "Wrong number of values for dynamic operation. The value array must contain the filtering value and the corresponding operation");
+        if (rawValues == null || rawValues.length != 2) {
+            throw new IllegalArgumentException("Must provide only operation and value for dynamic query");
         }
 
         Object value;
@@ -67,24 +69,23 @@ class SpecDynamic<T> implements Dynamic<Specification<T>> {
             if (comparisonOperation != null) {
                 value = rawValues[0];
             } else {
-                throw new IllegalArgumentException("No valid operation was informed for dynamic comparison");
+                throw new IllegalArgumentException("Must provide only operation and value for dynamic query");
             }
         }
 
         FilterData newFilter = new FilterData(filterData.attributePath(), filterData.path(),
-                filterData.parameters(), filterData.targetType(), filterData.operation(), filterData.negate(),
+                filterData.parameters(), filterData.targetType(), comparisonOperation.getOperation(), filterData.negate(),
                 filterData.ignoreCase(), List.<Object[]>of(new Object[]{value}), filterData.format(), filterData.modifiers());
 
         return filterOperationService.createFilter(newFilter);
     }
 
-    private static ComparisonOperation convertComparisonOperation(Object value) {
-        if (value == null) {
-            return null;
-        } else if (value instanceof String temp) {
-            return ComparisonOperation.valueOf(temp.toUpperCase());
+    private ComparisonOperation convertComparisonOperation(Object value) {
+        if (value instanceof String temp && temp.length() == 2) {
+            String upper = temp.toUpperCase();
+            return comparisonOperationNames.contains(upper) ? ComparisonOperation.valueOf(upper) : null;
         }
-        return value instanceof ComparisonOperation temp ? temp : null;
+        return value instanceof ComparisonOperation operation ? operation : null;
     }
 
 }
